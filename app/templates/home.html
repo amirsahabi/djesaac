@@ -8,11 +8,18 @@
     <table class='responstable'>
         <tr>
             <th>Number</th>
-            <th>Song Name</th>
-            <th>Artist</th>
+            <th>Title</th>
             <th>Link</th>
-            <th>Length</th>
         </tr>
+        {% set count = 0 %}
+        {% for song in songs %}
+            <tr>
+                <td>{{count}}</td>
+                <td>{{song.songTitle}}</td>
+                <td><a href="{{song.songLink}}">Link</a></td>
+            </tr>
+            {% set count = count + 1 %}
+        {% endfor %}
     </table>
 </body>
 </html>
