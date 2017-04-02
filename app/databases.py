@@ -11,3 +11,16 @@ db = SqliteExtDatabase('djesaac.db')
 class Base(Model):
     class Meta:
         database = db
+
+class History(Base):
+    uuid            = UUIDField()
+    songName        = CharField()
+    songArtist      = CharField()
+    songLink        = CharField()
+    dateTimePlayed  = DateTimeField()
+
+class SongQueue(Base):
+    uuid        = UUIDField()
+    songName    = CharField()
+    songArtist  = CharField()
+    songLink    = CharField()
