@@ -14,7 +14,7 @@
         {% set count = 0 %}
         {% for song in songs %}
             <tr>
-                <td>{{count}}</td>
+                <td>{{loop.index0}}</td>
                 <td>{{song.songTitle}}</td>
                 <td><a href="{{song.songLink}}">Link</a></td>
             </tr>
