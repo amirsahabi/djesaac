@@ -26,7 +26,7 @@ def history():
 
 def addSongToQueue(songLink):
     # TODO: add adding song to queue functionality
-    return 0
+    return "success"
 
 
 # start server
