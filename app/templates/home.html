@@ -11,14 +11,12 @@
             <th>Title</th>
             <th>Link</th>
         </tr>
-        {% set count = 0 %}
         {% for song in songs %}
             <tr>
                 <td>{{loop.index0}}</td>
                 <td>{{song.songTitle}}</td>
                 <td><a href="{{song.songLink}}">Link</a></td>
             </tr>
-            {% set count = count + 1 %}
         {% endfor %}
     </table>
 </body>

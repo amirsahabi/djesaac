@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 from flask import Flask, request, render_template
 import youtube_dl
 import databases
@@ -41,14 +42,14 @@ def addSongToQueue(songLink):
             'format': 'bestaudio/best',
             'extractaudio' : True,
             'audioformat' : 'mp3',
-            'outtmpl' : './music/%(id)s',
+            'outtmpl' : 'music/%(id)s',
             'noplaylist' : True,
         }
 
         # create youtubedl object
-        ydl = youtube_dl.YoutubeDL()
+        ydl = youtube_dl.YoutubeDL(dlOptions)
 
-        # download and get metadata while we're at it
+        # get metadata and download song while we're at it
         metadata = ydl.extract_info(songLink, download=True)
 
         # given metadata, log to database
