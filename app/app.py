@@ -9,14 +9,13 @@ app = Flask(__name__)
 # home
 @app.route('/')
 def home():
-
     # get songs from queue
     songsInQueue = []
     try:
         for song in databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded.desc()):
             songsInQueue.append(song)
     except:
-        print("Exception hit")
+        print("Exception hit in home()")
         return render_template('home.html')
 
     return render_template('home.html', songs=songsInQueue)
@@ -30,8 +29,16 @@ def add():
 
 @app.route('/history/')
 def history():
-    # TODO: add history functionality
-    return render_template('history.html')
+    history = []
+    try:
+        for event in databases.History.select().order_by(databases.History.dateTimeFinish.desc()):
+            history.append(event)
+    except:
+        print("Exception hit in history()")
+        return render_template('history.html')
+
+
+    return render_template('history.html', history=history)
 
 
 def addSongToQueue(songLink):

@@ -14,10 +14,25 @@ class Base(Model):
 
 class History(Base):
     uuid            = UUIDField()
-    songName        = CharField()
-    songArtist      = CharField()
+    songTitle       = CharField()
     songLink        = CharField()
-    dateTimePlayed  = DateTimeField()
+    dateTimeFinish  = DateTimeField()
+
+    @staticmethod
+    def addSongToHistory(title, link):
+        try:
+            eventInHistory = History()
+            eventInHistory.uuid = uuid.uuid1()
+            eventInHistory.songTitle = title
+            eventInHistory.songLink = link
+            eventInHistory.dateTimeFinish = datetime.datetime.now()
+            eventInHistory.save()
+
+            return eventInHistory.uuid
+        except:
+            print('Failed to insert into history table')
+            return -1
+
 
 class SongInQueue(Base):
     uuid        = UUIDField()
@@ -39,7 +54,7 @@ class SongInQueue(Base):
 
             return newSong.uuid
         except:
-            print("Failed to insert to database")
+            print("Failed to insert to queue table")
             return -1
 
 TABLE_LIST = [SongInQueue, History]

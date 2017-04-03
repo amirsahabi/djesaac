@@ -1,7 +1,28 @@
 <html>
 <head>
     <title>DJESAAC</title>
+    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/responsetable.css')}}"/>
 </head>
 <body>
+    <table class='responstable'>
+        <tr>
+            <td><a href="../add/">Add Song</a></td>
+            <td><a href="../">Home</a></td>
+        </tr>
+    </table>
+    <table class='responstable'>
+        <tr>
+            <th>Number</th>
+            <th>Title</th>
+            <th>Link</th>
+        </tr>
+        {% for event in history %}
+            <tr>
+                <tr>{{loop.index0}}</tr>
+                <tr>{{event.songTitle}}</tr>
+                <tr>{{event.songLink}}</tr>
+            </tr>
+        {% endfor %}
+    </table>
 </body>
 </html>
