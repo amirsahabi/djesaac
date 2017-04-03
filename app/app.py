@@ -48,8 +48,8 @@ def addSongToQueue(songLink):
         dlOptions = {
             'format': 'bestaudio/best',
             'extractaudio' : True,
-            'audioformat' : 'mp3',
-            'outtmpl' : 'music/%(id)s',
+            'audioformat' : 'wav',
+            'outtmpl' : 'music/%(id)s.wav',
             'noplaylist' : True,
         }
 
@@ -60,7 +60,7 @@ def addSongToQueue(songLink):
         metadata = ydl.extract_info(songLink, download=True)
 
         # given metadata, log to database
-        databases.SongInQueue.addSongToQueue('./music/'+metadata['id'], metadata['title'], songLink)
+        databases.SongInQueue.addSongToQueue('./music/'+metadata['id']+'.wav', metadata['title'], songLink)
 
     except:
         return "failure"
