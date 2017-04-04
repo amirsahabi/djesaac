@@ -41,7 +41,7 @@ except:
         print("Failed to initialize board, will only play music")
 
 def playSong(song):
-    counter = 1             # counter of samples
+    counter = 0             # counter of samples
     window = 0.02           # window size = 0.02 seconds
     trigger=0               # used to end a while loop
     maxpower=0              # modifier for rgb values
@@ -53,12 +53,6 @@ def playSong(song):
     y=np.array(raw[1])        # convert y to numpy array
     orig=y                    # keep an original copy of y
     songlength = len(y)       # total number of samples in y
-
-    # Find the start of the song
-    while y[counter][0]==0 and y[counter][1]==0:
-        counter+=1
-    songstart=counter
-    print(songstart)
 
     # Find maxpower of the song
     while trigger==0:
@@ -86,7 +80,7 @@ def playSong(song):
     print(y.shape)
     print(c.shape)
     trigger=0
-    counter=songstart
+    counter=0
 
     # set lo, md, and hi value arrays
     loval=[0]
@@ -135,28 +129,28 @@ def playSong(song):
 
 
     for i in range(1,len(loval)):
-        if loval[i] > .95:
+        if loval[i] > .90:
             hival[i]=0
             mdval[i]=0
             loval[i]=1
             # end loval if
-        elif mdval[i] > .95:
+        elif mdval[i] > .90:
             loval[i]=0
             mdval[i]=1
             hival[i]=0
             # end mdval if
-        elif hival[i] > .95:
+        elif hival[i] > .90:
             loval[i]=0
             mdval[i]=0
             hival[i]=1
             # end hival if
         # end value for loop
 
-        if loval[i] < 0.01:
+        if loval[i] < 0.08:
             loval[i] = 0
-        if mdval[i] < 0.01:
+        if mdval[i] < 0.08:
             mdval[i] = 0
-        if hival[i] < 0.01:
+        if hival[i] < 0.08:
             hival[i] = 0
 
 
