@@ -45,7 +45,7 @@ def playSong(song):
     window = 0.02           # window size = 0.02 seconds
     trigger=0               # used to end a while loop
     maxpower=0              # modifier for rgb values
-    Fs=44100                # default frequency for audio files
+    Fs=wave.open(song).getframerate()                # default frequency for audio files
     winsamples=window*Fs    # number of samples per window
 
     # Import sound file using scipy
@@ -152,20 +152,33 @@ def playSong(song):
             # end hival if
         # end value for loop
 
+        if loval[i] < 0.01:
+            loval[i] = 0
+        if mdval[i] < 0.01:
+            mdval[i] = 0
+        if hival[i] < 0.01:
+            hival[i] = 0
+
 
     # Play audio and sync up light values
     pg.mixer.init(frequency=wave.open(song).getframerate())
     pg.mixer.music.load(song)
     pg.mixer.music.play()
-    i=0
+    first = True
+    initVal = 0
     while pg.mixer.music.get_busy() == True:
-        if pg.mixer.music.get_pos()%20 == 0:
-            if(board is not None):
-                pin3.write(loval[i])
-                pin5.write(mdval[i])
-                pin6.write(hival[i])
-            i+=1
-        continue
+        if(board is not None):
+            try:
+                pos = pg.mixer.music.get_pos()
+                if first:
+                    initVal = pos
+                    first = False
+                pin3.write(loval[(pos - initVal)/20])
+                pin5.write(mdval[(pos - initVal)/20])
+                pin6.write(hival[(pos - initVal)/20])
+            except:
+                print('out of bounds')
+
     if(board is not None):
         pin3.write(0)
         pin5.write(0)
