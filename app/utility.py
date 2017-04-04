@@ -30,7 +30,15 @@ try:
     pin6 = board.get_pin('d:6:p')   # set pin 6 for blue
     print("Board initialized")
 except:
-    print("Failed to initialize board, will only play music")
+    # failed for windows, try mac
+    try:
+        board = pf.Arduino('/dev/tty.usbmodem1421')      # initialize board
+        pin3 = board.get_pin('d:3:p')   # set pin 3 for red
+        pin5 = board.get_pin('d:5:p')   # set pin 5 for green
+        pin6 = board.get_pin('d:6:p')   # set pin 6 for blue
+        print("Board initialized")
+    except:
+        print("Failed to initialize board, will only play music")
 
 def playSong(song):
     counter = 1             # counter of samples
