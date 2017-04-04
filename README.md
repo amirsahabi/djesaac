@@ -11,7 +11,8 @@ controlled by an arduino along to the music
 
 The server is written in python and depends on the libraries
 [flask](http://flask.pocoo.org/), [peewee](https://pypi.python.org/pypi/peewee),
-and [youtube_dl](https://pypi.python.org/pypi/youtube_dl) (all of which are
+[youtube_dl](https://pypi.python.org/pypi/youtube_dl), [scipy](https://www.scipy.org/),
+[pyfirmata](https://pypi.python.org/pypi/pyFirmata), [pygame](https://www.pygame.org) (all of which are
 available to install through pip).
 
 ## How to Run

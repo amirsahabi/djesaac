@@ -18,9 +18,9 @@
         </tr>
         {% for event in history %}
             <tr>
-                <tr>{{loop.index0}}</tr>
-                <tr>{{event.songTitle}}</tr>
-                <tr>{{event.songLink}}</tr>
+                <td>{{loop.index0}}</td>
+                <td>{{event.songTitle}}</td>
+                <td>{{event.songLink}}</td>
             </tr>
         {% endfor %}
     </table>

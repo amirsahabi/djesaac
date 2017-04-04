@@ -14,15 +14,16 @@ function onSubmit(){
         success: function(data){
             if(data === 'success'){
                 alert('Succesful submission');
-                $('#submitButton').prop('disabled', false);
                 //redirect
                 window.location.href = (window.location.origin);
             } else {
                 alert('Received error: ' + data + '. Try again');
+                $('#submitButton').prop('disabled', false);
             }
         },
         error: function(){
             alert("Something went wrong when submitting, try again");
+            $('#submitButton').prop('disabled', false);
         }
     });
 }

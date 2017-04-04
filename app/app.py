@@ -1,7 +1,10 @@
 from __future__ import unicode_literals
 from flask import Flask, request, render_template
+from pydub import AudioSegment
 import youtube_dl
 import databases
+import os
+from dbmonitor import *
 
 # create app
 app = Flask(__name__)
@@ -12,7 +15,7 @@ def home():
     # get songs from queue
     songsInQueue = []
     try:
-        for song in databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded.desc()):
+        for song in databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded):
             songsInQueue.append(song)
     except:
         print("Exception hit in home()")
@@ -46,10 +49,10 @@ def addSongToQueue(songLink):
         # given songlink, use youtubedl to download it
         # set options
         dlOptions = {
-            'format': 'bestaudio/best',
+            'format': 'bestaudio',
             'extractaudio' : True,
             'audioformat' : 'wav',
-            'outtmpl' : 'music/%(id)s.wav',
+            'outtmpl' : 'music/%(id)s',
             'noplaylist' : True,
         }
 
@@ -58,6 +61,13 @@ def addSongToQueue(songLink):
 
         # get metadata and download song while we're at it
         metadata = ydl.extract_info(songLink, download=True)
+
+        # convert the song from mp3 to wav for reasons
+        AudioSegment.from_file('./music/'+metadata['id']).export('./music/'+metadata['id']+'.wav', format='wav')
+        # AudioSegment.from_file('./music/'+metadata['id']).export('./music/'+'test'+'.wav', format='wav')
+
+        # remove original
+        os.remove('./music/'+metadata['id'])
 
         # given metadata, log to database
         databases.SongInQueue.addSongToQueue('./music/'+metadata['id']+'.wav', metadata['title'], songLink)
@@ -74,5 +84,7 @@ if __name__ == "__main__":
     databases.dropTables()
     databases.initTables()
 
-    app.debug = True
-    app.run(threaded=True, port=3000, host='0.0.0.0')
+    DBMonitor().start()
+
+    app.debug = False
+    app.run(threaded=False, port=3000, host='0.0.0.0')
