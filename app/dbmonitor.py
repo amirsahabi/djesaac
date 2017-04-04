@@ -16,5 +16,5 @@ class DBMonitor(threading.Thread):
                 databases.History.addSongToHistory(song.songTitle, song.songLink)
 
                 # remove song from queue
-                databases.SongInQueue.delete().where(databases.SongInQueue == song).execute()
+                databases.SongInQueue.delete().where(databases.SongInQueue.uuid == song.uuid).execute()
             time.sleep(3)
