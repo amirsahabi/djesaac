@@ -87,4 +87,4 @@ if __name__ == "__main__":
     DBMonitor().start()
 
     app.debug = False
-    app.run(threaded=False, port=3000, host='0.0.0.0')
+    app.run(threaded=True, port=3000, host='0.0.0.0')

@@ -19,7 +19,11 @@
         </tr>
         {% for song in songs %}
             <tr>
-                <td>{{loop.index0}}</td>
+                {% if loop.index0 == 0 %}
+                    <td>Now Playing</td>
+                {% else %}
+                    <td>{{loop.index0}}</td>
+                {% endif %}
                 <td>{{song.songTitle}}</td>
                 <td><a href="{{song.songLink}}">Link</a></td>
             </tr>
