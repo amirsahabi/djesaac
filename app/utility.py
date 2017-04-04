@@ -46,6 +46,9 @@ def playSong(song):
     trigger=0               # used to end a while loop
     maxpower=0              # modifier for rgb values
     Fs=wave.open(song).getframerate()                # default frequency for audio files
+    print(Fs)
+
+
     winsamples=window*Fs    # number of samples per window
 
     # Import sound file using scipy
@@ -57,13 +60,14 @@ def playSong(song):
     # Find maxpower of the song
     while trigger==0:
         y=orig[counter:counter+winsamples]
-        np.transpose(y)
         N=len(y)
+        if N==0:
+            break
         c=np.fft.fft(y)/N
         p=2*abs(c[2:int(m.floor(N/2))])
         f=range(1,int(m.floor(N/2)-1))
-        f*=Fs/N
-        totalpower=sum(sum(p[1:len(f)]))
+        f=f*(Fs/N)
+        totalpower=np.sum(p[1:len(f)])
         # check and update maxpower for this window
         if totalpower>maxpower:
             maxpower=totalpower
@@ -88,17 +92,18 @@ def playSong(song):
     hival=[0]
     while trigger==0:
         y=orig[counter:counter+winsamples]
-        np.transpose(y)
         N=len(y)
+        if N==0:
+            break
         c=np.fft.fft(y)/N
         p=2*abs(c[2:int(m.floor(N/2))])
         f=range(1,int(m.floor(N/2)-1))
         f*=Fs/N
-        totalpower=sum(sum(p[1:len(f)]))
+        totalpower=np.sum(p[1:len(f)])
 
-        lop = sum(sum(p[:13]))
-        mdp = sum(sum(p[14:30]))
-        hip = sum(sum(p[31:]))
+        lop = np.sum(p[:13])
+        mdp = np.sum(p[14:30])
+        hip = np.sum(p[31:])
 
         red = [lop*totalpower/maxpower]
         grn = [mdp*totalpower/maxpower]
