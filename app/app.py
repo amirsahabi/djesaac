@@ -30,18 +30,34 @@ def add():
     else:
         return addSongToQueue(request.form['link'])
 
-@app.route('/history/')
+@app.route('/history/', methods=['GET','POST'])
 def history():
-    history = []
-    try:
-        for event in databases.History.select().order_by(databases.History.dateTimeFinish.desc()):
-            history.append(event)
-    except:
-        print("Exception hit in history()")
-        return render_template('history.html')
+    if request.method == 'GET':
+        history = []
+        try:
+            for event in databases.History.select().order_by(databases.History.dateTimeFinish.desc()):
+                history.append(event)
+        except:
+            print("Exception hit in history()")
+            return render_template('history.html')
 
 
-    return render_template('history.html', history=history)
+        return render_template('history.html', history=history)
+    else:
+        songID = request.form['song']
+        if songID != '':
+            # check if it's cached
+            try:
+                song = databases.History.select().where(databases.History.uuid == songID).get()
+                if os.path.isfile(song.songPath):
+                    # file already downloaded, just
+                    databases.SongInQueue.addSongToQueue(song.songPath, song.songTitle, song.songLink)
+                else:
+                    addSongToQueue(song.songLink)
+            except:
+                return 'failure'
+            return 'success'
+    return 'failure'
 
 
 def addSongToQueue(songLink):

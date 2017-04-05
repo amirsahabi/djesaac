@@ -2,6 +2,8 @@
 <head>
     <title>DJESAAC</title>
     <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/responsetable.css')}}"/>
+    <script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.2.0.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/history.js')}}"></script>
 </head>
 <body>
     <table class='responstable'>
@@ -15,12 +17,14 @@
             <th>Number</th>
             <th>Title</th>
             <th>Link</th>
+            <th>Replay</th>
         </tr>
         {% for event in history %}
             <tr>
                 <td>{{loop.index0}}</td>
                 <td>{{event.songTitle}}</td>
                 <td><a href="{{event.songLink}}">Link</a></td>
+                <td><input type="button" value="Replay" id="{{event.uuid}}" onclick="sendReplayRequest('{{event.uuid}}')"/></td>
             </tr>
         {% endfor %}
     </table>

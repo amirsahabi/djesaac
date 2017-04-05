@@ -16,15 +16,17 @@ class History(Base):
     uuid            = UUIDField()
     songTitle       = CharField()
     songLink        = CharField()
+    songPath        = CharField()
     dateTimeFinish  = DateTimeField()
 
     @staticmethod
-    def addSongToHistory(title, link):
+    def addSongToHistory(title, link, path):
         try:
             eventInHistory = History()
             eventInHistory.uuid = uuid.uuid1()
             eventInHistory.songTitle = title
             eventInHistory.songLink = link
+            eventInHistory.songPath = path
             eventInHistory.dateTimeFinish = datetime.datetime.now()
             eventInHistory.save()
 

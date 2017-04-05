@@ -13,7 +13,7 @@ class DBMonitor(threading.Thread):
                 utility.playSong(song.songPath)
 
                 # add to History
-                databases.History.addSongToHistory(song.songTitle, song.songLink)
+                databases.History.addSongToHistory(song.songTitle, song.songLink, song.songPath)
 
                 # remove song from queue
                 databases.SongInQueue.delete().where(databases.SongInQueue.uuid == song.uuid).execute()

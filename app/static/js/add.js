@@ -13,7 +13,7 @@ function onSubmit(){
         data: {"link":linkStr},
         success: function(data){
             if(data === 'success'){
-                alert('Succesful submission');
+                alert('Successful submission');
                 //redirect
                 window.location.href = (window.location.origin);
             } else {
