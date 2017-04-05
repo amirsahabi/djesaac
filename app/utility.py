@@ -41,11 +41,14 @@ except:
         print("Failed to initialize board, will only play music")
 
 def playSong(song):
-    counter = 1             # counter of samples
+    counter = 0             # counter of samples
     window = 0.02           # window size = 0.02 seconds
     trigger=0               # used to end a while loop
     maxpower=0              # modifier for rgb values
     Fs=wave.open(song).getframerate()                # default frequency for audio files
+    print(Fs)
+
+
     winsamples=window*Fs    # number of samples per window
 
     # Import sound file using scipy
@@ -54,22 +57,17 @@ def playSong(song):
     orig=y                    # keep an original copy of y
     songlength = len(y)       # total number of samples in y
 
-    # Find the start of the song
-    while y[counter][0]==0 and y[counter][1]==0:
-        counter+=1
-    songstart=counter
-    print(songstart)
-
     # Find maxpower of the song
     while trigger==0:
         y=orig[counter:counter+winsamples]
-        np.transpose(y)
         N=len(y)
+        if N==0:
+            break
         c=np.fft.fft(y)/N
         p=2*abs(c[2:int(m.floor(N/2))])
         f=range(1,int(m.floor(N/2)-1))
-        f*=Fs/N
-        totalpower=sum(sum(p[1:len(f)]))
+        f=f*(Fs/N)
+        totalpower=np.sum(p[1:len(f)])
         # check and update maxpower for this window
         if totalpower>maxpower:
             maxpower=totalpower
@@ -86,7 +84,7 @@ def playSong(song):
     print(y.shape)
     print(c.shape)
     trigger=0
-    counter=songstart
+    counter=0
 
     # set lo, md, and hi value arrays
     loval=[0]
@@ -94,17 +92,18 @@ def playSong(song):
     hival=[0]
     while trigger==0:
         y=orig[counter:counter+winsamples]
-        np.transpose(y)
         N=len(y)
+        if N==0:
+            break
         c=np.fft.fft(y)/N
         p=2*abs(c[2:int(m.floor(N/2))])
         f=range(1,int(m.floor(N/2)-1))
         f*=Fs/N
-        totalpower=sum(sum(p[1:len(f)]))
+        totalpower=np.sum(p[1:len(f)])
 
-        lop = sum(sum(p[:13]))
-        mdp = sum(sum(p[14:30]))
-        hip = sum(sum(p[31:]))
+        lop = np.sum(p[:13])
+        mdp = np.sum(p[14:30])
+        hip = np.sum(p[31:])
 
         red = [lop*totalpower/maxpower]
         grn = [mdp*totalpower/maxpower]
@@ -135,28 +134,28 @@ def playSong(song):
 
 
     for i in range(1,len(loval)):
-        if loval[i] > .95:
+        if loval[i] > .90:
             hival[i]=0
             mdval[i]=0
             loval[i]=1
             # end loval if
-        elif mdval[i] > .95:
+        elif mdval[i] > .90:
             loval[i]=0
             mdval[i]=1
             hival[i]=0
             # end mdval if
-        elif hival[i] > .95:
+        elif hival[i] > .90:
             loval[i]=0
             mdval[i]=0
             hival[i]=1
             # end hival if
         # end value for loop
 
-        if loval[i] < 0.01:
+        if loval[i] < 0.08:
             loval[i] = 0
-        if mdval[i] < 0.01:
+        if mdval[i] < 0.08:
             mdval[i] = 0
-        if hival[i] < 0.01:
+        if hival[i] < 0.08:
             hival[i] = 0
 
 
