@@ -80,7 +80,6 @@ def addSongToQueue(songLink):
 
         # convert the song from mp3 to wav for reasons
         AudioSegment.from_file('./music/'+metadata['id']).export('./music/'+metadata['id']+'.wav', format='wav')
-        # AudioSegment.from_file('./music/'+metadata['id']).export('./music/'+'test'+'.wav', format='wav')
 
         # remove original
         os.remove('./music/'+metadata['id'])

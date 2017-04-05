@@ -41,12 +41,13 @@ except:
         print("Failed to initialize board, will only play music")
 
 def playSong(song):
+    print("Received song request")
+
     counter = 0             # counter of samples
     window = 0.02           # window size = 0.02 seconds
     trigger=0               # used to end a while loop
     maxpower=0              # modifier for rgb values
     Fs=wave.open(song).getframerate()                # default frequency for audio files
-    print(Fs)
 
 
     winsamples=window*Fs    # number of samples per window
@@ -64,8 +65,8 @@ def playSong(song):
         if N==0:
             break
         c=np.fft.fft(y)/N
-        p=2*abs(c[2:int(m.floor(N/2))])
-        f=range(1,int(m.floor(N/2)-1))
+        p=2*abs(c[1:int(m.floor(N/2))])
+        f=range(0,int(m.floor(N/2)-1))
         f=f*(Fs/N)
         totalpower=np.sum(p[1:len(f)])
         # check and update maxpower for this window
@@ -77,12 +78,6 @@ def playSong(song):
             trigger=1
             # end counter if
         # end trigger while
-    print(maxpower)
-    print(totalpower)
-    print(p.shape)
-    print(len(f))
-    print(y.shape)
-    print(c.shape)
     trigger=0
     counter=0
 
@@ -96,8 +91,8 @@ def playSong(song):
         if N==0:
             break
         c=np.fft.fft(y)/N
-        p=2*abs(c[2:int(m.floor(N/2))])
-        f=range(1,int(m.floor(N/2)-1))
+        p=2*abs(c[1:int(m.floor(N/2))])
+        f=range(0,int(m.floor(N/2)-1))
         f*=Fs/N
         totalpower=np.sum(p[1:len(f)])
 
@@ -117,21 +112,10 @@ def playSong(song):
             trigger = 1
             # end counter if
         # end trigger while
-    print(len(loval))
-    print(loval[1000:1100])
-    print(max(loval))
-    print(max(mdval))
-    print(max(hival))
-
     # Adjust light values
     loval = loval/max(loval)
     mdval = mdval/max(mdval)
     hival = hival/max(hival)
-
-    print(loval[1000:1100])
-    print(mdval[1000:1100])
-    print(hival[1000:1100])
-
 
     for i in range(1,len(loval)):
         if loval[i] > .90:
@@ -158,6 +142,7 @@ def playSong(song):
         if hival[i] < 0.08:
             hival[i] = 0
 
+    print("Finished analysis, playing song")
 
     # Play audio and sync up light values
     pg.mixer.init(frequency=wave.open(song).getframerate())
@@ -176,7 +161,7 @@ def playSong(song):
                 pin5.write(mdval[(pos - initVal)/20])
                 pin6.write(hival[(pos - initVal)/20])
             except:
-                print('out of bounds')
+                print('Don\'t go places you don\'t belong')
 
     if(board is not None):
         pin3.write(0)
