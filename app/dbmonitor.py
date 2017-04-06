@@ -35,6 +35,7 @@ class DBMonitor(threading.Thread):
                 self.pin6 = board.get_pin('d:6:p')   # set pin 6 for blue
                 print("Board initialized")
             except:
+                self.board = None
                 print("Failed to initialize board, will only play music")
         print("DBMonitor initialized")
 
@@ -53,8 +54,10 @@ class DBMonitor(threading.Thread):
                     # remove song from queue
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == song.uuid).execute()
             self.songPlaying = None
-            self.standbyMode()
-            time.sleep(3)
+            if self.board is not None:
+                self.standbyMode()
+            else:
+                time.sleep(3)
 
     def playSong(self, song):
         print("Received song request")
@@ -186,7 +189,7 @@ class DBMonitor(threading.Thread):
             self.pin3.write(0)
             self.pin5.write(0)
             self.pin6.write(0)
-        def standbyMode():
+        def standbyMode(self):
             while(databases.SongInQueue.select().wrapped_count()==0):
                 #heartbeat
                 for i in range(0.01,0.5,0.01):
