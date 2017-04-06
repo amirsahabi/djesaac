@@ -1,13 +1,14 @@
 h1, h2, h3, h4, h5, h6 {
-    font-family: Lato;
+    font-family: Ubuntu;
 }
 
 body{
     background-color: #262B35;
     /*background-color: #242629;*/
     /*background: white;*/
-    font-family: Lato;
+    font-family: Ubuntu;
     -webkit-font-smoothing: antialiased;
+    color: #DAE2F2;
     font-weight: 400;
 }
 .nav{
@@ -26,16 +27,16 @@ body{
     text-decoration: none;
     /*color: #3F3F4A;*/
     /*color: #5E687F;*/
-    color: #829A9E;
+    color: #757980;
     font-size: 23px;
     font-weight: 400;
     padding: 30px;
-    font-family: Lato;
+    font-family: Ubuntu;
 
 }
 #nav_link.current{
     /*color: #62A69F;*/
-    color: #B4C9E4;
+    color: #96B9CE;
 }
 
 .currently_playing{
@@ -62,9 +63,12 @@ table#cur_playing{
     margin-top: 80px;
     padding-top: 15px;
     display: block;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
 }
 table{
-    width: 60%;
+    width: 100%;
     margin-left: auto;
     margin-right: auto;
     /*background: #EEEEEE;*/
@@ -74,24 +78,20 @@ table{
 
 th {
     /*background-color: #18181C;*/
-    color: #BABFDB;
-    border-bottom: 3px solid #BABFDB;
-    font-family: Lato;
+    /*border-bottom: 3px solid #BABFDB;*/
+    border-bottom: 3px solid #96B9CE;
+    font-family: Ubuntu;
     text-align: left;
     padding: 8px;
     text-transform: uppercase;
+    font-weight: normal;
 }
 
 td {
+    font-size: 97%;
     text-align: left;
     padding: 8px;
-    color: #BABFDB;
-    border-bottom: 1px solid #829A9E;
-}
-
-tr:nth-child(odd){
-    /*background-color: #E0EFF1;*/
-    /*background-color: #3F464D;*/
+    border-bottom: 1px solid #757980;
 }
 
 #table_link{

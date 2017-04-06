@@ -152,5 +152,5 @@ if __name__ == "__main__":
     monitorThread = DBMonitor()
     monitorThread.start()
 
-    app.debug = False
-    app.run(threaded=True, port=3000, host='0.0.0.0')
+    app.debug = True
+    app.run(threaded=True, port=3000, host='0.0.0.0', use_reloader=False)
