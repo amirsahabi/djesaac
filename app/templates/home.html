@@ -43,8 +43,6 @@
                 <td>{{songs[i].songTitle}}</td>
                 <td><a id=table_link href="{{songs[i].songLink}}">Link</a></td>
 
-
-                </tr>
             {% endfor %}
         {% endif %}
     </table>
@@ -55,14 +53,16 @@
             <th>#</th>
             <th>Title</th>
             <th>Link</th>
+            <th></th>
         </tr>
         {% if songs|length != 0 %}
             {% for i in range(1,songs|length)%}
+            <tr>
                 <td>{{loop.index0+1}}</td>
                 <td>{{songs[i].songTitle}}</td>
                 <td><a id=table_link href="{{songs[i].songLink}}">Link</a></td>
-
-                </tr>
+                <td><i class="material-icons"><span class='remove' onclick="removeSongFromQueue('{{songs[i].uuid}}')">remove_circle_outline</span></i></td>
+            </tr>
             {% endfor %}
         {% endif %}
     </table>
