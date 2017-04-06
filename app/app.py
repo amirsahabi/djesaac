@@ -9,19 +9,41 @@ from dbmonitor import *
 # create app
 app = Flask(__name__)
 
-# home
-@app.route('/')
-def home():
-    # get songs from queue
-    songsInQueue = []
-    try:
-        for song in databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded):
-            songsInQueue.append(song)
-    except:
-        print("Exception hit in home()")
-        return render_template('home.html')
+monitorThread = None
 
-    return render_template('home.html', songs=songsInQueue)
+# home
+@app.route('/', methods=['GET','POST'])
+def home():
+    if(request.method == 'GET'):
+        # get songs from queue
+        songsInQueue = []
+        try:
+            for song in databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded):
+                songsInQueue.append(song)
+        except:
+            print("Exception hit in home()")
+            return render_template('home.html')
+
+        return render_template('home.html', songs=songsInQueue)
+    else:
+        command = request.form['command']
+        if command == "remove":
+            #do delete
+            uuid = str(request.form['songID'])
+
+            #verify the song isn't playing
+            if monitorThread.songPlaying == uuid:
+                return "Song can't be deleted, is currently playing"
+            else:
+                #delete from queue
+                try:
+                    databases.SongInQueue.delete().where(databases.SongInQueue.uuid == uuid).execute()
+                except:
+                    return "failure"
+            return "success"
+        else:
+            return "unknown command"
+
 
 @app.route('/add/', methods=['GET','POST'])
 def add():
@@ -75,14 +97,20 @@ def addSongToQueue(songLink):
         # create youtubedl object
         ydl = youtube_dl.YoutubeDL(dlOptions)
 
-        # get metadata and download song while we're at it
-        metadata = ydl.extract_info(songLink, download=True)
+        if not songHasBeenDownloaded(songLink):
 
-        # convert the song from mp3 to wav for reasons
-        AudioSegment.from_file('./music/'+metadata['id']).export('./music/'+metadata['id']+'.wav', format='wav')
+            # get metadata and download song while we're at it
+            metadata = ydl.extract_info(songLink, download=True)
 
-        # remove original
-        os.remove('./music/'+metadata['id'])
+            # convert the song from mp3 to wav for reasons
+            AudioSegment.from_file('./music/'+metadata['id']).export('./music/'+metadata['id']+'.wav', format='wav')
+
+            # remove original
+            os.remove('./music/'+metadata['id'])
+        else:
+            print("Song existed, no need to redownload")
+
+            metadata = ydl.extract_info(songLink, download=False)
 
         # given metadata, log to database
         databases.SongInQueue.addSongToQueue('./music/'+metadata['id']+'.wav', metadata['title'], songLink)
@@ -92,6 +120,21 @@ def addSongToQueue(songLink):
 
     return "success"
 
+def songHasBeenDownloaded(songLink):
+    #check both history and songqueue for the song
+    songs = databases.SongInQueue.select().where(databases.SongInQueue.songLink == songLink)
+    for song in songs:
+        if os.path.isfile(song.songPath):
+            #has been downloaded
+            return True
+
+    songs = databases.History.select().where(databases.History.songLink == songLink)
+    for song in songs:
+        if os.path.isfile(song.songPath):
+            return True
+
+    return False
+
 
 # start server
 if __name__ == "__main__":
@@ -99,7 +142,8 @@ if __name__ == "__main__":
     databases.dropTables()
     databases.initTables()
 
-    DBMonitor().start()
+    monitorThread = DBMonitor()
+    monitorThread.start()
 
     app.debug = False
     app.run(threaded=True, port=3000, host='0.0.0.0')
