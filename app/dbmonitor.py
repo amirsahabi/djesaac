@@ -195,7 +195,7 @@ class DBMonitor(threading.Thread):
                     self.pin6.write(i)
                     time.sleep(.1)
                     #end up for
-                for i in range(0.5,0.01,0.01)
+                for i in range(0.5,0.01,-0.01):
                     self.pin3.write(i)
                     self.pin5.write(i)
                     self.pin6.write(i)
