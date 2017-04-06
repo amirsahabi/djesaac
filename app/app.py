@@ -17,7 +17,6 @@ def home():
     if(request.method == 'GET'):
         # get songs from queue
         songsInQueue = []
-        isPlayingString = "Stop" if monitorThread.musicIsPlaying else "Play"
         try:
             for song in databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded):
                 songsInQueue.append(song)
@@ -25,7 +24,7 @@ def home():
             print("Exception hit in home()")
             return render_template('home.html')
 
-        return render_template('home.html', songs=songsInQueue, musicIsPlaying=isPlayingString)
+        return render_template('home.html', songs=songsInQueue, musicIsPlaying=monitorThread.musicIsPlaying)
     else:
         command = request.form['command']
         if command == "remove":
