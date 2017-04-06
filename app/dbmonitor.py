@@ -59,9 +59,7 @@ class DBMonitor(threading.Thread):
             else:
                 time.sleep(3)
 
-    def playSong(self, song):
-        print("Received song request")
-
+    def preprocess(self,nextsong):
         counter = 0             # counter of samples
         window = 0.02           # window size = 0.02 seconds
         trigger=0               # used to end a while loop
@@ -101,9 +99,9 @@ class DBMonitor(threading.Thread):
         counter=0
 
         # set lo, md, and hi value arrays
-        loval=[0]
-        mdval=[0]
-        hival=[0]
+        self.loval=[0]
+        self.mdval=[0]
+        self.hival=[0]
         while trigger==0:
             y=orig[counter:counter+winsamples]
             N=len(y)
@@ -123,44 +121,50 @@ class DBMonitor(threading.Thread):
             grn = [mdp*totalpower/maxpower]
             blu = [hip*totalpower/maxpower]
 
-            loval = np.concatenate((loval,red),axis=0)
-            mdval = np.concatenate((mdval,grn),axis=0)
-            hival = np.concatenate((hival,blu),axis=0)
+            self.loval = np.concatenate((self.loval,red),axis=0)
+            self.mdval = np.concatenate((self.mdval,grn),axis=0)
+            self.hival = np.concatenate((self.hival,blu),axis=0)
             counter+=winsamples+1
             if counter>songlength:
                 trigger = 1
                 # end counter if
             # end trigger while
         # Adjust light values
-        loval = loval/max(loval)
-        mdval = mdval/max(mdval)
-        hival = hival/max(hival)
+        self.loval = self.loval/max(self.loval)
+        self.mdval = self.mdval/max(self.mdval)
+        self.hival = self.hival/max(self.hival)
 
-        for i in range(1,len(loval)):
-            if loval[i] > .90:
-                hival[i]=0
-                mdval[i]=0
-                loval[i]=1
+        for i in range(1,len(self.loval)):
+            if self.loval[i] > .90:
+                self.hival[i]=0
+                self.mdval[i]=0
+                self.loval[i]=1
                 # end loval if
-            elif mdval[i] > .90:
-                loval[i]=0
-                mdval[i]=1
-                hival[i]=0
+            elif self.mdval[i] > .90:
+                self.loval[i]=0
+                self.mdval[i]=1
+                self.hival[i]=0
                 # end mdval if
-            elif hival[i] > .90:
-                loval[i]=0
-                mdval[i]=0
-                hival[i]=1
+            elif self.hival[i] > .90:
+                self.loval[i]=0
+                self.mdval[i]=0
+                self.hival[i]=1
                 # end hival if
             # end value for loop
 
-            if loval[i] < 0.08:
-                loval[i] = 0
-            if mdval[i] < 0.08:
-                mdval[i] = 0
-            if hival[i] < 0.08:
-                hival[i] = 0
+            if self.loval[i] < 0.04:
+                self.loval[i] = 0
+            if self.mdval[i] < 0.04:
+                self.mdval[i] = 0
+            if self.hival[i] < 0.04:
+                self.hival[i] = 0
 
+    def playSong(self, song):
+        print("Received song request")
+        self.preprocess(song)
+        loval=self.loval
+        mdval=self.mdval
+        hival=self.hival
         print("Finished analysis, playing song")
 
         # Play audio and sync up light values
