@@ -22,17 +22,17 @@ class DBMonitor(threading.Thread):
         # Initialize board and set pins using pyfirmata
         try:
             self.board = pf.Arduino('COM4')      # initialize board
-            self.pin3 = board.get_pin('d:3:p')   # set pin 3 for red
-            self.pin5 = board.get_pin('d:5:p')   # set pin 5 for green
-            self.pin6 = board.get_pin('d:6:p')   # set pin 6 for blue
+            self.pin3 = self.board.get_pin('d:3:p')   # set pin 3 for red
+            self.pin5 = self.board.get_pin('d:5:p')   # set pin 5 for green
+            self.pin6 = self.board.get_pin('d:6:p')   # set pin 6 for blue
             print("Board initialized")
         except:
             # failed for windows, try mac
             try:
                 self.board = pf.Arduino('/dev/tty.usbmodem1421')      # initialize board
-                self.pin3 = board.get_pin('d:3:p')   # set pin 3 for red
-                self.pin5 = board.get_pin('d:5:p')   # set pin 5 for green
-                self.pin6 = board.get_pin('d:6:p')   # set pin 6 for blue
+                self.pin3 = self.board.get_pin('d:3:p')   # set pin 3 for red
+                self.pin5 = self.board.get_pin('d:5:p')   # set pin 5 for green
+                self.pin6 = self.board.get_pin('d:6:p')   # set pin 6 for blue
                 print("Board initialized")
             except:
                 self.board = None
@@ -190,19 +190,65 @@ class DBMonitor(threading.Thread):
             self.pin5.write(0)
             self.pin6.write(0)
     def standbyMode(self):
+        cycles=20
         while(databases.SongInQueue.select().wrapped_count()==0):
-            #heartbeat
-            for i in range(0.01,0.5,0.01):
-                self.pin3.write(i)
-                self.pin5.write(i)
-                self.pin6.write(i)
-                time.sleep(.1)
-                #end up for
-            for i in range(0.5,0.01,-0.01):
-                self.pin3.write(i)
-                self.pin5.write(i)
-                self.pin6.write(i)
-                time.sleep(.1)
-                #end down for
+            if(cycles<20):
+                #sine wave
+                for i in range(0,314,2):
+                    self.pin3.write(m.sin(i/100.0)/2.0)
+                    self.pin5.write(m.sin(i/100.0)/2.0)
+                    self.pin6.write(m.sin(i/100.0)/2.0)
+                    time.sleep(.025)
+                    #end up for
+            if(cycles>19 and cycles<40):
+                #heartbeat
+                for i in range(0,120,2):
+                    self.pin5.write(m.sin(i/100.0)/2.0)
+                    self.pin6.write(m.sin(i/100.0)/2.0)
+                    time.sleep(.025)
+                #beat
+                self.pin3.write(.3)
+                time.sleep(.04)
+                self.pin3.write(0)
+                time.sleep(.5)
+                #beat
+                self.pin3.write(.3)
+                time.sleep(.04)
+                self.pin3.write(0)
+                time.sleep(.5)
+                for i in range(120,0,-2):
+                    self.pin5.write(m.sin(i/100.0)/2.0)
+                    self.pin6.write(m.sin(i/100.0)/2.0)
+                    time.sleep(.025)
+
+            if(cycles>39 and cycles<60):
+                #color wheel
+                #red up
+                for i in range(30,60,2):
+                    self.pin3.write(i/100.0)
+                    time.sleep(.05)
+                #green down
+                for i in range(60,30,2):
+                    self.pin5.write(i/100.0)
+                    time.sleep(.05)
+                #blue up
+                for i in range(30,60,2):
+                    self.pin6.write(i/100.0)
+                    time.sleep(.05)
+                #red down
+                for i in range(60,30,2):
+                    self.pin3.write(i/100.0)
+                    time.sleep(.05)
+                #green up
+                for i in range(30,60,2):
+                    self.pin5.write(i/100.0)
+                    time.sleep(.05)
+                #blue down
+                for i in range(60,30,2):
+                    self.pin6.write(i/100.0)
+                    time.sleep(.05)
+            if(cycles>59):
+                cycles=0
+            cycles+=1
             #end wrapped_count while
         #end standbyMode definition
