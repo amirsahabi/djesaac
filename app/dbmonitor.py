@@ -189,20 +189,20 @@ class DBMonitor(threading.Thread):
             self.pin3.write(0)
             self.pin5.write(0)
             self.pin6.write(0)
-        def standbyMode(self):
-            while(databases.SongInQueue.select().wrapped_count()==0):
-                #heartbeat
-                for i in range(0.01,0.5,0.01):
-                    self.pin3.write(i)
-                    self.pin5.write(i)
-                    self.pin6.write(i)
-                    time.sleep(.1)
-                    #end up for
-                for i in range(0.5,0.01,-0.01):
-                    self.pin3.write(i)
-                    self.pin5.write(i)
-                    self.pin6.write(i)
-                    time.sleep(.1)
-                    #end down for
-                #end wrapped_count while
-            #end standbyMode definition
+    def standbyMode(self):
+        while(databases.SongInQueue.select().wrapped_count()==0):
+            #heartbeat
+            for i in range(0.01,0.5,0.01):
+                self.pin3.write(i)
+                self.pin5.write(i)
+                self.pin6.write(i)
+                time.sleep(.1)
+                #end up for
+            for i in range(0.5,0.01,-0.01):
+                self.pin3.write(i)
+                self.pin5.write(i)
+                self.pin6.write(i)
+                time.sleep(.1)
+                #end down for
+            #end wrapped_count while
+        #end standbyMode definition
