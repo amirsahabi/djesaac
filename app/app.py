@@ -17,6 +17,7 @@ def home():
     if(request.method == 'GET'):
         # get songs from queue
         songsInQueue = []
+        isPlayingString = "Stop" if monitorThread.musicIsPlaying else "Play"
         try:
             for song in databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded):
                 songsInQueue.append(song)
@@ -24,7 +25,7 @@ def home():
             print("Exception hit in home()")
             return render_template('home.html')
 
-        return render_template('home.html', songs=songsInQueue)
+        return render_template('home.html', songs=songsInQueue, musicIsPlaying=isPlayingString)
     else:
         command = request.form['command']
         if command == "remove":
@@ -32,7 +33,7 @@ def home():
             uuid = str(request.form['songID'])
 
             #verify the song isn't playing
-            if monitorThread.songPlaying == uuid:
+            if monitorThread.songPlaying == uuid and monitorThread.musicIsPlaying:
                 return "Song can't be deleted, is currently playing"
             else:
                 #delete from queue
@@ -41,6 +42,13 @@ def home():
                 except:
                     return "failure"
             return "success"
+        elif command == "startstop":
+            try:
+                monitorThread.musicIsPlaying = not monitorThread.musicIsPlaying
+            except:
+                return "Can't stop this beat"
+            return "success"
+
         else:
             return "unknown command"
 
@@ -139,8 +147,8 @@ def songHasBeenDownloaded(songLink):
 # start server
 if __name__ == "__main__":
     #drop and init tables
-    databases.dropTables()
-    databases.initTables()
+    # databases.dropTables()
+    # databases.initTables()
 
     monitorThread = DBMonitor()
     monitorThread.start()

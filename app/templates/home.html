@@ -10,6 +10,7 @@
         <tr>
             <td><a href="../add/">Add Song</a></td>
             <td><a href="../history/">History</a></td>
+            <td><input type="button" value="{{musicIsPlaying}}" onclick="startStop()">
         </tr>
     </table>
     <table class='responstable'>
@@ -21,7 +22,11 @@
         {% for song in songs %}
             <tr>
                 {% if loop.index0 == 0 %}
-                    <td>Now Playing</td>
+                    {% if musicIsPlaying == "Stop" %}
+                        <td>Now Playing</td>
+                    {% else %}
+                        <td>Stopped</td>
+                    {% endif %}
                 {% else %}
                     <td>{{loop.index0}}</td>
                 {% endif %}

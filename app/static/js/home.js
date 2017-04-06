@@ -25,3 +25,28 @@ function removeSongFromQueue(songID){
         }
     });
 }
+
+function startStop(){
+    $('#startStop').prop('disabled', true);
+
+    //send request to server
+    $.ajax({
+        method: 'POST',
+        data : {
+            "command":"startstop"
+        },
+        success: function(data){
+            if(data === "success"){
+                //reload page I guess?
+                window.location.reload();
+            } else {
+                alert("Received error: " + data);
+                $('#startStop').prop('disabled', false);
+            }
+        },
+        error: function(){
+            alert("Something went wrong sending request, try again");
+            $('#startStop').prop('disabled',false);
+        }
+    })
+}
