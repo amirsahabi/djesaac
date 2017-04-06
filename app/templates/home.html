@@ -19,7 +19,7 @@
     $(document).ready(function(){
         $(".play_stop").click(function(){
             $(this).text(function(i, v){
-                return v === 'play_circle_outline' ? 'pause_circle_outline' : 'play_circle_outline'
+                return v === 'pause_circle_outline' ? 'play_circle_outline' : 'pause_circle_outline'
             });
         });
     });
@@ -36,6 +36,10 @@
         {% if songs|length != 0 %}
             {% for i in range(1)%}
                 {% if musicIsPlaying %}
+                    <td>
+                        <i class="material-icons"><span class='play_stop' onclick="startStop()">pause_circle_outline</span></i>
+                    </td>
+                {% else %}
                     <td>
                         <i class="material-icons"><span class='play_stop' onclick="startStop()">play_circle_outline</span></i>
                     </td>
