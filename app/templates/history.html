@@ -9,11 +9,17 @@
     <link rel="stylesheet" href="../static/styles/styles.css" />
 </head>
 <body>
-    <div class="nav">
-        <a id=nav_link href="..">HOME</a>
-        <a id=nav_link href="../add">ADD SONG</a>
-        <a id=nav_link class="current" href="../history/">HISTORY</a>
+    <script>
 
+
+
+
+
+    </script>
+    <div id="nav">
+        <a class="nav_link" href="..">HOME</a>
+        <a class="nav_link" href="../add">ADD SONG</a>
+        <a class="nav_link current" href="../history/">HISTORY</a>
     </div>
 
 
@@ -25,14 +31,17 @@
                 <th>Link</th>
                 <th></th>
             </tr>
-            {% for event in history %}
-            <tr>
-                <td>{{loop.index0}}</td>
-                <td>{{event.songTitle}}</td>
-                <td><a id=table_link href="{{event.songLink}}">Link</a></td>
-                <td><i class="material-icons"><span class='play_stop' onclick="sendReplayRequest('{{event.uuid}}')">replay</span></i></td>
-            </tr>
-            {% endfor %}
+            <tbody>
+                {% for event in history %}
+                <tr>
+                    <td>{{loop.index0}}</td>
+                    <td>{{event.songTitle}}</td>
+                    <td><a id=table_link href="{{event.songLink}}">Link</a></td>
+                    <td><i class="material-icons"><span class='play_stop' onclick="sendReplayRequest('{{event.uuid}}')">replay</span></i></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
 
     </table>
 </div>

@@ -10,8 +10,10 @@ body{
     -webkit-font-smoothing: antialiased;
     color: #DAE2F2;
     font-weight: 400;
+    margin: 0;
 }
-.nav{
+
+#nav{
     position: fixed;
     display: block;
     top: 0;
@@ -21,9 +23,16 @@ body{
     vertical-align: middle;
     min-height: 80px;
     line-height: 80px;
+    transition: all 0.5s linear;
+    z-index:9000;
+    background-color: #262B35;
 }
 
-#nav_link{
+#nav.shadow {
+    box-shadow:0 5px 10px rgba(0,0,0,0.5);
+}
+
+.nav_link{
     text-decoration: none;
     /*color: #3F3F4A;*/
     /*color: #5E687F;*/
@@ -34,7 +43,7 @@ body{
     font-family: Ubuntu;
 
 }
-#nav_link.current{
+.nav_link.current{
     /*color: #62A69F;*/
     color: #96B9CE;
 }

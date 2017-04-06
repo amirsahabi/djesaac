@@ -50,3 +50,18 @@ function startStop(){
         }
     })
 }
+
+
+
+$(function(){
+
+    $(window).on('scroll', function(){
+        if ( ! $(document).scrollTop()){ //top of page
+            $('#nav').removeClass('shadow');
+        }
+        else {
+            $('#nav').addClass('shadow');
+        }
+    });
+
+});
