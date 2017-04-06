@@ -1,31 +1,41 @@
 <html>
 <head>
     <title>DJESAAC</title>
-    <link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/responsetable.css')}}"/>
+    <!--<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/responsetable.css')}}"/>-->
     <script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.2.0.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/history.js')}}"></script>
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Lato" />
+    <link rel="stylesheet" href="../static/styles/styles.css" />
 </head>
 <body>
-    <table class='responstable'>
-        <tr>
-            <td><a href="../add/">Add Song</a></td>
-            <td><a href="../">Home</a></td>
-        </tr>
-    </table>
-    <table class='responstable'>
-        <tr>
-            <th>Number</th>
-            <th>Title</th>
-            <th>Link</th>
-        </tr>
-        {% for event in history %}
+    <div class="nav">
+        <a id=nav_link href="..">HOME</a>
+        <a id=nav_link href="../add">ADD SONG</a>
+        <a id=nav_link class="current" href="../history/">HISTORY</a>
+
+    </div>
+
+
+    <div class="playlist">
+        <table>
             <tr>
+                <th>#</th>
+                <th>Title</th>
+                <th>Link</th>
+                <th></th>
+            </tr>
+                {% for event in history %}
                 <td>{{loop.index0}}</td>
                 <td>{{event.songTitle}}</td>
-                <td><a href="{{event.songLink}}">Link</a></td>
+                <td><a id=table_link href="{{event.songLink}}">Link</a></td>
                 <td><input type="button" value="Replay" id="{{event.uuid}}" onclick="sendReplayRequest('{{event.uuid}}')"/></td>
-            </tr>
-        {% endfor %}
+
+                </tr>
+                {% endfor %}
+
     </table>
+</div>
+
+
 </body>
 </html>
