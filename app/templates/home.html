@@ -13,8 +13,17 @@
     <a id=nav_link class="current" href="">HOME</a>
     <a id=nav_link href="add">ADD SONG</a>
     <a id=nav_link href="history/">HISTORY</a>
-    <input type="button" value="{{musicIsPlaying}}" onclick="startStop()">
 </div>
+
+<script>
+    $(document).ready(function(){
+        $(".play_stop").click(function(){
+            $(this).text(function(i, v){
+                return v === 'play_circle_outline' ? 'pause_circle_outline' : 'play_circle_outline'
+            });
+        });
+    });
+</script>
 
 <div class="currently_playing">
     <h3 style="margin-bottom: 0; text-transform: uppercase; color: #829A9E">currently playing</h3>
@@ -28,15 +37,7 @@
             {% for i in range(1)%}
                 {% if musicIsPlaying %}
                     <td>
-                        <span onclick="startStop()">
-                             <i class="material-icons">play_circle_outline</i>
-                        </span>
-                    </td>
-                {% else %}
-                    <td>
-                        <span onclick="startStop()">
-                            <i class="material-icons">pause_circle_outline</i>
-                        </span>
+                        <i class="material-icons"><span class='play_stop' onclick="startStop()">play_circle_outline</span></i>
                     </td>
                 {% endif %}
                 <td>{{songs[i].songTitle}}</td>
