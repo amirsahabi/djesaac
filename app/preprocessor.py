@@ -47,7 +47,7 @@ class SongPreprocessor(threading.Thread):
             p[:,0]=p[:,0]+p[:,1]
             f=range(0,int(m.floor(N/2)-1))
             f=f*(Fs/N)
-            totalpower=np.sum(p[1:len(f)], 0)
+            totalpower=np.sum(p[1:len(f),0])
             # check and update maxpower for this window
             if totalpower>maxpower:
                 maxpower=totalpower
