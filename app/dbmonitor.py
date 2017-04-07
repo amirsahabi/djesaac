@@ -65,7 +65,13 @@ class DBMonitor(threading.Thread):
         trigger=0               # used to end a while loop
         maxpower=0              # modifier for rgb values
         Fs=wave.open(nextsong).getframerate()                # default frequency for audio files
-
+        #auto determine frequency binning variables
+        lopow=0
+        lofreq=[]
+        mdpow=0
+        mdfreq=[]
+        hipow=0
+        hifreq=[]
 
         winsamples=window*Fs    # number of samples per window
 
@@ -82,14 +88,25 @@ class DBMonitor(threading.Thread):
             if N==0:
                 break
             c=np.fft.fft(y)/N
-            p=2*abs(c[1:int(m.floor(N/2))])
+            p=2*(abs(c[1:int(m.floor(N/2))])**2)
+            p[:,0]=p[:,0]+p[:,1]
             f=range(0,int(m.floor(N/2)-1))
             f=f*(Fs/N)
-            totalpower=np.sum(p[1:len(f)])
+            totalpower=np.sum(p[1:len(f),0])
             # check and update maxpower for this window
             if totalpower>maxpower:
                 maxpower=totalpower
                 # end totalpower if
+            lopowind=np.argmax(p[:15,0])
+            lopow+=p[lopowind,0]
+            lofreq.append(lopowind)
+            mdpowind=np.argmax(p[10:30,0])
+            mdpow+=p[mdpowind,0]
+            mdfreq.append(mdpowind+10)
+            hipowind=np.argmax(p[20:,0])
+            hipow+=p[hipowind,0]
+            hifreq.append(hipowind+20)
+
             counter+=winsamples+1
             if counter>songlength:
                 trigger=1
@@ -97,7 +114,11 @@ class DBMonitor(threading.Thread):
             # end trigger while
         trigger=0
         counter=0
-
+        lomean=np.mean(lofreq)
+        mdmean=np.mean(mdfreq)
+        himean=np.mean(hifreq)
+        f1=m.ceil(lomean+(mdmean-lomean)*mdpow/(mdpow+lopow))
+        f2=m.ceil(mdmean+(himean-mdmean)*hipow/(hipow+mdpow))
         # set lo, md, and hi value arrays
         self.loval=[0]
         self.mdval=[0]
@@ -113,9 +134,9 @@ class DBMonitor(threading.Thread):
             f*=Fs/N
             totalpower=np.sum(p[1:len(f)])
 
-            lop = np.sum(p[:13])
-            mdp = np.sum(p[14:30])
-            hip = np.sum(p[31:])
+            lop = np.sum(p[:f1])
+            mdp = np.sum(p[f1:f2])
+            hip = np.sum(p[f2:])
 
             red = [lop*totalpower/maxpower]
             grn = [mdp*totalpower/maxpower]
