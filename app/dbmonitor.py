@@ -8,6 +8,8 @@ from scipy.io import wavfile as wf
 import pyfirmata as pf
 import pygame as pg
 import wave
+import preprocessor
+
 
 class DBMonitor(threading.Thread):
     def __init__(self):
@@ -18,6 +20,9 @@ class DBMonitor(threading.Thread):
         self.pin3 = None
         self.pin5 = None
         self.pin6 = None
+
+        self.preprocessor = preprocessor.SongPreprocessor()
+        self.preprocessor.start()
 
         # Initialize board and set pins using pyfirmata
         try:
@@ -45,7 +50,7 @@ class DBMonitor(threading.Thread):
                 song = databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded).get()
                 self.songPlaying = str(song.uuid)
 
-                self.playSong(song.songPath)
+                self.playSong(song.songPath, song.uuid)
 
                 if self.musicIsPlaying:
                     # add to History
@@ -59,112 +64,24 @@ class DBMonitor(threading.Thread):
             else:
                 time.sleep(3)
 
-    def preprocess(self,nextsong):
-        counter = 0             # counter of samples
-        window = 0.02           # window size = 0.02 seconds
-        trigger=0               # used to end a while loop
-        maxpower=0              # modifier for rgb values
-        Fs=wave.open(nextsong).getframerate()                # default frequency for audio files
-
-
-        winsamples=window*Fs    # number of samples per window
-
-        # Import sound file using scipy
-        raw= wf.read(nextsong)    # raw comes in default format
-        y=np.array(raw[1])        # convert y to numpy array
-        orig=y                    # keep an original copy of y
-        songlength = len(y)       # total number of samples in y
-
-        # Find maxpower of the song
-        while trigger==0:
-            y=orig[counter:counter+winsamples]
-            N=len(y)
-            if N==0:
-                break
-            c=np.fft.fft(y)/N
-            p=2*abs(c[1:int(m.floor(N/2))])
-            f=range(0,int(m.floor(N/2)-1))
-            f=f*(Fs/N)
-            totalpower=np.sum(p[1:len(f)])
-            # check and update maxpower for this window
-            if totalpower>maxpower:
-                maxpower=totalpower
-                # end totalpower if
-            counter+=winsamples+1
-            if counter>songlength:
-                trigger=1
-                # end counter if
-            # end trigger while
-        trigger=0
-        counter=0
-
-        # set lo, md, and hi value arrays
-        self.loval=[0]
-        self.mdval=[0]
-        self.hival=[0]
-        while trigger==0:
-            y=orig[counter:counter+winsamples]
-            N=len(y)
-            if N==0:
-                break
-            c=np.fft.fft(y)/N
-            p=2*abs(c[1:int(m.floor(N/2))])
-            f=range(0,int(m.floor(N/2)-1))
-            f*=Fs/N
-            totalpower=np.sum(p[1:len(f)])
-
-            lop = np.sum(p[:13])
-            mdp = np.sum(p[14:30])
-            hip = np.sum(p[31:])
-
-            red = [lop*totalpower/maxpower]
-            grn = [mdp*totalpower/maxpower]
-            blu = [hip*totalpower/maxpower]
-
-            self.loval = np.concatenate((self.loval,red),axis=0)
-            self.mdval = np.concatenate((self.mdval,grn),axis=0)
-            self.hival = np.concatenate((self.hival,blu),axis=0)
-            counter+=winsamples+1
-            if counter>songlength:
-                trigger = 1
-                # end counter if
-            # end trigger while
-        # Adjust light values
-        self.loval = self.loval/max(self.loval)
-        self.mdval = self.mdval/max(self.mdval)
-        self.hival = self.hival/max(self.hival)
-
-        for i in range(1,len(self.loval)):
-            if self.loval[i] > .90:
-                self.hival[i]=0
-                self.mdval[i]=0
-                self.loval[i]=1
-                # end loval if
-            elif self.mdval[i] > .90:
-                self.loval[i]=0
-                self.mdval[i]=1
-                self.hival[i]=0
-                # end mdval if
-            elif self.hival[i] > .90:
-                self.loval[i]=0
-                self.mdval[i]=0
-                self.hival[i]=1
-                # end hival if
-            # end value for loop
-
-            if self.loval[i] < 0.04:
-                self.loval[i] = 0
-            if self.mdval[i] < 0.04:
-                self.mdval[i] = 0
-            if self.hival[i] < 0.04:
-                self.hival[i] = 0
-
-    def playSong(self, song):
+    def playSong(self, song, songUUID):
         print("Received song request")
-        self.preprocess(song)
-        loval=self.loval
-        mdval=self.mdval
-        hival=self.hival
+
+        #dont preprocess song if it's already preprocessed
+        if(songUUID not in self.preprocessor.lovals.keys() or
+            songUUID not in self.preprocesor.mdvals.keys() or
+            songUUID not in self.preprocessor.hivals.keys()):
+            # second thread to preprocess the song
+            self.preprocessor.preprocessSong(song, songUUID)
+
+
+        # wait for the preprocessor to finish the song
+        while self.preprocessor.is_alive():
+            self.preprocessor.join(0.2)
+        loval=self.preprocessor.lovals[songUUID]
+        mdval=self.preprocessor.mdvals[songUUID]
+        hival=self.preprocessor.hivals[songUUID]
+
         print("Finished analysis, playing song")
 
         # Play audio and sync up light values
@@ -188,11 +105,17 @@ class DBMonitor(threading.Thread):
         if not self.musicIsPlaying:
             # music could've been stopped while song still playing, stop mixer
             pg.mixer.music.stop()
+        else:
+            # music stopped naturally, remove the preprocessing
+            del self.preprocessor.lovals[songUUID]
+            del self.preprocessor.mdvals[songUUID]
+            del self.preprocessor.hivals[songUUID]
 
         if(self.board is not None):
             self.pin3.write(0)
             self.pin5.write(0)
             self.pin6.write(0)
+
     def standbyMode(self):
         cycles=20
         while(databases.SongInQueue.select().wrapped_count()==0):
