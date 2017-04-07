@@ -2,10 +2,13 @@ from peewee import *
 import uuid
 import datetime
 from playhouse.sqlite_ext import SqliteExtDatabase
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 # create database
 db = SqliteExtDatabase('djesaac.db')
-
+logger = logging.getLogger(__name__)
 # create base class,
 # all further database classes should extend this one
 class Base(Model):
@@ -32,7 +35,7 @@ class History(Base):
 
             return eventInHistory.uuid
         except:
-            print('Failed to insert into history table')
+            logger.info('Failed to insert into history table')
             return -1
 
 
@@ -56,7 +59,7 @@ class SongInQueue(Base):
 
             return newSong.uuid
         except:
-            print("Failed to insert to queue table")
+            logger.info("Failed to insert to queue table")
             return -1
 
 TABLE_LIST = [SongInQueue, History]
@@ -67,4 +70,4 @@ def dropTables():
     try:
         db.drop_tables(TABLE_LIST)
     except:
-        print("couldn't drop tables")
+        logger.info("couldn't drop tables")
