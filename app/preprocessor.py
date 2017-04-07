@@ -32,7 +32,7 @@ class SongPreprocessor(threading.Thread):
         hipow=0
         hifreq=[]
 
-        winsamples=window*Fs    # number of samples per window
+        winsamples=int(window*Fs)    # number of samples per window
 
         # Import sound file using scipy
         raw= wf.read(songPath)    # raw comes in default format
@@ -78,8 +78,8 @@ class SongPreprocessor(threading.Thread):
         lomean=np.mean(lofreq)
         mdmean=np.mean(mdfreq)
         himean=np.mean(hifreq)
-        f1=m.ceil(lomean+(mdmean-lomean)*mdpow/(mdpow+lopow))
-        f2=m.ceil(mdmean+(himean-mdmean)*hipow/(hipow+mdpow))
+        f1=int(m.ceil(lomean+(mdmean-lomean)*mdpow/(mdpow+lopow)))
+        f2=int(m.ceil(mdmean+(himean-mdmean)*hipow/(hipow+mdpow)))
 
         # set lo, md, and hi value arrays
         loval=[0]
