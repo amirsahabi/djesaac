@@ -1,9 +1,11 @@
 import threading
 import wave
+import databases
 import numpy as np
 import math as m
 import logging
 from scipy.io import wavfile as wf
+import time
 
 logging.basicConfig(level=logging.INFO)
 
@@ -14,6 +16,26 @@ class SongPreprocessor(threading.Thread):
         self.mdvals = {}
         self.hivals = {}
         self.logger = logging.getLogger(__name__)
+
+    def run(self):
+        while(True):
+            # yet another db monitor
+            while databases.PreprocessRequest.select().wrapped_count() > 0:
+                # get longest waiting request
+                topRequest = databases.PreprocessRequest.select().order_by(databases.PreprocessRequest.datetime).get()
+
+                # get request type
+                if topRequest.requestType == "process":
+                    self.preprocessSong(topRequest.songPath, str(topRequest.songUUID))
+                elif topRequest.requestType == "decomission":
+                    self.decomissionSong(str(topRequest.songUUID))
+                else:
+                    self.logger.warning("Unknown request type")
+
+                # remove the request
+                databases.PreprocessRequest.delete().where(databases.PreprocessRequest.uuid == topRequest.uuid).execute()
+            time.sleep(1.5)
+
 
     def decomissionSong(self, songUUID):
         if(songUUID in self.lovals.keys()):

@@ -70,17 +70,18 @@ class DBMonitor(threading.Thread):
     def playSong(self, song, songUUID):
         self.logger.info("Received song request")
 
+        procID = -1
         #dont preprocess song if it's already preprocessed
         if(songUUID not in self.preprocessor.lovals.keys() or
             songUUID not in self.preprocessor.mdvals.keys() or
             songUUID not in self.preprocessor.hivals.keys()):
             # second thread to preprocess the song
-            self.preprocessor.preprocessSong(song, songUUID)
+            procID = databases.PreprocessRequest.newPreProcessRequest(song, songUUID)
 
 
         # wait for the preprocessor to finish the song
-        while self.preprocessor.is_alive():
-            self.preprocessor.join(0.2)
+        while databases.PreprocessRequest.hasntBeenProcessed(procID):
+            time.sleep(0.3)
         loval=self.preprocessor.lovals[songUUID]
         mdval=self.preprocessor.mdvals[songUUID]
         hival=self.preprocessor.hivals[songUUID]
@@ -110,7 +111,7 @@ class DBMonitor(threading.Thread):
             pg.mixer.music.stop()
         else:
             # music stopped naturally, remove the preprocessing
-            self.preprocessor.decomissionSong(songUUID)
+            databases.PreprocessRequest.newDecomissionRequest(songUUID)
 
         if(self.board is not None):
             self.pin3.write(0)

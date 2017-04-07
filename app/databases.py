@@ -62,7 +62,50 @@ class SongInQueue(Base):
             logger.info("Failed to insert to queue table")
             return -1
 
-TABLE_LIST = [SongInQueue, History]
+class PreprocessRequest(Base):
+    uuid        = UUIDField()
+    songPath    = CharField(null=True)
+    songUUID    = UUIDField()
+    requestType = CharField()
+    datetime    = DateTimeField()
+
+    @staticmethod
+    def newPreProcessRequest(songPath, songUUID):
+        try:
+            npp = PreprocessRequest()
+            npp.uuid = uuid.uuid1()
+            npp.songPath = songPath
+            npp.songUUID = songUUID
+            npp.requestType = "process"
+            npp.datetime = datetime.datetime.now()
+            npp.save()
+
+            return npp.uuid
+        except:
+            return -1
+
+    @staticmethod
+    def newDecomissionRequest(songUUID):
+        try:
+            nd = PreprocessRequest()
+            nd.uuid = uuid.uuid1()
+            nd.songUUID = songUUID
+            nd.requestType = "decomission"
+            nd.datetime = datetime.datetime.now()
+            nd.save()
+
+            return nd.uuid
+        except:
+            return -1
+
+    @staticmethod
+    def hasntBeenProcessed(reqID):
+        if reqID == -1:
+            return False
+        else:
+            return PreprocessRequest.select().where(PreprocessRequest.uuid == reqID).wrapped_count() > 0
+
+TABLE_LIST = [SongInQueue, History, PreprocessRequest]
 
 def initTables():
     db.create_tables(TABLE_LIST)

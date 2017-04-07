@@ -41,7 +41,7 @@ def home():
                 #delete from queue
                 try:
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == uuid).execute()
-                    monitorThread.preprocessor.decomissionSong(uuid)
+                    databases.PreprocessRequest.delete().where(databases.PreprocessRequest.songUUID == uuid).execute()
                 except:
                     return "failure"
             return "success"
@@ -85,6 +85,8 @@ def history():
                 if os.path.isfile(song.songPath):
                     # file already downloaded, just
                     databases.SongInQueue.addSongToQueue(song.songPath, song.songTitle, song.songLink)
+                    # needs to be reprocessed
+                    databases.PreprocessRequest.newPreProcessRequest(song.songPath, song.uuid)
                 else:
                     addSongToQueue(song.songLink)
             except:
@@ -128,7 +130,7 @@ def addSongToQueue(songLink):
 
         if songUUID != "-1":
             # tell the preprocessor in the dbmonitor to preprocess it
-            monitorThread.preprocessor.preprocessSong('./music/'+metadata['id']+'.wav', songUUID)
+            databases.PreprocessRequest.newPreProcessRequest('./music/'+metadata['id']+'.wav', songUUID)
         else:
             return "failure"
 
