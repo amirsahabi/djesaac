@@ -72,7 +72,7 @@ class DBMonitor(threading.Thread):
 
         #dont preprocess song if it's already preprocessed
         if(songUUID not in self.preprocessor.lovals.keys() or
-            songUUID not in self.preprocesor.mdvals.keys() or
+            songUUID not in self.preprocessor.mdvals.keys() or
             songUUID not in self.preprocessor.hivals.keys()):
             # second thread to preprocess the song
             self.preprocessor.preprocessSong(song, songUUID)
