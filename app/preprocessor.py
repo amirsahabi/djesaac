@@ -83,7 +83,7 @@ class SongPreprocessor(threading.Thread):
         while trigger==0:
             y=orig[counter:counter+winsamples]
             N=len(y)
-            if N==0:
+            if N < winsamples:
                 break
             c=np.fft.fft(y)/N
             p=2*(abs(c[1:int(m.floor(N/2))])**2)
