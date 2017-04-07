@@ -5,12 +5,15 @@ import youtube_dl
 import databases
 import os
 from dbmonitor import *
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 # create app
 app = Flask(__name__)
 
 monitorThread = None
-
+logger = logging.getLogger(__name__)
 # home
 @app.route('/', methods=['GET','POST'])
 def home():
@@ -21,7 +24,7 @@ def home():
             for song in databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded):
                 songsInQueue.append(song)
         except:
-            print("Exception hit in home()")
+            logger.info("Exception hit in home()")
             return render_template('home.html')
 
         return render_template('home.html', songs=songsInQueue, musicIsPlaying=monitorThread.musicIsPlaying)
@@ -38,6 +41,9 @@ def home():
                 #delete from queue
                 try:
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == uuid).execute()
+                    del monitorThread.preprocessor.lovals[uuid]
+                    del monitorThread.preprocessor.mdvals[uuid]
+                    del monitorThread.preprocessor.hivals[uuid]
                 except:
                     return "failure"
             return "success"
@@ -67,7 +73,7 @@ def history():
             for event in databases.History.select().order_by(databases.History.dateTimeFinish.desc()):
                 history.append(event)
         except:
-            print("Exception hit in history()")
+            logger.info("Exception hit in history()")
             return render_template('history.html')
 
 
@@ -115,12 +121,18 @@ def addSongToQueue(songLink):
             # remove original
             os.remove('./music/'+metadata['id'])
         else:
-            print("Song existed, no need to redownload")
+            logger.info("Song existed, no need to redownload")
 
             metadata = ydl.extract_info(songLink, download=False)
 
         # given metadata, log to database
-        databases.SongInQueue.addSongToQueue('./music/'+metadata['id']+'.wav', metadata['title'], songLink)
+        songUUID = str(databases.SongInQueue.addSongToQueue('./music/'+metadata['id']+'.wav', metadata['title'], songLink))
+
+        if songUUID != "-1":
+            # tell the preprocessor in the dbmonitor to preprocess it
+            monitorThread.preprocessor.preprocessSong('./music/'+metadata['id']+'.wav', songUUID)
+        else:
+            return "failure"
 
     except:
         return "failure"

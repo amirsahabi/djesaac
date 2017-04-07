@@ -2,7 +2,10 @@ import threading
 import wave
 import numpy as np
 import math as m
+import logging
 from scipy.io import wavfile as wf
+
+logging.basicConfig(level=logging.INFO)
 
 class SongPreprocessor(threading.Thread):
     def __init__(self):
@@ -10,9 +13,10 @@ class SongPreprocessor(threading.Thread):
         self.lovals = {}
         self.mdvals = {}
         self.hivals = {}
-        print("Started preprocessor thread")
+        self.logger = logging.getLogger(__name__)
 
     def preprocessSong(self, songPath, songUUID):
+        self.logger.info("Preprocessing " + songUUID)
         counter = 0             # counter of samples
         window = 0.02           # window size = 0.02 seconds
         trigger=0               # used to end a while loop
@@ -140,3 +144,4 @@ class SongPreprocessor(threading.Thread):
         self.lovals[songUUID] = loval
         self.mdvals[songUUID] = mdval
         self.hivals[songUUID] = hival
+        self.logger.info("Finished preprocessing " + songUUID)

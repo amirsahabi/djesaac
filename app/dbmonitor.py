@@ -9,7 +9,9 @@ import pyfirmata as pf
 import pygame as pg
 import wave
 import preprocessor
+import logging
 
+logging.basicConfig(level=logging.INFO)
 
 class DBMonitor(threading.Thread):
     def __init__(self):
@@ -21,6 +23,7 @@ class DBMonitor(threading.Thread):
         self.pin5 = None
         self.pin6 = None
 
+        self.logger = logging.getLogger(__name__)
         self.preprocessor = preprocessor.SongPreprocessor()
         self.preprocessor.start()
 
@@ -30,7 +33,7 @@ class DBMonitor(threading.Thread):
             self.pin3 = self.board.get_pin('d:3:p')   # set pin 3 for red
             self.pin5 = self.board.get_pin('d:5:p')   # set pin 5 for green
             self.pin6 = self.board.get_pin('d:6:p')   # set pin 6 for blue
-            print("Board initialized")
+            self.logger.info("Board initialized")
         except:
             # failed for windows, try mac
             try:
@@ -38,11 +41,11 @@ class DBMonitor(threading.Thread):
                 self.pin3 = self.board.get_pin('d:3:p')   # set pin 3 for red
                 self.pin5 = self.board.get_pin('d:5:p')   # set pin 5 for green
                 self.pin6 = self.board.get_pin('d:6:p')   # set pin 6 for blue
-                print("Board initialized")
+                self.logger.info("Board initialized")
             except:
                 self.board = None
-                print("Failed to initialize board, will only play music")
-        print("DBMonitor initialized")
+                self.logger.info("Failed to initialize board, will only play music")
+        self.logger.info("DBMonitor initialized")
 
     def run(self):
         while(True):
@@ -50,7 +53,7 @@ class DBMonitor(threading.Thread):
                 song = databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded).get()
                 self.songPlaying = str(song.uuid)
 
-                self.playSong(song.songPath, song.uuid)
+                self.playSong(song.songPath, self.songPlaying)
 
                 if self.musicIsPlaying:
                     # add to History
@@ -65,7 +68,7 @@ class DBMonitor(threading.Thread):
                 time.sleep(3)
 
     def playSong(self, song, songUUID):
-        print("Received song request")
+        self.logger.info("Received song request")
 
         #dont preprocess song if it's already preprocessed
         if(songUUID not in self.preprocessor.lovals.keys() or
@@ -82,7 +85,7 @@ class DBMonitor(threading.Thread):
         mdval=self.preprocessor.mdvals[songUUID]
         hival=self.preprocessor.hivals[songUUID]
 
-        print("Finished analysis, playing song")
+        self.logger.info("Finished analysis, playing song")
 
         # Play audio and sync up light values
         pg.mixer.init(frequency=wave.open(song).getframerate())
@@ -101,7 +104,7 @@ class DBMonitor(threading.Thread):
                     self.pin5.write(mdval[(pos - initVal)/20])
                     self.pin6.write(hival[(pos - initVal)/20])
                 except:
-                    print('Don\'t go places you don\'t belong')
+                    self.logger.info('Don\'t go places you don\'t belong')
         if not self.musicIsPlaying:
             # music could've been stopped while song still playing, stop mixer
             pg.mixer.music.stop()
