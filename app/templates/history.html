@@ -10,20 +10,40 @@
 </head>
 <body>
     <script>
+        $(document).ready(function () {
 
+            $('.add_song').click(function () {
+                if ($('.open_add').is(":hidden")) {
+                    $('.history').animate({marginTop:'+=' + $('.open_add').height()});
+                    $('.open_add').slideDown('slow');
+                } else {
 
+                    $('.history').animate({marginTop:'-=' + $('.open_add').height()});
+                    $('.open_add').slideUp('fast');
+                }
+            });
 
+        });
 
 
     </script>
+
     <div id="nav">
         <a class="nav_link" href="..">HOME</a>
-        <a class="nav_link" href="../add">ADD SONG</a>
+        <a href="#" class="add_song nav_link" >ADD SONG</a>
         <a class="nav_link current" href="../history/">HISTORY</a>
+
+        <div class="open_add hide">
+            <input type="text" class="songLink" id="songLink" name="songLink" placeholder="Link to song ...">
+            <button type="submit" class="addSong" style="position: relative; top: 9px;" id="submitButton" onclick="onSubmit()" value="Submit">
+                <i class="material-icons blue"><i class="material-icons">file_upload</i>
+                </i>
+            </button>
+        </div>
     </div>
 
 
-    <div class="playlist">
+    <div class="history">
         <table>
             <tr>
                 <th>#</th>

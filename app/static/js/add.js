@@ -9,6 +9,7 @@ function onSubmit(){
 
     // send link to server to add to queue
     $.ajax({
+        url: '/add/',
         method: 'POST',
         data: {"link":linkStr},
         success: function(data){

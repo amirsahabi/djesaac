@@ -65,3 +65,11 @@ $(function(){
     });
 
 });
+
+
+
+$(function(){
+    $("#add").click(function(){
+        $("p").slideDown();
+    });
+});

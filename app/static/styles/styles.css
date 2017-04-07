@@ -48,7 +48,60 @@ body{
     color: #96B9CE;
 }
 
+.hide  { display:none; }
+.open_add {
+    background-color:#262B35;
+}
+
+.songLink {
+    background-color: transparent;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 2px solid #FF9A52;
+    width: 30%;
+    margin: auto;
+    font-size: 15px;
+    font-family: Ubuntu;
+    color: #DAE2F2;
+}
+
+
+.songLink textarea{
+    resize:none;
+    overflow: hidden;
+}
+
+input::-webkit-input-placeholder {
+    color: #757980 !important;
+
+}
+
+input:-moz-placeholder { /* Firefox 18- */
+    color: #757980 !important;
+}
+
+input::-moz-placeholder {  /* Firefox 19+ */
+    color: #757980 !important;
+}
+
+input:-ms-input-placeholder {
+    color: #757980 !important;
+}
+
+input:focus {
+    outline:none;
+}
+
+.addSong{
+    background-color: transparent;
+    border:0;
+    padding: 0;
+}
+.material-icons.blue { color: #96B9CE; }
+
 .currently_playing{
+    position: relative;
     margin-top: 80px;
     padding-top: 15px;
     display: block;
@@ -69,7 +122,18 @@ table#cur_playing{
 
 
 .playlist{
-    margin-top: 80px;
+    position: relative;
+    margin-top: 30px;
+    padding-top: 15px;
+    display: block;
+    width: 60%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.history{
+    position: relative;
+    margin-top: 90px;
     padding-top: 15px;
     display: block;
     width: 60%;
@@ -117,6 +181,3 @@ th:nth-child(1), td:nth-child(1) {
     text-align: center;
 }
 
-/*.button{*/
-/*color:*/
-/*}*/
