@@ -110,9 +110,7 @@ class DBMonitor(threading.Thread):
             pg.mixer.music.stop()
         else:
             # music stopped naturally, remove the preprocessing
-            del self.preprocessor.lovals[songUUID]
-            del self.preprocessor.mdvals[songUUID]
-            del self.preprocessor.hivals[songUUID]
+            self.preprocessor.decomissionSong(songUUID)
 
         if(self.board is not None):
             self.pin3.write(0)

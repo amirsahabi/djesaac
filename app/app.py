@@ -41,9 +41,7 @@ def home():
                 #delete from queue
                 try:
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == uuid).execute()
-                    del monitorThread.preprocessor.lovals[uuid]
-                    del monitorThread.preprocessor.mdvals[uuid]
-                    del monitorThread.preprocessor.hivals[uuid]
+                    monitorThread.preprocessor.decomissionSong(uuid)
                 except:
                     return "failure"
             return "success"

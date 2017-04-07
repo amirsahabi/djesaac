@@ -15,7 +15,24 @@ class SongPreprocessor(threading.Thread):
         self.hivals = {}
         self.logger = logging.getLogger(__name__)
 
+    def decomissionSong(self, songUUID):
+        if(songUUID in self.lovals.keys()):
+            del self.lovals[songUUID]
+        if(songUUID in self.mdvals.keys()):
+            del self.mdvals[songUUID]
+        if(songUUID in self.hivals.keys()):
+            del self.hivals[songUUID]
+
     def preprocessSong(self, songPath, songUUID):
+        # dont preprocess song if its already been processed
+        if( songUUID in self.lovals.keys() and
+            songUUID in self.mdvals.keys() and
+            songUUID in self.hivals.keys()):
+            # do not print
+            self.logger.info("Do not have to preprocess song")
+            return
+
+
         self.logger.info("Preprocessing " + songUUID)
         counter = 0             # counter of samples
         window = 0.02           # window size = 0.02 seconds
