@@ -17,11 +17,17 @@ logger = logging.getLogger(__name__)
 
 class DBMonitor:
     def __init__(self, musicIsPlayingValue, songPlayingValue, threadIssue):
+        # I like the idea of encapsulation for all these functions and variables
+        # but when the object is instantiated in the main thread, it instantiates
+        # an object before the run() function is called in its new process
+        # (by multiprocessing.Process). To prevent creating redundant connections
+        # (or even dual spawning threads), this variable prevents the object
+        # from instantiating. Note that the run() function also calls __init__()
         if threadIssue:
             return
 
-        self.songPlaying = songPlayingValue
-        self.musicIsPlaying = musicIsPlayingValue
+        self.songPlaying = songPlayingValue         # multiprocessing.Array object
+        self.musicIsPlaying = musicIsPlayingValue   # multiprocessing.Value object
         self.board = None
         self.pin3 = None
         self.pin5 = None
