@@ -4,6 +4,7 @@
     <!--<link rel="stylesheet" type="text/css" href="{{url_for('static', filename='styles/responsetable.css')}}"/>-->
     <script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.2.0.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/home.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/add.js')}}"></script>
     <script src="../static/js/jquery-3.2.0.js"></script>
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Ubuntu" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -12,8 +13,16 @@
 <body>
 <div id="nav">
     <a class="nav_link current" href="">HOME</a>
-    <a class="nav_link" href="add">ADD SONG</a>
+    <a href="#/" class="add_song nav_link" >ADD SONG</a>
     <a class="nav_link" href="history/">HISTORY</a>
+
+    <div class="open_add hide">
+        <input type="text" class="songLink" id="songLink" name="songLink" placeholder="Link to song ...">
+        <button type="submit" class="addSong" style="position: relative; top: 9px;" id="submitButton" onclick="onSubmit()" value="Submit">
+            <i class="material-icons blue"><i class="material-icons">file_upload</i>
+            </i>
+        </button>
+    </div>
 </div>
 
 <script>
@@ -23,6 +32,17 @@
                 return v === 'pause_circle_outline' ? 'play_circle_outline' : 'pause_circle_outline'
             });
         });
+
+        $('.add_song').click(function () {
+            if ($('.open_add').is(":hidden")) {
+                $('.currently_playing').animate({marginTop:'+=' + $('.open_add').height()});
+                $('.open_add').slideDown('slow');
+            } else {
+                $('.currently_playing').animate({marginTop:'-='+  $('.open_add').height()});
+                $('.open_add').slideUp('fast');
+            }
+        });
+
     });
 </script>
 
