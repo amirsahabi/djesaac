@@ -1,6 +1,5 @@
 # dbmonitor.py
 import time
-import threading
 import databases
 import numpy as np
 import math as m
@@ -10,20 +9,25 @@ import pygame as pg
 import wave
 import preprocessor
 import logging
+import os
+from multiprocessing import Value
 
 logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
-class DBMonitor(threading.Thread):
-    def __init__(self):
-        super(DBMonitor, self).__init__()
-        self.songPlaying = None
-        self.musicIsPlaying = True
+class DBMonitor:
+    def __init__(self, musicIsPlayingValue, songPlayingValue, threadIssue):
+        if threadIssue:
+            return
+
+        self.songPlaying = songPlayingValue
+        self.musicIsPlaying = musicIsPlayingValue
         self.board = None
         self.pin3 = None
         self.pin5 = None
         self.pin6 = None
 
-        self.logger = logging.getLogger(__name__)
+        logger = logging.getLogger(__name__)
         self.preprocessor = preprocessor.SongPreprocessor()
         self.preprocessor.start()
 
@@ -33,7 +37,7 @@ class DBMonitor(threading.Thread):
             self.pin3 = self.board.get_pin('d:3:p')   # set pin 3 for red
             self.pin5 = self.board.get_pin('d:5:p')   # set pin 5 for green
             self.pin6 = self.board.get_pin('d:6:p')   # set pin 6 for blue
-            self.logger.info("Board initialized")
+            logger.info("Board initialized")
         except:
             # failed for windows, try mac
             try:
@@ -41,34 +45,37 @@ class DBMonitor(threading.Thread):
                 self.pin3 = self.board.get_pin('d:3:p')   # set pin 3 for red
                 self.pin5 = self.board.get_pin('d:5:p')   # set pin 5 for green
                 self.pin6 = self.board.get_pin('d:6:p')   # set pin 6 for blue
-                self.logger.info("Board initialized")
+                logger.info("Board initialized")
             except:
                 self.board = None
-                self.logger.info("Failed to initialize board, will only play music")
-        self.logger.info("DBMonitor initialized")
+                logger.info("Failed to initialize board, will only play music")
+        logger.info("DBMonitor initialized")
 
-    def run(self):
+    def run(self, musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, threadIssue):
+        logger.info("Running DBMonitor")
+        self.__init__(musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, threadIssue)
+
         while(True):
-            while(self.musicIsPlaying and databases.SongInQueue.select().wrapped_count() > 0):
+            while(self.musicIsPlaying.value == 1 and databases.SongInQueue.select().wrapped_count() > 0):
                 song = databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded).get()
-                self.songPlaying = str(song.uuid)
+                self.songPlaying.value = str(song.uuid)
 
-                self.playSong(song.songPath, self.songPlaying)
+                self.playSong(song.songPath, str(self.songPlaying.value))
 
-                if self.musicIsPlaying:
+                if self.musicIsPlaying.value == 1:
                     # add to History
                     databases.History.addSongToHistory(song.songTitle, song.songLink, song.songPath)
 
                     # remove song from queue
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == song.uuid).execute()
-            self.songPlaying = None
+            self.songPlaying.value = ''
             if self.board is not None:
                 self.standbyMode()
             else:
                 time.sleep(3)
 
     def playSong(self, song, songUUID):
-        self.logger.info("Received song request")
+        logger.info("Received song request")
 
         procID = -1
         #dont preprocess song if it's already preprocessed
@@ -78,15 +85,15 @@ class DBMonitor(threading.Thread):
             # second thread to preprocess the song
             procID = databases.PreprocessRequest.newPreProcessRequest(song, songUUID)
 
-
         # wait for the preprocessor to finish the song
         while databases.PreprocessRequest.hasntBeenProcessed(procID):
             time.sleep(0.3)
+
         loval=self.preprocessor.lovals[songUUID]
         mdval=self.preprocessor.mdvals[songUUID]
         hival=self.preprocessor.hivals[songUUID]
 
-        self.logger.info("Finished analysis, playing song")
+        logger.info("Finished analysis, playing song")
 
         # Play audio and sync up light values
         pg.mixer.init(frequency=wave.open(song).getframerate())
@@ -94,7 +101,7 @@ class DBMonitor(threading.Thread):
         pg.mixer.music.play()
         first = True
         initVal = 0
-        while pg.mixer.music.get_busy() == True and self.musicIsPlaying:
+        while pg.mixer.music.get_busy() == True and self.musicIsPlaying.value == 1:
             if(self.board is not None):
                 try:
                     pos = pg.mixer.music.get_pos()
@@ -105,8 +112,8 @@ class DBMonitor(threading.Thread):
                     self.pin5.write(mdval[(pos - initVal)/20])
                     self.pin6.write(hival[(pos - initVal)/20])
                 except:
-                    self.logger.info('Don\'t go places you don\'t belong')
-        if not self.musicIsPlaying:
+                    logger.info('Don\'t go places you don\'t belong')
+        if not (self.musicIsPlaying.value == 1):
             # music could've been stopped while song still playing, stop mixer
             pg.mixer.music.stop()
         else:

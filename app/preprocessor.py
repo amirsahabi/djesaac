@@ -1,5 +1,6 @@
 import threading
 import wave
+import os
 import databases
 import numpy as np
 import math as m
@@ -30,7 +31,7 @@ class SongPreprocessor(threading.Thread):
                 elif topRequest.requestType == "decomission":
                     self.decomissionSong(str(topRequest.songUUID))
                 else:
-                    self.logger.warning("Unknown request type")
+                    self.logger.info("Unknown request type")
 
                 # remove the request
                 databases.PreprocessRequest.delete().where(databases.PreprocessRequest.uuid == topRequest.uuid).execute()
@@ -53,7 +54,6 @@ class SongPreprocessor(threading.Thread):
             # do not print
             self.logger.info("Do not have to preprocess song")
             return
-
 
         self.logger.info("Preprocessing " + songUUID)
         counter = 0             # counter of samples
