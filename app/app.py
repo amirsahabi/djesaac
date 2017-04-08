@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from flask import Flask, request, render_template
+from flask import Flask, request, render_template, Response
 from pydub import AudioSegment
 import youtube_dl
 import databases
@@ -64,10 +64,6 @@ def home():
             if ''.join(songPlaying) == uuid:
                 # send next signal
                 skipSongRequest[:] = uuid
-
-                # wait until the song is no longer playing before successfully exiting
-                while ''.join(skipSongRequest) == ''.join(songPlaying):
-                    time.sleep(0.1)
         else:
             return "unknown command"
         return "success"
@@ -111,6 +107,20 @@ def history():
             return 'success'
     return 'failure'
 
+@app.route('/updater/')
+def listener():
+    def listenForSongIsFinished():
+        flaskThreadSongPlaying = ''.join(songPlaying)
+        while True:
+            if(databases.SongInQueue.select().wrapped_count() > 0):
+                # check to see if previous song is current song
+                if(flaskThreadSongPlaying != ''.join(songPlaying)):
+                    #song playing has changed, send data request
+                    yield "data: newsong\n\n"
+                    # rewrite the song name
+                    flaskThreadSongPlaying = ''.join(songPlaying)
+
+    return Response(listenForSongIsFinished(), mimetype="text/event-stream")
 
 def addSongToQueue(songLink):
     try:

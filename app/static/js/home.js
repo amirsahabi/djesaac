@@ -39,7 +39,6 @@ function skipSong(songID){
             if(data !== 'success'){
                 alert('Received error: ' + data);
             }
-            window.location.href = window.location.origin;
         },
         error: function(){
             alert("Something went wrong when submitting, try again");
