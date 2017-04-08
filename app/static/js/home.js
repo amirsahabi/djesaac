@@ -11,11 +11,11 @@ function removeSongFromQueue(songID){
             "songID":songID
         },
         success: function(data){
-            if(data === 'success'){
+            if(data.response === 'success'){
                 alert('Successful submission');
                 window.location.href = (window.location.origin);
-            } else {
-                alert('Received error: ' + data);
+            } else if(data.response === "failure") {
+                alert('Received error: ' + data.error);
             }
             $('#'+songID).prop('disabled', false);
         },
@@ -36,8 +36,8 @@ function skipSong(songID){
             "songID":songID
         },
         success: function(data){
-            if(data !== 'success'){
-                alert('Received error: ' + data);
+            if(data.response !== 'success'){
+                alert('Received error: ' + data.error);
             }
         },
         error: function(){
@@ -57,11 +57,11 @@ function startStop(){
             "command":"startstop"
         },
         success: function(data){
-            if(data === "success"){
+            if(data.response === "success"){
                 //reload page I guess?
                 window.location.reload();
-            } else {
-                alert("Received error: " + data);
+            } else if(data.response === "failure") {
+                alert("Received error: " + data.error);
                 $('#startStop').prop('disabled', false);
             }
         },

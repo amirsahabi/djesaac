@@ -1,5 +1,5 @@
 from __future__ import unicode_literals
-from flask import Flask, request, render_template, Response
+from flask import Flask, request, render_template, Response, jsonify
 from pydub import AudioSegment
 from multiprocessing import Process, Value, Array
 from dbmonitor import *
@@ -37,6 +37,7 @@ def home():
 
         return render_template('home.html', songs=songsInQueue, musicIsPlaying=musicIsPlaying.value == 1)
     else:
+        responseData = {}
         command = request.form['command']
         if command == "remove":
             #do delete
@@ -44,19 +45,22 @@ def home():
 
             #verify the song isn't playing
             if ''.join(songPlaying) == uuid and musicIsPlaying.value == 1:
-                return "Song can't be deleted, is currently playing"
+                responseData["response"] = "failure"
+                responseData["error"]    = "Song can't be deleted, is currently playing"
             else:
                 #delete from queue
                 try:
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == uuid).execute()
                     databases.PreprocessRequest.delete().where(databases.PreprocessRequest.songUUID == uuid).execute()
                 except:
-                    return "failure"
+                    responseData["response"] = "failure"
+                    responseData["error"]    = "Failed to remove from database"
         elif command == "startstop":
             try:
                 musicIsPlaying.value = (musicIsPlaying.value + 1) % 2
             except:
-                return "Can't stop this beat"
+                responseData["response"] = "failure"
+                responseData["error"]    = "Can't stop this beat"
         elif command == "next":
             uuid = str(request.form['songID'])
 
@@ -65,8 +69,9 @@ def home():
                 # send next signal
                 skipSongRequest[:] = uuid
         else:
-            return "unknown command"
-        return "success"
+            responseData["response"] = "failure"
+            responseData["error"]    = "unknown command"
+        return jsonify(responseData)
 
 
 @app.route('/add/', methods=['POST'])
