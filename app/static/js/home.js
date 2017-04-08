@@ -26,6 +26,28 @@ function removeSongFromQueue(songID){
     });
 }
 
+function skipSong(songID){
+    $('.skipsong').prop('disabled', true);
+
+    $.ajax({
+        method: 'POST',
+        data : {
+            "command":"next",
+            "songID":songID
+        },
+        success: function(data){
+            if(data !== 'success'){
+                alert('Received error: ' + data);
+            }
+            window.location.href = window.location.origin;
+        },
+        error: function(){
+            alert("Something went wrong when submitting, try again");
+            $('.skipsong').prop('disabled',false);
+        }
+    });
+}
+
 function startStop(){
     $('#startStop').prop('disabled', true);
 

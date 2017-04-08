@@ -14,12 +14,15 @@ logging.basicConfig(level=logging.INFO)
 # create app
 app = Flask(__name__)
 
-musicIsPlaying = Value('d' , 1)
-songPlaying = Array(ctypes.c_char_p, 36)
-songPlaying[:] = " " *36
+musicIsPlaying  = Value('d' , 1)
+songPlaying     = Array(ctypes.c_char_p, 36)
+skipSongRequest = Array(ctypes.c_char_p, 36)
+songPlaying[:]      = " " * 36
+skipSongRequest[:]  = " " * 36
 monitor = None
 logger = logging.getLogger(__name__)
 # home
+
 @app.route('/', methods=['GET','POST'])
 def home():
     if(request.method == 'GET'):
@@ -49,16 +52,25 @@ def home():
                     databases.PreprocessRequest.delete().where(databases.PreprocessRequest.songUUID == uuid).execute()
                 except:
                     return "failure"
-            return "success"
         elif command == "startstop":
             try:
                 musicIsPlaying.value = (musicIsPlaying.value + 1) % 2
             except:
                 return "Can't stop this beat"
-            return "success"
+        elif command == "next":
+            uuid = str(request.form['songID'])
 
+            # verify song is playing
+            if ''.join(songPlaying) == uuid:
+                # send next signal
+                skipSongRequest[:] = uuid
+
+                # wait until the song is no longer playing before successfully exiting
+                while ''.join(skipSongRequest) == ''.join(songPlaying):
+                    time.sleep(0.1)
         else:
             return "unknown command"
+        return "success"
 
 
 @app.route('/add/', methods=['GET','POST'])
@@ -89,9 +101,9 @@ def history():
                 song = databases.History.select().where(databases.History.uuid == songID).get()
                 if os.path.isfile(song.songPath):
                     # file already downloaded, just
-                    databases.SongInQueue.addSongToQueue(song.songPath, song.songTitle, song.songLink)
+                    newSongUUID = databases.SongInQueue.addSongToQueue(song.songPath, song.songTitle, song.songLink)
                     # needs to be reprocessed
-                    databases.PreprocessRequest.newPreProcessRequest(song.songPath, song.uuid)
+                    databases.PreprocessRequest.newPreProcessRequest(song.songPath, str(newSongUUID))
                 else:
                     addSongToQueue(song.songLink)
             except:
@@ -166,8 +178,8 @@ if __name__ == "__main__":
     # databases.dropTables()
     # databases.initTables()
 
-    monitor = DBMonitor(musicIsPlaying, songPlaying , True)
-    monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, False))
+    monitor = DBMonitor(musicIsPlaying, songPlaying, skipSongRequest, True)
+    monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, False))
     monitorProc.start()
 
     app.debug = True

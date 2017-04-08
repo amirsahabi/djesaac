@@ -47,6 +47,10 @@ class SongPreprocessor(threading.Thread):
             del self.hivals[songUUID]
 
     def preprocessSong(self, songPath, songUUID):
+        # defensive check
+        if(songUUID == "-1"):
+            return
+
         # dont preprocess song if its already been processed
         if( songUUID in self.lovals.keys() and
             songUUID in self.mdvals.keys() and

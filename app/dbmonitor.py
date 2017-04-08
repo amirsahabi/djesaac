@@ -16,7 +16,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class DBMonitor:
-    def __init__(self, musicIsPlayingValue, songPlayingValue, threadIssue):
+    def __init__(self, musicIsPlayingValue, songPlayingValue, skipSongRequest, threadIssue):
         # I like the idea of encapsulation for all these functions and variables
         # but when the object is instantiated in the main thread, it instantiates
         # an object before the run() function is called in its new process
@@ -26,14 +26,14 @@ class DBMonitor:
         if threadIssue:
             return
 
-        self.songPlaying = songPlayingValue         # multiprocessing.Array object
+        self.songPlaying    = songPlayingValue         # multiprocessing.Array object
         self.musicIsPlaying = musicIsPlayingValue   # multiprocessing.Value object
-        self.board = None
-        self.pin3 = None
-        self.pin5 = None
-        self.pin6 = None
+        self.skipSong       = skipSongRequest
+        self.board          = None
+        self.pin3           = None
+        self.pin5           = None
+        self.pin6           = None
 
-        logger = logging.getLogger(__name__)
         self.preprocessor = preprocessor.SongPreprocessor()
         self.preprocessor.start()
 
@@ -57,9 +57,9 @@ class DBMonitor:
                 logger.info("Failed to initialize board, will only play music")
         logger.info("DBMonitor initialized")
 
-    def run(self, musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, threadIssue):
+    def run(self, musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, threadIssue):
         logger.info("Running DBMonitor")
-        self.__init__(musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, threadIssue)
+        self.__init__(musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, threadIssue)
 
         while(True):
             while(self.musicIsPlaying.value == 1 and databases.SongInQueue.select().wrapped_count() > 0):
@@ -107,7 +107,17 @@ class DBMonitor:
         pg.mixer.music.play()
         first = True
         initVal = 0
-        while pg.mixer.music.get_busy() == True and self.musicIsPlaying.value == 1:
+        while(pg.mixer.music.get_busy() == True and self.musicIsPlaying.value == 1):
+            # check for skip
+            if(self.skipSong[0] != ' '):
+                # skip song requested verify it's this song
+                if(''.join(self.skipSong[:]) == ''.join(self.songPlaying[:])):
+                    pg.mixer.music.stop()       # turn off music
+                    self.skipSong[:] = ' ' * 36 # clear song to skip
+                    break                       # exit loop
+                else:
+                    self.skipSong[:] = ' ' * 36
+
             if(self.board is not None):
                 try:
                     pos = pg.mixer.music.get_pos()
