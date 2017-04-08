@@ -72,7 +72,31 @@ function startStop(){
     })
 }
 
-
+function reArrangeQueueTable(parameters){
+    //get rows
+    var currentlyPlayingRow = $('.currently_playing').find('tr.tabledatarow');
+    //check there is a song now playing
+    if(currentlyPlayingRow.length > 0){
+        if(parameters.newID === ' '.repeat(36) && parameters.newTitle == '' && parameters.newLink == ""){
+            //no next song, just remove the column
+            currentlyPlayingRow.remove();
+        } else {
+            //acocomodate next song
+            currentlyPlayingRow.find('.skipsong').attr('onclick', "skipSong('"+parameters.newID+"')");
+            currentlyPlayingRow.find('.songtitlecolumn').text(parameters.newTitle);
+            currentlyPlayingRow.find('.table_link').attr('href', parameters.newLink);
+        }
+    }
+    var playlistRows = $('.playlist').find('tr.tabledatarow');
+    if(playlistRows.length > 0){
+        $(playlistRows[0]).remove();
+        // playlistRows = $('.playlist').find('tr.tabledatarow');
+        playlistRows.each(function(){
+            var indexNum = $(this).find('.queueindexcolumn').text();
+            $(this).find('.queueindexcolumn').text(parseInt(indexNum)-1);
+        })
+    }
+}
 
 $(function(){
 

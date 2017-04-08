@@ -130,21 +130,74 @@ def history():
 @app.route('/updater/')
 def listener():
     def listenForSongIsFinished():
-        flaskThreadSongPlaying = ''.join(songPlaying)
+        flaskThreadSongPlaying      = str(''.join(songPlaying))
+        flaskThreadSongObject       = databases.SongInQueue.select().where(databases.SongInQueue.uuid == flaskThreadSongPlaying).get() if flaskThreadSongPlaying != ' ' * 36 else None
+        flaskThreadSongPlayingTitle = str(flaskThreadSongObject.songTitle) if flaskThreadSongPlaying != ' ' * 36 else ''
+        flaskThreadSongPlayingLink  = str(flaskThreadSongObject.songLink)  if flaskThreadSongPlaying != ' ' * 36 else ''
         while True:
             if(databases.SongInQueue.select().wrapped_count() > 0):
                 # check to see if previous song is current song
                 if(flaskThreadSongPlaying != ''.join(songPlaying)):
+                    # get new variables
+                    newSongID       = str(''.join(songPlaying))
+                    newSongObject   = databases.SongInQueue.select().where(databases.SongInQueue.uuid == newSongID).get()
+                    newSongTitle    = str(newSongObject.songTitle)
+                    newSongLink     = str(newSongObject.songLink)
+
+                    # create response
+                    # responseString =     ("data: response: newsong,"
+                    #                         "oldID: {},newID: {},"
+                    #                         "oldTitle: {},newTitle: {},"
+                    #                         "oldLink: {},newLink: {}\n\n").format(       \
+                    #                         flaskThreadSongPlaying, newSongID,          \
+                    #                         flaskThreadSongPlayingTitle, newSongTitle,  \
+                    #                         flaskThreadSongPlayingLink, newSongLink     \
+                    #                         )
+
                     #song playing has changed, send data request
-                    yield "data: newsong\n\n"
-                    # rewrite the song name
-                    flaskThreadSongPlaying = ''.join(songPlaying)
+                    # yield responseString
+                    yield "data: STARTUPDATE\n\n"
+                    yield "data: oldID: {}\n\n".format(flaskThreadSongPlaying)
+                    yield "data: newID: {}\n\n".format(newSongID)
+                    yield "data: oldTitle: {}\n\n".format(flaskThreadSongPlayingTitle)
+                    yield "data: newTitle: {}\n\n".format(newSongTitle)
+                    yield "data: oldLink: {}\n\n".format(flaskThreadSongPlayingLink)
+                    yield "data: newLink: {}\n\n".format(newSongLink)
+                    yield "data: ENDUPDATE\n\n"
+                    # transition listening to data to new data
+                    flaskThreadSongPlaying      = newSongID
+                    flaskThreadSongObject       = newSongObject
+                    flaskThreadSongPlayingTitle = newSongTitle
+                    flaskThreadSongPlayingLink  = newSongLink
             elif(flaskThreadSongPlaying != ' ' * 36):
                 # no more songs playing but the last one finished, send an event
-                yield "data: newsong\n\n"
-                flaskThreadSongPlaying = ' ' * 36
-            else:
-                time.sleep(1)
+                newSongID = ' ' * 36
+                newSongObject = None
+                newSongTitle = ''
+                newSongLink = ''
+
+                # responseString =     "data: response: newsong,\
+                #                         oldID: {},newID: {},\
+                #                         oldTitle: {},newTitle: {},\
+                #                         oldLink: {},newLink: {}\n\n".format(       \
+                #                         flaskThreadSongPlaying, newSongID,          \
+                #                         flaskThreadSongPlayingTitle, newSongTitle,  \
+                #                         flaskThreadSongPlayingLink, newSongLink     \
+                #                         )
+                yield "data: STARTUPDATE\n\n"
+                yield "data: oldID: {}\n\n".format(flaskThreadSongPlaying)
+                yield "data: newID: {}\n\n".format(newSongID)
+                yield "data: oldTitle: {}\n\n".format(flaskThreadSongPlayingTitle)
+                yield "data: newTitle: {}\n\n".format(newSongTitle)
+                yield "data: oldLink: {}\n\n".format(flaskThreadSongPlayingLink)
+                yield "data: newLink: {}\n\n".format(newSongLink)
+                yield "data: ENDUPDATE\n\n"
+
+                flaskThreadSongPlaying = newSongID
+                flaskThreadSongObject  = newSongObject
+                flaskThreadSongPlayingTitle = newSongTitle
+                flaskThreadSongPlayingLink  = newSongLink
+            time.sleep(0.5)
 
     return Response(listenForSongIsFinished(), mimetype="text/event-stream")
 
