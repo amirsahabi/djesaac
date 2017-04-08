@@ -77,7 +77,7 @@ function reArrangeQueueTable(parameters){
     var currentlyPlayingRow = $('.currently_playing').find('tr.tabledatarow');
     //check there is a song now playing
     if(currentlyPlayingRow.length > 0){
-        if(parameters.newID != undefined and parameters.newID.trim() === ' ' && parameters.newTitle == '' && parameters.newLink == ""){
+        if(typeof parameters.newID != 'string' and parameters.newID.trim() === ' ' && parameters.newTitle == '' && parameters.newLink == ""){
             //no next song, just remove the column
             currentlyPlayingRow.remove();
         } else {
