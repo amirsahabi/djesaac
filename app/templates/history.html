@@ -24,6 +24,12 @@
                 }
             });
 
+            var eventSource = new EventSource("/updater");
+            eventSource.onmessage = function(event) {
+                //reload the page for now, in the future hopefully it's dynamic
+                window.location.reload()
+            };
+
         });
 
 
