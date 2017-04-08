@@ -1,9 +1,12 @@
 import threading
 import wave
+import os
+import databases
 import numpy as np
 import math as m
 import logging
 from scipy.io import wavfile as wf
+import time
 
 logging.basicConfig(level=logging.INFO)
 
@@ -14,6 +17,26 @@ class SongPreprocessor(threading.Thread):
         self.mdvals = {}
         self.hivals = {}
         self.logger = logging.getLogger(__name__)
+
+    def run(self):
+        while(True):
+            # yet another db monitor
+            while databases.PreprocessRequest.select().wrapped_count() > 0:
+                # get longest waiting request
+                topRequest = databases.PreprocessRequest.select().order_by(databases.PreprocessRequest.datetime).get()
+
+                # get request type
+                if topRequest.requestType == "process":
+                    self.preprocessSong(topRequest.songPath, str(topRequest.songUUID))
+                elif topRequest.requestType == "decomission":
+                    self.decomissionSong(str(topRequest.songUUID))
+                else:
+                    self.logger.info("Unknown request type")
+
+                # remove the request
+                databases.PreprocessRequest.delete().where(databases.PreprocessRequest.uuid == topRequest.uuid).execute()
+            time.sleep(1.5)
+
 
     def decomissionSong(self, songUUID):
         if(songUUID in self.lovals.keys()):
@@ -31,7 +54,6 @@ class SongPreprocessor(threading.Thread):
             # do not print
             self.logger.info("Do not have to preprocess song")
             return
-
 
         self.logger.info("Preprocessing " + songUUID)
         counter = 0             # counter of samples
@@ -61,7 +83,7 @@ class SongPreprocessor(threading.Thread):
         while trigger==0:
             y=orig[counter:counter+winsamples]
             N=len(y)
-            if N<Fs*window:
+            if N < winsamples:
                 break
             c=np.fft.fft(y)/N
             p=2*(abs(c[1:int(m.floor(N/2))])**2)

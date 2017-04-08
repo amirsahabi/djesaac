@@ -6,13 +6,17 @@ import databases
 import os
 from dbmonitor import *
 import logging
+from multiprocessing import Process, Value, Array
+import ctypes
 
 logging.basicConfig(level=logging.INFO)
 
 # create app
 app = Flask(__name__)
 
-monitorThread = None
+musicIsPlaying = Value('d' , 1)
+songPlaying = Array(ctypes.c_char_p, 40)
+monitor = None
 logger = logging.getLogger(__name__)
 # home
 @app.route('/', methods=['GET','POST'])
@@ -27,7 +31,7 @@ def home():
             logger.info("Exception hit in home()")
             return render_template('home.html')
 
-        return render_template('home.html', songs=songsInQueue, musicIsPlaying=monitorThread.musicIsPlaying)
+        return render_template('home.html', songs=songsInQueue, musicIsPlaying=musicIsPlaying.value == 1)
     else:
         command = request.form['command']
         if command == "remove":
@@ -35,19 +39,19 @@ def home():
             uuid = str(request.form['songID'])
 
             #verify the song isn't playing
-            if monitorThread.songPlaying == uuid and monitorThread.musicIsPlaying:
+            if songPlaying.value == uuid and musicIsPlaying.value == 1:
                 return "Song can't be deleted, is currently playing"
             else:
                 #delete from queue
                 try:
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == uuid).execute()
-                    monitorThread.preprocessor.decomissionSong(uuid)
+                    databases.PreprocessRequest.delete().where(databases.PreprocessRequest.songUUID == uuid).execute()
                 except:
                     return "failure"
             return "success"
         elif command == "startstop":
             try:
-                monitorThread.musicIsPlaying = not monitorThread.musicIsPlaying
+                musicIsPlaying.value = (musicIsPlaying.value + 1) % 2
             except:
                 return "Can't stop this beat"
             return "success"
@@ -85,6 +89,8 @@ def history():
                 if os.path.isfile(song.songPath):
                     # file already downloaded, just
                     databases.SongInQueue.addSongToQueue(song.songPath, song.songTitle, song.songLink)
+                    # needs to be reprocessed
+                    databases.PreprocessRequest.newPreProcessRequest(song.songPath, song.uuid)
                 else:
                     addSongToQueue(song.songLink)
             except:
@@ -128,7 +134,7 @@ def addSongToQueue(songLink):
 
         if songUUID != "-1":
             # tell the preprocessor in the dbmonitor to preprocess it
-            monitorThread.preprocessor.preprocessSong('./music/'+metadata['id']+'.wav', songUUID)
+            databases.PreprocessRequest.newPreProcessRequest('./music/'+metadata['id']+'.wav', songUUID)
         else:
             return "failure"
 
@@ -156,11 +162,12 @@ def songHasBeenDownloaded(songLink):
 # start server
 if __name__ == "__main__":
     #drop and init tables
-    # databases.dropTables()
-    # databases.initTables()
+    databases.dropTables()
+    databases.initTables()
 
-    monitorThread = DBMonitor()
-    monitorThread.start()
+    monitor = DBMonitor(musicIsPlaying, songPlaying , True)
+    monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, False))
+    monitorProc.start()
 
     app.debug = True
     app.run(threaded=True, port=3000, host='0.0.0.0', use_reloader=False)
