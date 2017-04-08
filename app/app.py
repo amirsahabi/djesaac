@@ -69,12 +69,9 @@ def home():
         return "success"
 
 
-@app.route('/add/', methods=['GET','POST'])
+@app.route('/add/', methods=['POST'])
 def add():
-    if(request.method == 'GET'):
-        return render_template('add.html')
-    else:
-        return addSongToQueue(request.form['link'])
+    return addSongToQueue(request.form['link'])
 
 @app.route('/history/', methods=['GET','POST'])
 def history():
