@@ -52,12 +52,14 @@ def home():
                 try:
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == uuid).execute()
                     databases.PreprocessRequest.delete().where(databases.PreprocessRequest.songUUID == uuid).execute()
+                    responseData["response"] = "success"
                 except:
                     responseData["response"] = "failure"
                     responseData["error"]    = "Failed to remove from database"
         elif command == "startstop":
             try:
                 musicIsPlaying.value = (musicIsPlaying.value + 1) % 2
+                responseData["response"] = "success"
             except:
                 responseData["response"] = "failure"
                 responseData["error"]    = "Can't stop this beat"
@@ -68,6 +70,7 @@ def home():
             if ''.join(songPlaying) == uuid:
                 # send next signal
                 skipSongRequest[:] = uuid
+            responseData["response"] = "success"
         else:
             responseData["response"] = "failure"
             responseData["error"]    = "unknown command"
@@ -76,7 +79,15 @@ def home():
 
 @app.route('/add/', methods=['POST'])
 def add():
-    return addSongToQueue(request.form['link'])
+    responseData = {}
+    songUUID = addSongToQueue(request.form['link'])
+    if songUUID == "-1":
+        responseData["response"]    = "failure"
+        responseData["error"]       = "Could not add to database"
+    else:
+        responseData["response"]    = "success"
+        responseData["songID"]      = str(songUUID)
+    return jsonify(responseData)
 
 @app.route('/history/', methods=['GET','POST'])
 def history():
@@ -131,6 +142,7 @@ def listener():
     return Response(listenForSongIsFinished(), mimetype="text/event-stream")
 
 def addSongToQueue(songLink):
+    songUUID = "-1"
     try:
         # given songlink, use youtubedl to download it
         # set options
@@ -167,13 +179,12 @@ def addSongToQueue(songLink):
             # tell the preprocessor in the dbmonitor to preprocess it
             databases.PreprocessRequest.newPreProcessRequest('./music/'+metadata['id']+'.wav', songUUID)
         else:
-            return "failure"
+            return songUUID
 
     except:
-        return "failure"
+        return songUUID
 
-    return "success"
-
+    return songUUID
 def songHasBeenDownloaded(songLink):
     #check both history and songqueue for the song
     songs = databases.SongInQueue.select().where(databases.SongInQueue.songLink == songLink)

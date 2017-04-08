@@ -13,12 +13,12 @@ function onSubmit(){
         method: 'POST',
         data: {"link":linkStr},
         success: function(data){
-            if(data === 'success'){
+            if(data.response === 'success'){
                 alert('Successful submission');
                 //redirect
                 window.location.href = (window.location.origin);
-            } else {
-                alert('Received error: ' + data + '. Try again');
+            } else if(data.response === 'failure') {
+                alert('Received error: ' + data.error + '. Try again');
                 $('#submitButton').prop('disabled', false);
             }
         },
