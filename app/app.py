@@ -144,16 +144,6 @@ def listener():
                     newSongTitle    = str(newSongObject.songTitle)
                     newSongLink     = str(newSongObject.songLink)
 
-                    # create response
-                    # responseString =     ("data: response: newsong,"
-                    #                         "oldID: {},newID: {},"
-                    #                         "oldTitle: {},newTitle: {},"
-                    #                         "oldLink: {},newLink: {}\n\n").format(       \
-                    #                         flaskThreadSongPlaying, newSongID,          \
-                    #                         flaskThreadSongPlayingTitle, newSongTitle,  \
-                    #                         flaskThreadSongPlayingLink, newSongLink     \
-                    #                         )
-
                     #song playing has changed, send data request
                     # yield responseString
                     yield "data: STARTUPDATE\n\n"
@@ -176,14 +166,6 @@ def listener():
                 newSongTitle = ''
                 newSongLink = ''
 
-                # responseString =     "data: response: newsong,\
-                #                         oldID: {},newID: {},\
-                #                         oldTitle: {},newTitle: {},\
-                #                         oldLink: {},newLink: {}\n\n".format(       \
-                #                         flaskThreadSongPlaying, newSongID,          \
-                #                         flaskThreadSongPlayingTitle, newSongTitle,  \
-                #                         flaskThreadSongPlayingLink, newSongLink     \
-                #                         )
                 yield "data: STARTUPDATE\n\n"
                 yield "data: oldID: {}\n\n".format(flaskThreadSongPlaying)
                 yield "data: newID: {}\n\n".format(newSongID)
