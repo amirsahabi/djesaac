@@ -119,6 +119,12 @@ def listener():
                     yield "data: newsong\n\n"
                     # rewrite the song name
                     flaskThreadSongPlaying = ''.join(songPlaying)
+            elif(flaskThreadSongPlaying != ''):
+                # no more songs playing but the last one finished, send an event
+                yield "data: newsong\n\n"
+                flaskThreadSongPlaying = ""
+            else:
+                time.sleep(1)
 
     return Response(listenForSongIsFinished(), mimetype="text/event-stream")
 
