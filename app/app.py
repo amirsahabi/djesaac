@@ -80,13 +80,13 @@ def home():
 @app.route('/add/', methods=['POST'])
 def add():
     responseData = {}
-    songUUID = addSongToQueue(request.form['link'])
+    songUUID = str(addSongToQueue(request.form['link']))
     if songUUID == "-1":
         responseData["response"]    = "failure"
         responseData["error"]       = "Could not add to database"
     else:
         responseData["response"]    = "success"
-        responseData["songID"]      = str(songUUID)
+        responseData["songID"]      = songUUID
     return jsonify(responseData)
 
 @app.route('/history/', methods=['GET','POST'])
@@ -103,7 +103,9 @@ def history():
 
         return render_template('history.html', history=history)
     else:
+        responseData = {}
         songID = request.form['song']
+        newSongUUID = "-1"
         if songID != '':
             # check if it's cached
             try:
@@ -114,11 +116,16 @@ def history():
                     # needs to be reprocessed
                     databases.PreprocessRequest.newPreProcessRequest(song.songPath, str(newSongUUID))
                 else:
-                    addSongToQueue(song.songLink)
+                    newSongUUID = addSongToQueue(song.songLink)
+                responseData["response"] = "success"
+                responseData["songID"]   = str(newSongUUID)
             except:
-                return 'failure'
-            return 'success'
-    return 'failure'
+                responseData["response"] = "failure"
+                responseData["error"]    = "Failed to insert new request into database"
+        else:
+            responseData["response"] = "failure"
+            responseData["error"]    = "Invalid song ID"
+        return jsonify(responseData)
 
 @app.route('/updater/')
 def listener():

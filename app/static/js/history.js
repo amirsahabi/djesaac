@@ -7,10 +7,10 @@ function sendReplayRequest(songID){
         method: 'POST',
         data: {"song":songID},
         success: function(data){
-            if(data === 'success'){
+            if(data.response === 'success'){
                 alert('Successful submission');
-            } else {
-                alert('Received error: ' + data + '. Try again');
+            } else if(data.response === 'failure'){
+                alert('Received error: ' + data.error + '. Try again');
             }
             $('#'+songID).prop('disabled', false);
         },
