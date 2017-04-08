@@ -119,7 +119,7 @@ def listener():
             elif(flaskThreadSongPlaying != ' ' * 36):
                 # no more songs playing but the last one finished, send an event
                 yield "data: newsong\n\n"
-                flaskThreadSongPlaying = ""
+                flaskThreadSongPlaying = ' ' * 36
             else:
                 time.sleep(1)
 
