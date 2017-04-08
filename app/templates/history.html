@@ -12,7 +12,8 @@
 <body>
     <script>
         $(document).ready(function () {
-
+            var updateEventInProgress = false;
+            var updateEventParameters = {};
             $('.add_song').click(function () {
                 if ($('.open_add').is(":hidden")) {
                     $('.history').animate({marginTop:'+=' + $('.open_add').height()});
@@ -27,7 +28,22 @@
             var eventSource = new EventSource("/updater");
             eventSource.onmessage = function(event) {
                 //reload the page for now, in the future hopefully it's dynamic
-                window.location.reload()
+                // window.location.reload()
+                if(event.data == "STARTUPDATE"){
+                    updateEventInProgress = true;
+                    updateEventParameters = {};
+                }else if(event.data == "ENDUPDATE"){
+                    //push changes to page
+                    updateEventInProgress = false;
+                    rearrangeHistoryTable(updateEventParameters);
+                }else if(updateEventInProgress){
+                    var parameterStart = event.data.indexOf(": ");
+                    var parameterName  = event.data.substring(0,parameterStart);
+                    var parameterValue = event.data.substring(parameterStart+2);
+                    updateEventParameters[parameterName] = parameterValue;
+                } else {
+                    //what in the world are you sending me??
+                }
             };
 
         });
@@ -52,7 +68,7 @@
 
     <div class="history">
         <table>
-            <tr>
+            <tr class="tableheaderrow">
                 <th>#</th>
                 <th>Title</th>
                 <th>Link</th>
@@ -60,11 +76,11 @@
             </tr>
             <tbody>
                 {% for event in history %}
-                <tr>
-                    <td>{{loop.index0}}</td>
-                    <td>{{event.songTitle}}</td>
-                    <td><a id=table_link href="{{event.songLink}}">Link</a></td>
-                    <td><i class="material-icons"><span class='play_stop' onclick="sendReplayRequest('{{event.uuid}}')">replay</span></i></td>
+                <tr class="tabledatarow">
+                    <td class="indexcolumn">{{loop.index0}}</td>
+                    <td class="titlecolumn">{{event.songTitle}}</td>
+                    <td class="linkcolumn"><a id=table_link href="{{event.songLink}}">Link</a></td>
+                    <td class="replaycolumn"><i class="material-icons"><span class='play_stop' onclick="sendReplayRequest('{{event.uuid}}')">replay</span></i></td>
                 </tr>
                 {% endfor %}
             </tbody>
