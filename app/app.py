@@ -119,7 +119,7 @@ def listener():
                     yield "data: newsong\n\n"
                     # rewrite the song name
                     flaskThreadSongPlaying = ''.join(songPlaying)
-            elif(flaskThreadSongPlaying != ''):
+            elif(flaskThreadSongPlaying != ' ' * 36):
                 # no more songs playing but the last one finished, send an event
                 yield "data: newsong\n\n"
                 flaskThreadSongPlaying = ""
