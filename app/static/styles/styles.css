@@ -98,6 +98,11 @@ input:focus {
     border:0;
     padding: 0;
 }
+
+.material-icons {
+    cursor: pointer;
+}
+
 .material-icons.blue { color: #96B9CE; }
 
 .currently_playing{
