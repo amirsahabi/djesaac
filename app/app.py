@@ -15,7 +15,8 @@ logging.basicConfig(level=logging.INFO)
 app = Flask(__name__)
 
 musicIsPlaying = Value('d' , 1)
-songPlaying = Array(ctypes.c_char_p, 40)
+songPlaying = Array(ctypes.c_char_p, 36)
+songPlaying[:] = " " *36
 monitor = None
 logger = logging.getLogger(__name__)
 # home
@@ -39,7 +40,7 @@ def home():
             uuid = str(request.form['songID'])
 
             #verify the song isn't playing
-            if songPlaying.value == uuid and musicIsPlaying.value == 1:
+            if ''.join(songPlaying) == uuid and musicIsPlaying.value == 1:
                 return "Song can't be deleted, is currently playing"
             else:
                 #delete from queue
@@ -162,8 +163,8 @@ def songHasBeenDownloaded(songLink):
 # start server
 if __name__ == "__main__":
     #drop and init tables
-    databases.dropTables()
-    databases.initTables()
+    # databases.dropTables()
+    # databases.initTables()
 
     monitor = DBMonitor(musicIsPlaying, songPlaying , True)
     monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, False))

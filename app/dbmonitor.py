@@ -64,9 +64,9 @@ class DBMonitor:
         while(True):
             while(self.musicIsPlaying.value == 1 and databases.SongInQueue.select().wrapped_count() > 0):
                 song = databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded).get()
-                self.songPlaying.value = str(song.uuid)
+                self.songPlaying[:] = str(song.uuid)
 
-                self.playSong(song.songPath, str(self.songPlaying.value))
+                self.playSong(song.songPath, ''.join(self.songPlaying[:]))
 
                 if self.musicIsPlaying.value == 1:
                     # add to History
@@ -74,7 +74,7 @@ class DBMonitor:
 
                     # remove song from queue
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == song.uuid).execute()
-            self.songPlaying.value = ''
+            self.songPlaying[:] = ' ' * 36
             if self.board is not None:
                 self.standbyMode()
             else:
