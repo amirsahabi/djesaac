@@ -100,9 +100,9 @@ class DBMonitor:
         hival=self.preprocessor.hivals[songUUID]
 
         logger.info("Finished analysis, playing song")
-
+        wavObj = wave.open(song)
         # Play audio and sync up light values
-        pg.mixer.init(frequency=wave.open(song).getframerate())
+        pg.mixer.init(frequency=wavObj.getframerate(), size=wavObj.getsampwidth()*-8)
         pg.mixer.music.load(song)
         pg.mixer.music.play()
         first = True
@@ -140,6 +140,7 @@ class DBMonitor:
             self.pin3.write(0)
             self.pin5.write(0)
             self.pin6.write(0)
+        pg.mixer.quit()
 
     def standbyMode(self):
         cycles=20
