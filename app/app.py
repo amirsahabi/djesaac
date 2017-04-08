@@ -1,12 +1,12 @@
 from __future__ import unicode_literals
 from flask import Flask, request, render_template, Response
 from pydub import AudioSegment
+from multiprocessing import Process, Value, Array
+from dbmonitor import *
 import youtube_dl
 import databases
 import os
-from dbmonitor import *
 import logging
-from multiprocessing import Process, Value, Array
 import ctypes
 
 logging.basicConfig(level=logging.INFO)

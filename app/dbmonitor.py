@@ -1,16 +1,16 @@
 # dbmonitor.py
+from scipy.io import wavfile as wf
+from multiprocessing import Value
 import time
 import databases
 import numpy as np
 import math as m
-from scipy.io import wavfile as wf
 import pyfirmata as pf
 import pygame as pg
 import wave
 import preprocessor
 import logging
 import os
-from multiprocessing import Value
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)

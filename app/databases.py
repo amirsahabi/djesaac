@@ -1,7 +1,7 @@
 from peewee import *
+from playhouse.sqlite_ext import SqliteExtDatabase
 import uuid
 import datetime
-from playhouse.sqlite_ext import SqliteExtDatabase
 import logging
 
 logging.basicConfig(level=logging.INFO)

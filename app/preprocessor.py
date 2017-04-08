@@ -1,3 +1,4 @@
+from scipy.io import wavfile as wf
 import threading
 import wave
 import os
@@ -5,7 +6,6 @@ import databases
 import numpy as np
 import math as m
 import logging
-from scipy.io import wavfile as wf
 import time
 
 logging.basicConfig(level=logging.INFO)
