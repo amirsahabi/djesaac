@@ -1,6 +1,7 @@
 # constants.py
 # define some constants to be used in the program
 
+PORT                        = 3000
 DEBUGMODE                   = True
 EMPTY_UUID                  = ' ' * 36
 FAILED_UUID_STR             = '-1'
@@ -14,3 +15,8 @@ ARDUINO_PIN3                = 'd:6:p'
 DB_NAME                     = 'djesaac.db'
 DB_PREPROC_PROCESS          = 'process'
 DB_PREPROC_DECOMISSION      = 'decomission'
+
+RESPONSE                    = 'response'
+ERROR                       = 'error'
+SUCCESS                     = 'success'
+FAILURE                     = 'failure'

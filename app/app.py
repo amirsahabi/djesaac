@@ -46,24 +46,24 @@ def home():
 
             #verify the song isn't playing
             if ''.join(songPlaying) == uuid and musicIsPlaying.value == 1:
-                responseData["response"] = "failure"
-                responseData["error"]    = "Song can't be deleted, is currently playing"
+                responseData[constants.RESPONSE] = constants.FAILURE
+                responseData[constants.ERROR]    = "Song can't be deleted, is currently playing"
             else:
                 #delete from queue
                 try:
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == uuid).execute()
                     databases.PreprocessRequest.delete().where(databases.PreprocessRequest.songUUID == uuid).execute()
-                    responseData["response"] = "success"
+                    responseData[constants.RESPONSE] = constants.SUCCESS
                 except:
-                    responseData["response"] = "failure"
-                    responseData["error"]    = "Failed to remove from database"
+                    responseData[constants.RESPONSE] = constants.FAILURE
+                    responseData[constants.ERROR]    = "Failed to remove from database"
         elif command == "startstop":
             try:
                 musicIsPlaying.value = (musicIsPlaying.value + 1) % 2
-                responseData["response"] = "success"
+                responseData[constants.RESPONSE] = constants.SUCCESS
             except:
-                responseData["response"] = "failure"
-                responseData["error"]    = "Can't stop this beat"
+                responseData[constants.RESPONSE] = constants.FAILURE
+                responseData[constants.ERROR]    = "Can't stop this beat"
         elif command == "next":
             uuid = str(request.form['songID'])
 
@@ -71,10 +71,10 @@ def home():
             if ''.join(songPlaying) == uuid:
                 # send next signal
                 skipSongRequest[:] = uuid
-            responseData["response"] = "success"
+            responseData[constants.RESPONSE] = constants.SUCCESS
         else:
-            responseData["response"] = "failure"
-            responseData["error"]    = "unknown command"
+            responseData[constants.RESPONSE] = constants.FAILURE
+            responseData[constants.ERROR]    = "unknown command"
         return jsonify(responseData)
 
 
@@ -83,10 +83,10 @@ def add():
     responseData = {}
     songUUID = str(addSongToQueue(request.form['link']))
     if songUUID == constants.FAILED_UUID_STR:
-        responseData["response"]    = "failure"
+        responseData[constants.RESPONSE]    = constants.FAILURE
         responseData["error"]       = "Could not add to database"
     else:
-        responseData["response"]    = "success"
+        responseData[constants.RESPONSE]    = constants.SUCCESS
         responseData["songID"]      = songUUID
     return jsonify(responseData)
 
@@ -118,13 +118,13 @@ def history():
                     databases.PreprocessRequest.newPreProcessRequest(song.songPath, str(newSongUUID))
                 else:
                     newSongUUID = addSongToQueue(song.songLink)
-                responseData["response"] = "success"
+                responseData[constants.RESPONSE] = constants.SUCCESS
                 responseData["songID"]   = str(newSongUUID)
             except:
-                responseData["response"] = "failure"
+                responseData[constants.RESPONSE] = constants.FAILURE
                 responseData["error"]    = "Failed to insert new request into database"
         else:
-            responseData["response"] = "failure"
+            responseData[constants.RESPONSE] = constants.FAILURE
             responseData["error"]    = "Invalid song ID"
         return jsonify(responseData)
 
@@ -255,4 +255,4 @@ if __name__ == "__main__":
     monitorProc.start()
 
     app.debug = constants.DEBUGMODE
-    app.run(threaded=True, port=3000, host='0.0.0.0', use_reloader=False)
+    app.run(threaded=True, port=constants.PORT, host='0.0.0.0', use_reloader=False)
