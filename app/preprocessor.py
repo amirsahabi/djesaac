@@ -61,6 +61,7 @@ class SongPreprocessor(threading.Thread):
             return
 
         self.logger.info("Preprocessing " + songUUID)
+        startTime = time.time()
         counter = 0             # counter of samples
         window = 0.02           # window size = 0.02 seconds
         trigger=0               # used to end a while loop
@@ -174,5 +175,5 @@ class SongPreprocessor(threading.Thread):
         self.lovals[songUUID] = loval
         self.mdvals[songUUID] = mdval
         self.hivals[songUUID] = hival
-        self.logger.info("Finished preprocessing " + songUUID)
+        self.logger.info("Finished preprocessing {} in {} seconds".format(songUUID, time.time() - startTime))
         #end preprocessSong(self, songPath, songUUID)
