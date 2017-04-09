@@ -85,7 +85,7 @@ function reArrangeQueueTable(parameters){
             //acocomodate next song
             currentlyPlayingRow.find('.skipsong').attr('onclick', "skipSong('"+parameters.newID+"')");
             currentlyPlayingRow.find('.songtitlecolumn').text(parameters.newTitle);
-            currentlyPlayingRow.find('.table_link').attr('href', parameters.newLink);
+            currentlyPlayingRow.find('#table_link').attr('href', parameters.newLink);
         }
     }
     var playlistRows = $('.playlist').find('tr.tabledatarow');
