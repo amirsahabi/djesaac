@@ -3,11 +3,12 @@ from playhouse.sqlite_ext import SqliteExtDatabase
 import uuid
 import datetime
 import logging
+import constants
 
 logging.basicConfig(level=logging.INFO)
 
 # create database
-db = SqliteExtDatabase('djesaac.db')
+db = SqliteExtDatabase(constants.DB_NAME)
 logger = logging.getLogger(__name__)
 # create base class,
 # all further database classes should extend this one
@@ -36,7 +37,7 @@ class History(Base):
             return eventInHistory.uuid
         except:
             logger.info('Failed to insert into history table')
-            return -1
+            return constants.FAILED_UUID_STR
 
 
 class SongInQueue(Base):
@@ -60,7 +61,7 @@ class SongInQueue(Base):
             return newSong.uuid
         except:
             logger.info("Failed to insert to queue table")
-            return -1
+            return constants.FAILED_UUID_STR
 
 class PreprocessRequest(Base):
     uuid        = UUIDField()
@@ -76,13 +77,13 @@ class PreprocessRequest(Base):
             npp.uuid = uuid.uuid1()
             npp.songPath = songPath
             npp.songUUID = songUUID
-            npp.requestType = "process"
+            npp.requestType = constants.DB_PREPROC_PROCESS
             npp.datetime = datetime.datetime.now()
             npp.save()
 
             return npp.uuid
         except:
-            return -1
+            return constants.FAILED_UUID_STR
 
     @staticmethod
     def newDecomissionRequest(songUUID):
@@ -90,7 +91,7 @@ class PreprocessRequest(Base):
             nd = PreprocessRequest()
             nd.uuid = uuid.uuid1()
             nd.songUUID = songUUID
-            nd.requestType = "decomission"
+            nd.requestType = constants.DB_PREPROC_DECOMISSION
             nd.datetime = datetime.datetime.now()
             nd.save()
 

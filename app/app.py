@@ -8,6 +8,7 @@ import databases
 import os
 import logging
 import ctypes
+import constants
 
 logging.basicConfig(level=logging.INFO)
 
@@ -17,8 +18,8 @@ app = Flask(__name__)
 musicIsPlaying  = Value('d' , 1)
 songPlaying     = Array(ctypes.c_char_p, 36)
 skipSongRequest = Array(ctypes.c_char_p, 36)
-songPlaying[:]      = " " * 36
-skipSongRequest[:]  = " " * 36
+songPlaying[:]      = constants.EMPTY_UUID
+skipSongRequest[:]  = constants.EMPTY_UUID
 monitor = None
 logger = logging.getLogger(__name__)
 # home
@@ -81,7 +82,7 @@ def home():
 def add():
     responseData = {}
     songUUID = str(addSongToQueue(request.form['link']))
-    if songUUID == "-1":
+    if songUUID == constants.FAILED_UUID_STR:
         responseData["response"]    = "failure"
         responseData["error"]       = "Could not add to database"
     else:
@@ -105,7 +106,7 @@ def history():
     else:
         responseData = {}
         songID = request.form['song']
-        newSongUUID = "-1"
+        newSongUUID = constants.FAILED_UUID_STR
         if songID != '':
             # check if it's cached
             try:
@@ -131,9 +132,9 @@ def history():
 def listener():
     def listenForSongIsFinished():
         flaskThreadSongPlaying      = str(''.join(songPlaying))
-        flaskThreadSongObject       = databases.SongInQueue.select().where(databases.SongInQueue.uuid == flaskThreadSongPlaying).get() if flaskThreadSongPlaying != ' ' * 36 else None
-        flaskThreadSongPlayingTitle = str(flaskThreadSongObject.songTitle) if flaskThreadSongPlaying != ' ' * 36 else ''
-        flaskThreadSongPlayingLink  = str(flaskThreadSongObject.songLink)  if flaskThreadSongPlaying != ' ' * 36 else ''
+        flaskThreadSongObject       = databases.SongInQueue.select().where(databases.SongInQueue.uuid == flaskThreadSongPlaying).get() if flaskThreadSongPlaying != constants.EMPTY_UUID else None
+        flaskThreadSongPlayingTitle = str(flaskThreadSongObject.songTitle) if flaskThreadSongPlaying != constants.EMPTY_UUID else ''
+        flaskThreadSongPlayingLink  = str(flaskThreadSongObject.songLink)  if flaskThreadSongPlaying != constants.EMPTY_UUID else ''
         while True:
             if(databases.SongInQueue.select().wrapped_count() > 0):
                 # check to see if previous song is current song
@@ -159,9 +160,9 @@ def listener():
                     flaskThreadSongObject       = newSongObject
                     flaskThreadSongPlayingTitle = newSongTitle
                     flaskThreadSongPlayingLink  = newSongLink
-            elif(flaskThreadSongPlaying != ' ' * 36):
+            elif(flaskThreadSongPlaying != constants.EMPTY_UUID):
                 # no more songs playing but the last one finished, send an event
-                newSongID = ' ' * 36
+                newSongID = constants.EMPTY_UUID
                 newSongObject = None
                 newSongTitle = ''
                 newSongLink = ''
@@ -184,7 +185,7 @@ def listener():
     return Response(listenForSongIsFinished(), mimetype="text/event-stream")
 
 def addSongToQueue(songLink):
-    songUUID = "-1"
+    songUUID = constants.FAILED_UUID_STR
     try:
         # given songlink, use youtubedl to download it
         # set options
@@ -217,7 +218,7 @@ def addSongToQueue(songLink):
         # given metadata, log to database
         songUUID = str(databases.SongInQueue.addSongToQueue('./music/'+metadata['id']+'.wav', metadata['title'], songLink))
 
-        if songUUID != "-1":
+        if songUUID != constants.FAILED_UUID_STR:
             # tell the preprocessor in the dbmonitor to preprocess it
             databases.PreprocessRequest.newPreProcessRequest('./music/'+metadata['id']+'.wav', songUUID)
         else:
@@ -253,5 +254,5 @@ if __name__ == "__main__":
     monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, False))
     monitorProc.start()
 
-    app.debug = True
+    app.debug = constants.DEBUGMODE
     app.run(threaded=True, port=3000, host='0.0.0.0', use_reloader=False)

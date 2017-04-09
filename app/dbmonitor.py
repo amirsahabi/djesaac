@@ -11,6 +11,7 @@ import wave
 import preprocessor
 import logging
 import os
+import constants
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -39,18 +40,12 @@ class DBMonitor:
 
         # Initialize board and set pins using pyfirmata
         try:
-            self.board = pf.Arduino('COM4')      # initialize board
-            self.pin3 = self.board.get_pin('d:3:p')   # set pin 3 for red
-            self.pin5 = self.board.get_pin('d:5:p')   # set pin 5 for green
-            self.pin6 = self.board.get_pin('d:6:p')   # set pin 6 for blue
+            self.initBoard(constants.ARDUINO_WINDOWS_LOC_DEFAULT, constants.ARDUINO_PIN1, constants.ARDUINO_PIN2, constants.ARDUINO_PIN3)
             logger.info("Board initialized")
         except:
             # failed for windows, try mac
             try:
-                self.board = pf.Arduino('/dev/tty.usbmodem1421')      # initialize board
-                self.pin3 = self.board.get_pin('d:3:p')   # set pin 3 for red
-                self.pin5 = self.board.get_pin('d:5:p')   # set pin 5 for green
-                self.pin6 = self.board.get_pin('d:6:p')   # set pin 6 for blue
+                self.initBoard(constants.ARDUINO_OSX_LOC_DEFAULT, constants.ARDUINO_PIN1, constants.ARDUINO_PIN2, constants.ARDUINO_PIN3)
                 logger.info("Board initialized")
             except:
                 self.board = None
@@ -74,7 +69,7 @@ class DBMonitor:
 
                     # remove song from queue
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == song.uuid).execute()
-            self.songPlaying[:] = ' ' * 36
+            self.songPlaying[:] = constants.EMPTY_UUID
             if self.board is not None:
                 self.standbyMode()
             else:
@@ -113,10 +108,10 @@ class DBMonitor:
                 # skip song requested verify it's this song
                 if(''.join(self.skipSong[:]) == ''.join(self.songPlaying[:])):
                     pg.mixer.music.stop()       # turn off music
-                    self.skipSong[:] = ' ' * 36 # clear song to skip
+                    self.skipSong[:] = constants.EMPTY_UUID # clear song to skip
                     break                       # exit loop
                 else:
-                    self.skipSong[:] = ' ' * 36
+                    self.skipSong[:] = constants.EMPTY_UUID
 
             if(self.board is not None):
                 try:
@@ -199,3 +194,9 @@ class DBMonitor:
             self.pin6.write(pin3)
         if sleepTime is not None:
             time.sleep(sleepTime)
+
+    def initBoard(self, _board, _pin3, _pin5, _pin6):
+        self.board = pf.Arduino(_board)         # init board
+        self.pin3  = self.board.get_pin(_pin3)  # R
+        self.pin5  = self.board.get_pin(_pin5)  # G
+        self.pin6  = self.board.get_pin(_pin6)  # B
