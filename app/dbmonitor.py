@@ -78,7 +78,7 @@ class DBMonitor:
     def playSong(self, song, songUUID):
         logger.info("Received song request")
 
-        procID = -1
+        procID = constants.FAILED_UUID_STR
         #dont preprocess song if it's already preprocessed
         if(songUUID not in self.preprocessor.lovals.keys() or
             songUUID not in self.preprocessor.mdvals.keys() or

@@ -97,11 +97,11 @@ class PreprocessRequest(Base):
 
             return nd.uuid
         except:
-            return -1
+            return constants.FAILED_UUID_STR
 
     @staticmethod
     def hasntBeenProcessed(reqID):
-        if reqID == -1:
+        if reqID == constants.FAILED_UUID_STR:
             return False
         else:
             return PreprocessRequest.select().where(PreprocessRequest.uuid == reqID).wrapped_count() > 0

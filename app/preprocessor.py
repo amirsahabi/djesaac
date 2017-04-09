@@ -7,6 +7,7 @@ import numpy as np
 import math as m
 import logging
 import time
+import constants
 
 logging.basicConfig(level=logging.INFO)
 
@@ -26,9 +27,9 @@ class SongPreprocessor(threading.Thread):
                 topRequest = databases.PreprocessRequest.select().order_by(databases.PreprocessRequest.datetime).get()
 
                 # get request type
-                if topRequest.requestType == "process":
+                if topRequest.requestType == constants.DB_PREPROC_PROCESS:
                     self.preprocessSong(topRequest.songPath, str(topRequest.songUUID))
-                elif topRequest.requestType == "decomission":
+                elif topRequest.requestType == constants.DB_PREPROC_DECOMISSION:
                     self.decomissionSong(str(topRequest.songUUID))
                 else:
                     self.logger.info("Unknown request type")
@@ -48,7 +49,7 @@ class SongPreprocessor(threading.Thread):
 
     def preprocessSong(self, songPath, songUUID):
         # defensive check
-        if(songUUID == "-1"):
+        if(songUUID == constants.FAILED_UUID_STR):
             return
 
         # dont preprocess song if its already been processed
