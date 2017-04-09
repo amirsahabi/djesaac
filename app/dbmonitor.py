@@ -11,6 +11,7 @@ import wave
 import preprocessor
 import logging
 import os
+import constants
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -39,18 +40,12 @@ class DBMonitor:
 
         # Initialize board and set pins using pyfirmata
         try:
-            self.board = pf.Arduino('COM4')      # initialize board
-            self.pin3 = self.board.get_pin('d:3:p')   # set pin 3 for red
-            self.pin5 = self.board.get_pin('d:5:p')   # set pin 5 for green
-            self.pin6 = self.board.get_pin('d:6:p')   # set pin 6 for blue
+            self.initBoard(constants.ARDUINO_WINDOWS_LOC_DEFAULT, constants.ARDUINO_PIN1, constants.ARDUINO_PIN2, constants.ARDUINO_PIN3)
             logger.info("Board initialized")
         except:
             # failed for windows, try mac
             try:
-                self.board = pf.Arduino('/dev/tty.usbmodem1421')      # initialize board
-                self.pin3 = self.board.get_pin('d:3:p')   # set pin 3 for red
-                self.pin5 = self.board.get_pin('d:5:p')   # set pin 5 for green
-                self.pin6 = self.board.get_pin('d:6:p')   # set pin 6 for blue
+                self.initBoard(constants.ARDUINO_OSX_LOC_DEFAULT, constants.ARDUINO_PIN1, constants.ARDUINO_PIN2, constants.ARDUINO_PIN3)
                 logger.info("Board initialized")
             except:
                 self.board = None
@@ -74,7 +69,7 @@ class DBMonitor:
 
                     # remove song from queue
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == song.uuid).execute()
-            self.songPlaying[:] = ' ' * 36
+            self.songPlaying[:] = constants.EMPTY_UUID
             if self.board is not None:
                 self.standbyMode()
             else:
@@ -113,10 +108,10 @@ class DBMonitor:
                 # skip song requested verify it's this song
                 if(''.join(self.skipSong[:]) == ''.join(self.songPlaying[:])):
                     pg.mixer.music.stop()       # turn off music
-                    self.skipSong[:] = ' ' * 36 # clear song to skip
+                    self.skipSong[:] = constants.EMPTY_UUID # clear song to skip
                     break                       # exit loop
                 else:
-                    self.skipSong[:] = ' ' * 36
+                    self.skipSong[:] = constants.EMPTY_UUID
 
             if(self.board is not None):
                 try:
@@ -148,60 +143,60 @@ class DBMonitor:
             if(cycles<20):
                 #sine wave
                 for i in range(0,314,2):
-                    self.pin3.write(m.sin(i/100.0)/2.0)
-                    self.pin5.write(m.sin(i/100.0)/2.0)
-                    self.pin6.write(m.sin(i/100.0)/2.0)
-                    time.sleep(.025)
+                    writeVal = m.sin(i/100.0)/2.0
+                    writeToPinsAndSleep(writeVal, writeVal, writeVal, 0.025)
                     #end up for
             if(cycles>19 and cycles<40):
                 #heartbeat
                 for i in range(0,120,2):
-                    self.pin5.write(m.sin(i/100.0)/2.0)
-                    self.pin6.write(m.sin(i/100.0)/2.0)
-                    time.sleep(.025)
+                    writeVal = m.sin(i/100.0)/2.0
+                    writeToPinsAndSleep(None, writeVal, writeVal, 0.025)
                 #beat
-                self.pin3.write(.3)
-                time.sleep(.04)
-                self.pin3.write(0)
-                time.sleep(.5)
-                #beat
-                self.pin3.write(.3)
-                time.sleep(.04)
-                self.pin3.write(0)
-                time.sleep(.5)
+                writeToPinsAndSleep(0.3, None, None, 0.04)
+                writeToPinsAndSleep(0.0, None, None, 0.5)
+                writeToPinsAndSleep(0.3, None, None, 0.04)
+                writeToPinsAndSleep(0.0, None, None, 0.5)
+
                 for i in range(120,0,-2):
-                    self.pin5.write(m.sin(i/100.0)/2.0)
-                    self.pin6.write(m.sin(i/100.0)/2.0)
-                    time.sleep(.025)
+                    writeVal = m.sin(i/100.0)/2.0
+                    writeToPinsAndSleep(None, writeVal, writeVal, 0.025)
 
             if(cycles>39 and cycles<60):
                 #color wheel
                 #red up
                 for i in range(30,60,2):
-                    self.pin3.write(i/100.0)
-                    time.sleep(.05)
+                    writeToPinsAndSleep(i/100.0, None, None, 0.05)
                 #green down
                 for i in range(60,30,2):
-                    self.pin5.write(i/100.0)
-                    time.sleep(.05)
+                    writeToPinsAndSleep(i/100.0, None, None, 0.05)
                 #blue up
                 for i in range(30,60,2):
-                    self.pin6.write(i/100.0)
-                    time.sleep(.05)
+                    writeToPinsAndSleep(None, None, i/100.0, 0.05)
                 #red down
                 for i in range(60,30,2):
-                    self.pin3.write(i/100.0)
-                    time.sleep(.05)
+                    writeToPinsAndSleep(i/100.0, None, None, 0.05)
                 #green up
                 for i in range(30,60,2):
-                    self.pin5.write(i/100.0)
-                    time.sleep(.05)
+                    writeToPinsAndSleep(None, i/100.0, None, 0.05)
                 #blue down
                 for i in range(60,30,2):
-                    self.pin6.write(i/100.0)
-                    time.sleep(.05)
-            if(cycles>59):
-                cycles=0
-            cycles+=1
+                    writeToPinsAndSleep(None, None, i/100.0, 0.05)
+            cycles = (cycles + 1) % 60
             #end wrapped_count while
         #end standbyMode definition
+
+    def writeToPinsAndSleep(pin1, pin2, pin3, sleepTime):
+        if(pin1 is not None):
+            self.pin3.write(pin1)
+        if pin2 is not None:
+            self.pin5.write(pin2)
+        if pin3 is not None:
+            self.pin6.write(pin3)
+        if sleepTime is not None:
+            time.sleep(sleepTime)
+
+    def initBoard(self, _board, _pin3, _pin5, _pin6):
+        self.board = pf.Arduino(_board)         # init board
+        self.pin3  = self.board.get_pin(_pin3)  # R
+        self.pin5  = self.board.get_pin(_pin5)  # G
+        self.pin6  = self.board.get_pin(_pin6)  # B
