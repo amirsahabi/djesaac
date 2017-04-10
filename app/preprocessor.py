@@ -156,13 +156,27 @@ class SongPreprocessor(threading.Thread):
                 relthresh=np.sum(totalpowerarr[len(totalpowerarr)-100:])/100.0
             else:
                 relthresh=np.sum(totalpowerarr[:101])/100.0
+                #end index if
 
-            #intensity factor
-            intfactor=m.log10(maxpower*10.0/relthresh)
+            if relthresh==0:
+                loval[index]=0
+                mdval[index]=0
+                hival[index]=0
+                intfactor=0
+            else:
+                #intensity factor
+                intfactor=m.log10(maxpower*10.0/relthresh)
+                #end relthresh if
+            if intfactor==0:
+                loval[index]=0
+                mdval[index]=0
+                hival[index]=0
+            else:
+                loval[index]=lop/relthresh/intfactor
+                mdval[index]=mdp/relthresh/intfactor
+                hival[index]=hip/relthresh/intfactor
+                #end intfactor if
 
-            loval[index]=lop/relthresh/intfactor
-            mdval[index]=mdp/relthresh/intfactor
-            hival[index]=hip/relthresh/intfactor
 
             index+=1
 
