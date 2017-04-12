@@ -23,4 +23,4 @@ SUCCESS                     = 'success'
 FAILURE                     = 'failure'
 
 WINDOW_SIZE_MSEC            = 0.02
-WINDOW_SIZE_SEC             = WINDOW_SIZE_MSEC * 1000
+WINDOW_SIZE_SEC             = int(WINDOW_SIZE_MSEC * 1000)
