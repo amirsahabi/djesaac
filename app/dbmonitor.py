@@ -145,7 +145,7 @@ class DBMonitor:
     def standbyMode(self):
         logger.info('Standby Mode')
         cycles=20
-        while(databases.SongInQueue.select().wrapped_count()==0):
+        while(databases.SongInQueue.select().wrapped_count() == 0 or self.musicIsPlaying.value == 0):
             if(cycles<20):
                 #sine wave
                 for i in range(0,314,2):
