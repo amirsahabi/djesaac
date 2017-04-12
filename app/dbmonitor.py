@@ -124,9 +124,9 @@ class DBMonitor:
                     if first:
                         initVal = pos
                         first = False
-                    self.pin3.write(loval[(pos - initVal)/20])
-                    self.pin5.write(mdval[(pos - initVal)/20])
-                    self.pin6.write(hival[(pos - initVal)/20])
+                    self.pin3.write(loval[(pos - initVal)/constants.WINDOW_SIZE_SEC])
+                    self.pin5.write(mdval[(pos - initVal)/constants.WINDOW_SIZE_SEC])
+                    self.pin6.write(hival[(pos - initVal)/constants.WINDOW_SIZE_SEC])
                 except:
                     logger.info('Don\'t go places you don\'t belong')
         if not (self.musicIsPlaying.value == 1):

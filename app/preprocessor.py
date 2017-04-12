@@ -63,7 +63,7 @@ class SongPreprocessor(threading.Thread):
         self.logger.info("Preprocessing " + songUUID)
         startTime = time.time()
         counter = 0             # counter of samples
-        window = 0.02           # window size = 0.02 seconds
+        window = constants.WINDOW_SIZE_MSEC # window size = 0.02 seconds
         trigger=0               # used to end a while loop
         Fs=wave.open(songPath).getframerate()                # default frequency for audio files
         winsamples=int(window*Fs)    # number of samples per window
