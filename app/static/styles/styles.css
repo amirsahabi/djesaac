@@ -154,6 +154,10 @@ table{
     border-collapse: collapse;
 }
 
+tr {
+    height: 45px;
+}
+
 th {
     /*background-color: #18181C;*/
     /*border-bottom: 3px solid #BABFDB;*/
@@ -170,6 +174,13 @@ td {
     text-align: left;
     padding: 8px;
     border-bottom: 1px solid #757980;
+}
+.table_alert_success {
+    color: #FF9A52;
+}
+
+.table_alert_error {
+    color: #FF4E4C;
 }
 
 #table_link{

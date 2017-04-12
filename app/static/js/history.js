@@ -1,4 +1,4 @@
-function sendReplayRequest(songID){
+function sendReplayRequest(songID, rowID){
     // disable submit button again
     $('#'+songID).prop('disabled', true);
 
@@ -8,14 +8,54 @@ function sendReplayRequest(songID){
         data: {"song":songID},
         success: function(data){
             if(data.response === 'success'){
-                alert('Successful submission');
+                var successAlert = $('<tr class="table_alert_success" id=rowID> <td colspan="4">Successfully added song to playlist</td></tr>');
+                var originalRow = $('<tr id=rowID>'+ $('#'+rowID).html() + '</tr>');
+
+                $('#'+rowID).fadeOut('slow', function(){
+                    successAlert.insertAfter($(this)).hide();
+                    $(this).remove();
+                    successAlert.fadeIn('slow', function(){});
+                    successAlert.delay(1000).fadeOut('slow', function(){
+                        originalRow.insertAfter(successAlert).hide();
+                        successAlert.remove();
+                        originalRow.fadeIn('slow');
+                    });
+
+                });
+
             } else if(data.response === 'failure'){
-                alert('Received error: ' + data.error + '. Try again');
+                var errorAlert = $('<tr class="table_alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
+                $('#'+rowID).fadeOut('slow', function(){
+                    errorAlert.insertAfter($(this)).hide();
+                    $(this).remove();
+                    errorAlert.fadeIn('slow', function(){});
+                    errorAlert.delay(1000).fadeOut('slow', function(){
+                        originalRow.insertAfter(errorAlert).hide();
+                        errorAlert.remove();
+                        originalRow.fadeIn('slow');
+                    });
+
+                });
             }
             $('#'+songID).prop('disabled', false);
+
+
+
         },
         error: function(){
-            alert("Something went wrong when submitting, try again");
+            var errorAlert = $('<tr class="table_alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
+            $('#'+rowID).fadeOut('slow', function(){
+                errorAlert.insertAfter($(this)).hide();
+                $(this).remove();
+                errorAlert.fadeIn('slow', function(){});
+                errorAlert.delay(1000).fadeOut('slow', function(){
+                    originalRow.insertAfter(errorAlert).hide();
+                    errorAlert.remove();
+                    originalRow.fadeIn('slow');
+                });
+
+            });
+
             $('#' + songID).prop('disabled', false);
         }
     });
