@@ -247,8 +247,8 @@ def songHasBeenDownloaded(songLink):
 # start server
 if __name__ == "__main__":
     #drop and init tables
-    # databases.dropTables()
-    # databases.initTables()
+    databases.dropTables()
+    databases.initTables()
 
     monitor = DBMonitor(musicIsPlaying, songPlaying, skipSongRequest, True)
     monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, False))

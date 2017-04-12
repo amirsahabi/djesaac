@@ -48,8 +48,13 @@ class DBMonitor:
                 self.initBoard(constants.ARDUINO_OSX_LOC_DEFAULT, constants.ARDUINO_PIN1, constants.ARDUINO_PIN2, constants.ARDUINO_PIN3)
                 logger.info("Board initialized")
             except:
-                self.board = None
-                logger.info("Failed to initialize board, will only play music")
+                try:
+                    # failed for mac, try ubuntu
+                    self.initBoard(constants.ARDUINO_UBUNTU_LOC_DEFAULT, constants.ARDUINO_PIN1, constants.ARDUINO_PIN2, constants.ARDUINO_PIN3)
+                    logger.info('Board initialized')
+                except:
+                    self.board = None
+                    logger.info("Failed to initialize board, will only play music")
         logger.info("DBMonitor initialized")
 
     def run(self, musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, threadIssue):
@@ -138,54 +143,55 @@ class DBMonitor:
         pg.mixer.quit()
 
     def standbyMode(self):
+        logger.info('Standby Mode')
         cycles=20
         while(databases.SongInQueue.select().wrapped_count()==0):
             if(cycles<20):
                 #sine wave
                 for i in range(0,314,2):
                     writeVal = m.sin(i/100.0)/2.0
-                    writeToPinsAndSleep(writeVal, writeVal, writeVal, 0.025)
+                    self.writeToPinsAndSleep(writeVal, writeVal, writeVal, 0.025)
                     #end up for
             if(cycles>19 and cycles<40):
                 #heartbeat
                 for i in range(0,120,2):
                     writeVal = m.sin(i/100.0)/2.0
-                    writeToPinsAndSleep(None, writeVal, writeVal, 0.025)
+                    self.writeToPinsAndSleep(None, writeVal, writeVal, 0.025)
                 #beat
-                writeToPinsAndSleep(0.3, None, None, 0.04)
-                writeToPinsAndSleep(0.0, None, None, 0.5)
-                writeToPinsAndSleep(0.3, None, None, 0.04)
-                writeToPinsAndSleep(0.0, None, None, 0.5)
+                self.writeToPinsAndSleep(0.3, None, None, 0.04)
+                self.writeToPinsAndSleep(0.0, None, None, 0.5)
+                self.writeToPinsAndSleep(0.3, None, None, 0.04)
+                self.writeToPinsAndSleep(0.0, None, None, 0.5)
 
                 for i in range(120,0,-2):
                     writeVal = m.sin(i/100.0)/2.0
-                    writeToPinsAndSleep(None, writeVal, writeVal, 0.025)
+                    self.writeToPinsAndSleep(None, writeVal, writeVal, 0.025)
 
             if(cycles>39 and cycles<60):
                 #color wheel
                 #red up
                 for i in range(30,60,2):
-                    writeToPinsAndSleep(i/100.0, None, None, 0.05)
+                    self.writeToPinsAndSleep(i/100.0, None, None, 0.05)
                 #green down
                 for i in range(60,30,2):
-                    writeToPinsAndSleep(i/100.0, None, None, 0.05)
+                    self.writeToPinsAndSleep(i/100.0, None, None, 0.05)
                 #blue up
                 for i in range(30,60,2):
-                    writeToPinsAndSleep(None, None, i/100.0, 0.05)
+                    self.writeToPinsAndSleep(None, None, i/100.0, 0.05)
                 #red down
                 for i in range(60,30,2):
-                    writeToPinsAndSleep(i/100.0, None, None, 0.05)
+                    self.writeToPinsAndSleep(i/100.0, None, None, 0.05)
                 #green up
                 for i in range(30,60,2):
-                    writeToPinsAndSleep(None, i/100.0, None, 0.05)
+                    self.writeToPinsAndSleep(None, i/100.0, None, 0.05)
                 #blue down
                 for i in range(60,30,2):
-                    writeToPinsAndSleep(None, None, i/100.0, 0.05)
+                    self.writeToPinsAndSleep(None, None, i/100.0, 0.05)
             cycles = (cycles + 1) % 60
             #end wrapped_count while
         #end standbyMode definition
 
-    def writeToPinsAndSleep(pin1, pin2, pin3, sleepTime):
+    def writeToPinsAndSleep(self, pin1, pin2, pin3, sleepTime):
         if(pin1 is not None):
             self.pin3.write(pin1)
         if pin2 is not None:
