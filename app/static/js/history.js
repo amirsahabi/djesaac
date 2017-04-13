@@ -9,7 +9,7 @@ function sendReplayRequest(songID, rowID){
         success: function(data){
             if(data.response === 'success'){
                 var successAlert = $('<tr class="table_alert_success" id=rowID> <td colspan="4">Successfully added song to playlist</td></tr>');
-                var originalRow = $('<tr id=rowID>'+ $('#'+rowID).html() + '</tr>');
+                var originalRow = $('<tr class="tabledatarow">'+ $('#'+rowID).html() + '</tr>');
 
                 $('#'+rowID).fadeOut('slow', function(){
                     successAlert.insertAfter($(this)).hide();
