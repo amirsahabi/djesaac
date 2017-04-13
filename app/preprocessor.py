@@ -96,21 +96,24 @@ class SongPreprocessor(threading.Thread):
             #fft and power calculation
             c=np.fft.fft(y, axis=0)/N
             p=2*(abs(c[1:int(m.floor(N/2))])**2)
-            p[:,0]=p[:,0]+p[:,1]
-            powarr[:,index]=p[:,0]
-            totalpower=np.sum(p[:,0])
+            psize=p.shape
+            psub=p
+            if len(psize)>1:
+                psub=p[:,0]+p[:,1]
+            powarr[:,index]=psub
+            totalpower=np.sum(psub)
             totalpowerarr[index]=totalpower
             if totalpower>maxpower:
                 maxpower=totalpower
             #auto binning: finding frequencies with max powers
-            lopowind=np.argmax(p[:15,0])
-            lopow+=p[lopowind,0]
+            lopowind=np.argmax(psub[:15])
+            lopow+=psub[lopowind]
             lofreq[index]=lopowind
-            mdpowind=np.argmax(p[10:30,0])
-            mdpow+=p[mdpowind,0]
+            mdpowind=np.argmax(psub[10:30])
+            mdpow+=psub[mdpowind]
             mdfreq[index]=mdpowind+10
-            hipowind=np.argmax(p[20:,0])
-            hipow+=p[hipowind,0]
+            hipowind=np.argmax(psub[20:])
+            hipow+=psub[hipowind]
             hifreq[index]=hipowind+20
 
             counter+=winsamples
