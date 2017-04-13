@@ -94,7 +94,7 @@ class SongPreprocessor(threading.Thread):
             if N < winsamples:
                 break
             #fft and power calculation
-            c=np.fft.fft(y)/N
+            c=np.fft.fft(y, axis=0)/N
             p=2*(abs(c[1:int(m.floor(N/2))])**2)
             p[:,0]=p[:,0]+p[:,1]
             powarr[:,index]=p[:,0]
