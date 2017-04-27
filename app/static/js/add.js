@@ -28,3 +28,11 @@ function onSubmit(){
         }
     });
 }
+
+$(document).ready(function () {
+    $(document).on("keyup", "#songLink", function (e) {
+        if(e.keyCode == 13){
+            $("#submitButton").click();
+        }
+    });
+});
