@@ -9,7 +9,7 @@ import logging
 import time
 import constants
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=constants.LOG_LEVEL)
 
 class SongPreprocessor(threading.Thread):
     def __init__(self):

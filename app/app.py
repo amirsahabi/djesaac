@@ -10,7 +10,7 @@ import logging
 import ctypes
 import constants
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=constants.LOG_LEVEL)
 
 # create app
 app = Flask(__name__)

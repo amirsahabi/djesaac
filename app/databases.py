@@ -5,7 +5,7 @@ import datetime
 import logging
 import constants
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=constants.LOG_LEVEL)
 
 # create database
 db = SqliteExtDatabase(constants.DB_NAME)

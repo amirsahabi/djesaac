@@ -2,7 +2,6 @@
 from scipy.io import wavfile as wf
 from multiprocessing import Value
 import time
-import databases
 import numpy as np
 import math as m
 import pyfirmata as pf
@@ -12,8 +11,9 @@ import preprocessor
 import logging
 import os
 import constants
+import databases
 
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=constants.LOG_LEVEL)
 logger = logging.getLogger(__name__)
 
 class DBMonitor:
@@ -28,7 +28,7 @@ class DBMonitor:
             return
 
         self.songPlaying    = songPlayingValue         # multiprocessing.Array object
-        self.musicIsPlaying = musicIsPlayingValue   # multiprocessing.Value object
+        self.musicIsPlaying = musicIsPlayingValue      # multiprocessing.Value object
         self.skipSong       = skipSongRequest
         self.board          = None
         self.pin3           = None
@@ -129,6 +129,8 @@ class DBMonitor:
                     self.pin6.write(hival[(pos - initVal)/constants.WINDOW_SIZE_SEC])
                 except:
                     logger.info('Don\'t go places you don\'t belong')
+            else:
+                time.sleep(0.1)
         if not (self.musicIsPlaying.value == 1):
             # music could've been stopped while song still playing, stop mixer
             pg.mixer.music.stop()
