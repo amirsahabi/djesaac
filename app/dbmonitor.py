@@ -62,19 +62,21 @@ class DBMonitor:
         self.__init__(musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, threadIssue)
 
         while(True):
-            while(self.musicIsPlaying.value == 1 and databases.SongInQueue.select().wrapped_count() > 0):
+            while(self.musicIsPlaying.value == constants.PLAY and databases.SongInQueue.select().wrapped_count() > 0):
                 song = databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded).get()
                 self.songPlaying[:] = str(song.uuid)
 
                 self.playSong(song.songPath, ''.join(self.songPlaying[:]))
 
-                if self.musicIsPlaying.value == 1:
+                if self.musicIsPlaying.value == constants.PLAY:
                     # add to History
                     databases.History.addSongToHistory(song.songTitle, song.songLink, song.songPath)
 
                     # remove song from queue
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == song.uuid).execute()
-            self.songPlaying[:] = constants.EMPTY_UUID
+            if(self.musicIsPlaying.value == copnstants.PLAY):
+                self.songPlaying[:] = constants.EMPTY_UUID
+
             if self.board is not None:
                 self.standbyMode()
             else:
@@ -107,7 +109,7 @@ class DBMonitor:
         pg.mixer.music.play()
         first = True
         initVal = 0
-        while(pg.mixer.music.get_busy() == True and self.musicIsPlaying.value == 1):
+        while(pg.mixer.music.get_busy() == True and self.musicIsPlaying.value == constants.PLAY):
             # check for skip
             if(self.skipSong[0] != ' '):
                 # skip song requested verify it's this song
@@ -131,7 +133,7 @@ class DBMonitor:
                     logger.info('Don\'t go places you don\'t belong')
             else:
                 time.sleep(0.1)
-        if not (self.musicIsPlaying.value == 1):
+        if self.musicIsPlaying.value == constants.STOP:
             # music could've been stopped while song still playing, stop mixer
             pg.mixer.music.stop()
         else:
@@ -147,7 +149,7 @@ class DBMonitor:
     def standbyMode(self):
         logger.info('Standby Mode')
         cycles=20
-        while(databases.SongInQueue.select().wrapped_count() == 0 or self.musicIsPlaying.value == 0):
+        while(databases.SongInQueue.select().wrapped_count() == 0 or self.musicIsPlaying.value == constants.PLAY):
             if(cycles<20):
                 #sine wave
                 for i in range(0,314,2):

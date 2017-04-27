@@ -36,7 +36,7 @@ def home():
             logger.info("Exception hit in home()")
             return render_template('home.html')
 
-        return render_template('home.html', songs=songsInQueue, musicIsPlaying=musicIsPlaying.value == 1)
+        return render_template('home.html', songs=songsInQueue, musicIsPlaying=musicIsPlaying.value == constants.PLAY)
     else:
         responseData = {}
         command = request.form['command']
@@ -45,7 +45,7 @@ def home():
             uuid = str(request.form['songID'])
 
             #verify the song isn't playing
-            if ''.join(songPlaying) == uuid and musicIsPlaying.value == 1:
+            if ''.join(songPlaying) == uuid and musicIsPlaying.value == constants.PLAY:
                 responseData[constants.RESPONSE] = constants.FAILURE
                 responseData[constants.ERROR]    = "Song can't be deleted, is currently playing"
             else:
@@ -146,7 +146,7 @@ def listener():
                     newSongLink     = str(newSongObject.songLink)
 
                     #song playing has changed, send data request
-                    # yield responseString
+                    # there's got to be a cleaner way to do this
                     yield "data: STARTUPDATE\n\n"
                     yield "data: oldID: {}\n\n".format(flaskThreadSongPlaying)
                     yield "data: newID: {}\n\n".format(newSongID)
@@ -247,8 +247,8 @@ def songHasBeenDownloaded(songLink):
 # start server
 if __name__ == "__main__":
     #drop and init tables
-    databases.dropTables()
-    databases.initTables()
+    # databases.dropTables()
+    # databases.initTables()
 
     monitor = DBMonitor(musicIsPlaying, songPlaying, skipSongRequest, True)
     monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, False))
