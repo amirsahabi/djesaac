@@ -74,7 +74,7 @@ class DBMonitor:
 
                     # remove song from queue
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == song.uuid).execute()
-            if(self.musicIsPlaying.value == copnstants.PLAY):
+            if(self.musicIsPlaying.value == constants.PLAY):
                 self.songPlaying[:] = constants.EMPTY_UUID
 
             if self.board is not None:
