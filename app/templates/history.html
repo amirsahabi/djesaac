@@ -6,6 +6,7 @@
     <script type="text/javascript" src="{{url_for('static', filename='js/history.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/add.js')}}"></script>
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Ubuntu" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Cookie" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="../static/styles/styles.css" />
 </head>
@@ -14,16 +15,6 @@
         $(document).ready(function () {
             var updateEventInProgress = false;
             var updateEventParameters = {};
-            $('.add_song').click(function () {
-                if ($('.open_add').is(":hidden")) {
-                    $('.history').animate({marginTop:'+=' + $('.open_add').height()});
-                    $('.open_add').slideDown('slow');
-                } else {
-
-                    $('.history').animate({marginTop:'-=' + $('.open_add').height()});
-                    $('.open_add').slideUp('fast');
-                }
-            });
 
             var eventSource = new EventSource("/updater");
             eventSource.onmessage = function(event) {
@@ -52,16 +43,30 @@
     </script>
 
     <div id="nav">
-        <a class="nav_link" href="..">HOME</a>
-        <a href="#" class="add_song nav_link" >ADD SONG</a>
-        <a class="nav_link current" href="../history/">HISTORY</a>
+        <div class="nav_container">
+            <div id="navLinks">
+                <a class="nav_link" style="padding-left: 0;" href="">HOME</a>
+                <a class="nav_link current" href="history/">HISTORY</a>
+            </div>
 
-        <div class="open_add hide">
-            <input type="text" class="songLink" id="songLink" name="songLink" placeholder="Link to song ...">
-            <button type="submit" class="addSong" style="position: relative; top: 9px;" id="submitButton" onclick="onSubmit()" value="Submit">
-                <i class="material-icons blue"><i class="material-icons">file_upload</i>
-                </i>
-            </button>
+            <div id="getSongLink">
+                <input type="text" class="songLink" id="songLink" name="songLink" placeholder="ADD NEW SONG ...">
+                <button type="submit" class="addSong" style="position: relative; top: 10px;" id="submitButton" onclick="onSubmit()" value="Submit">
+                    <i class="material-icons blue"><i class="material-icons">file_upload</i>
+                    </i>
+                </button>
+
+                <div class="loading hide" id="loadingSongLink">
+                    <a id="loading">loading</a>
+                </div>
+                <div class="hide" id="add_suc">
+                    <a class="alert_success">successfully added song</a>
+                </div>
+                <div class="hide" id="add_fail">
+                    <a class="alert_error">there was an error</a>
+                </div>
+            </div>
+
         </div>
     </div>
 

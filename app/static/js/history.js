@@ -8,7 +8,7 @@ function sendReplayRequest(songID, rowID){
         data: {"song":songID},
         success: function(data){
             if(data.response === 'success'){
-                var successAlert = $('<tr class="table_alert_success" id=rowID> <td colspan="4">Successfully added song to playlist</td></tr>');
+                var successAlert = $('<tr class="alert_success" id=rowID> <td colspan="4">Successfully added song to playlist</td></tr>');
                 var originalRow = $('<tr class="tabledatarow">'+ $('#'+rowID).html() + '</tr>');
 
                 $('#'+rowID).fadeOut('slow', function(){
@@ -24,7 +24,7 @@ function sendReplayRequest(songID, rowID){
                 });
 
             } else if(data.response === 'failure'){
-                var errorAlert = $('<tr class="table_alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
+                var errorAlert = $('<tr class="alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
                 $('#'+rowID).fadeOut('slow', function(){
                     errorAlert.insertAfter($(this)).hide();
                     $(this).remove();
@@ -43,7 +43,7 @@ function sendReplayRequest(songID, rowID){
 
         },
         error: function(){
-            var errorAlert = $('<tr class="table_alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
+            var errorAlert = $('<tr class="alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
             $('#'+rowID).fadeOut('slow', function(){
                 errorAlert.insertAfter($(this)).hide();
                 $(this).remove();

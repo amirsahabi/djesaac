@@ -7,43 +7,53 @@
     <script type="text/javascript" src="{{url_for('static', filename='js/add.js')}}"></script>
     <script src="../static/js/jquery-3.2.0.js"></script>
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Ubuntu" />
+    <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Cookie" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="../static/styles/styles.css" />
 </head>
 <body>
 <div id="nav">
-    <a class="nav_link current" href="">HOME</a>
-    <a href="#/" class="add_song nav_link" >ADD SONG</a>
-    <a class="nav_link" href="history/">HISTORY</a>
+    <div class="nav_container">
+        <div id="navLinks">
+            <a class="nav_link current" style="padding-left: 0;" href="">HOME</a>
+            <a class="nav_link" href="history/">HISTORY</a>
+        </div>
 
-    <div class="open_add hide">
-        <input type="text" class="songLink" id="songLink" name="songLink" placeholder="Link to song ...">
-        <button type="submit" class="addSong" style="position: relative; top: 9px;" id="submitButton" onclick="onSubmit()" value="Submit">
-            <i class="material-icons blue"><i class="material-icons">file_upload</i>
-            </i>
-        </button>
+        <div id="getSongLink">
+            <input type="text" class="songLink" id="songLink" name="songLink" placeholder="ADD NEW SONG ...">
+            <button type="submit" class="addSong" style="position: relative; top: 10px;" id="submitButton" onclick="onSubmit()" value="Submit">
+                <i class="material-icons blue"><i class="material-icons">file_upload</i>
+                </i>
+            </button>
+
+            <div class="loading hide" id="loadingSongLink">
+                <a id="loading">loading</a>
+            </div>
+            <div class="hide" id="add_suc">
+                <a class="alert_success">successfully added song</a>
+            </div>
+            <div class="hide" id="add_fail">
+                <a class="alert_error">there was an error</a>
+            </div>
+        </div>
+
     </div>
 </div>
+
 
 <script>
     var updateEventInProgress = false;
     var updateEventParameters = {};
     $(document).ready(function(){
+
+
+
         $(".play_stop").click(function(){
             $(this).text(function(i, v){
                 return v === 'pause_circle_outline' ? 'play_circle_outline' : 'pause_circle_outline'
             });
         });
 
-        $('.add_song').click(function () {
-            if ($('.open_add').is(":hidden")) {
-                $('.currently_playing').animate({marginTop:'+=' + $('.open_add').height()});
-                $('.open_add').slideDown('slow');
-            } else {
-                $('.currently_playing').animate({marginTop:'-='+  $('.open_add').height()});
-                $('.open_add').slideUp('fast');
-            }
-        });
 
         var eventSource = new EventSource("/updater");
         eventSource.onmessage = function(event) {
@@ -71,7 +81,7 @@
 <div class="currently_playing">
     <h3 style="margin-bottom: 0; text-transform: uppercase; color: #757980; font-weight: 100;">currently playing</h3>
     <table>
-        <tr class="tableheaderrow">
+        <tr class="tableheaderrow" >
             <th>#</th>
             <th>Title</th>
             <th>Link</th>
@@ -114,6 +124,9 @@
             {% endfor %}
         {% endif %}
     </table>
+</div>
+<div id="footer">
+
 </div>
 
 
