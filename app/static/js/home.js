@@ -99,6 +99,19 @@ function reArrangeQueueTable(parameters){
     }
 }
 
+function addNewSongToQueue(parameters){
+    //create new row
+    var newObj = $('<tr class="tabledatarow"></tr>');
+    newObj.append('<td class="queueindexcolumn">'+parameters.count+"</td>");
+    newObj.append('<td class="songtitlecolumn">'+parameters.newTitle+"</td>");
+    var link = $('<a id="table_link" href="'+parameters.newLink+'">Link</a>');
+    newObj.append($("<td></td>").append(link));
+    var remove = $('<i class="material-icons"><span class="remove" onclick="removeSongFromQueue("'+parameters.newID+'")">remove_circle_outline</span></i>');
+    newObj.append($("<td></td>").append(remove));
+    var table = $('div.playlist').find('table');
+    table.append(newObj);
+}
+
 $(function(){
 
     $(window).on('scroll', function(){

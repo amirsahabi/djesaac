@@ -59,13 +59,16 @@
         eventSource.onmessage = function(event) {
             //reload the page for now, in the future hopefully it's dynamic
             // window.location.reload()
-            if(event.data == "STARTUPDATE"){
+            if(event.data == "STARTUPDATE" || event.data == "NEWSONG"){
                 updateEventInProgress = true;
                 updateEventParameters = {};
             }else if(event.data == "ENDUPDATE"){
                 //push changes to page
                 updateEventInProgress = false;
                 reArrangeQueueTable(updateEventParameters);
+            }else if(event.data == "ENDSONG"){
+                updateEventInProgress = false;
+                addNewSongToQueue(updateEventParameters);
             }else if(updateEventInProgress){
                 var parameterStart = event.data.indexOf(": ");
                 var parameterName  = event.data.substring(0,parameterStart);
@@ -118,7 +121,7 @@
             <tr class="tabledatarow">
                 <td class="queueindexcolumn">{{loop.index0+1}}</td>
                 <td class="songtitlecolumn">{{songs[i].songTitle}}</td>
-                <td class="songlinkcolumn"><a id=table_link href="{{songs[i].songLink}}">Link</a></td>
+                <td class="songlinkcolumn"><a id="table_link" href="{{songs[i].songLink}}">Link</a></td>
                 <td class="removebuttoncolumn"><i class="material-icons"><span class='remove' onclick="removeSongFromQueue('{{songs[i].uuid}}')">remove_circle_outline</span></i></td>
             </tr>
             {% endfor %}
