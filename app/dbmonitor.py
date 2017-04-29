@@ -96,11 +96,11 @@ class DBMonitor:
                 if( instanceRed != ''.join(self.redLoc) or instanceBlue != ''.join(self.blueLoc) or
                     instanceGreen != ''.join(self.greenLoc) or instanceBoard != ''.join(self.boardLoc)):
                     try:
-                        self.initBoard()
                         instanceRed   = ''.join(self.redLoc[:])
                         instanceGreen = ''.join(self.greenLoc[:])
                         instanceBlue  = ''.join(self.blueLoc[:])
                         instanceBoard = ''.join(self.boardLoc[:])
+                        self.initBoard()
                     except:
                         self.board = None
 
