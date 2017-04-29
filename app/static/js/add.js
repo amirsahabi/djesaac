@@ -31,9 +31,9 @@ function onSubmit(){
             if(data.response === 'success'){
                 $("#loadingSongLink").fadeOut(500).promise().done(function(){
                     $("#add_suc").fadeIn().promise().done(function(){
-                        setTimeout(function () {
-                            window.location.href = (window.location.origin);
-                        }, 2000); //redirect in 2sec
+                        // setTimeout(function () {
+                        //     window.location.href = (window.location.origin);
+                        // }, 2000); //redirect in 2sec
                     });
                 });
 
@@ -70,5 +70,3 @@ $(document).ready(function () {
         }
     });
 });
-
-

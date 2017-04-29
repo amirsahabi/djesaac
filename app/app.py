@@ -140,8 +140,26 @@ def listener():
         flaskThreadSongObject       = databases.SongInQueue.select().where(databases.SongInQueue.uuid == flaskThreadSongPlaying).get() if flaskThreadSongPlaying != constants.EMPTY_UUID else None
         flaskThreadSongPlayingTitle = str(flaskThreadSongObject.songTitle) if flaskThreadSongPlaying != constants.EMPTY_UUID else ''
         flaskThreadSongPlayingLink  = str(flaskThreadSongObject.songLink)  if flaskThreadSongPlaying != constants.EMPTY_UUID else ''
+        songsInQueueCount           = databases.SongInQueue.select().wrapped_count()
+
         while True:
             if(databases.SongInQueue.select().wrapped_count() > 0):
+                newSongs = []
+                if(songsInQueueCount < databases.SongInQueue.select().wrapped_count()):
+                    for song in databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded.desc()):
+                        newSongs.append(song)
+                        songsInQueueCount += 1
+                        if(songsInQueueCount == databases.SongInQueue.select().wrapped_count()):
+                            break
+                    for iterator in range(len(newSongs)-1, -1,-1):
+                        yield "data: NEWSONG\n\n"
+                        yield "data: newID: {}\n\n".format(newSongs[iterator].uuid)
+                        yield "data: newTitle: {}\n\n".format(newSongs[iterator].songTitle)
+                        yield "data: newLink: {}\n\n".format(newSongs[iterator].songLink)
+                        yield "data: count: {}\n\n".format(str(songsInQueueCount - iterator))
+                        yield "data: ENDSONG\n\n"
+
+
                 # check to see if previous song is current song
                 if(flaskThreadSongPlaying != ''.join(songPlaying)):
                     # get new variables
@@ -165,6 +183,7 @@ def listener():
                     flaskThreadSongObject       = newSongObject
                     flaskThreadSongPlayingTitle = newSongTitle
                     flaskThreadSongPlayingLink  = newSongLink
+                    songsInQueueCount -= 1
             elif(flaskThreadSongPlaying != constants.EMPTY_UUID):
                 # no more songs playing but the last one finished, send an event
                 newSongID = constants.EMPTY_UUID
@@ -185,6 +204,7 @@ def listener():
                 flaskThreadSongObject  = newSongObject
                 flaskThreadSongPlayingTitle = newSongTitle
                 flaskThreadSongPlayingLink  = newSongLink
+                songsInQueueCount -= 1
             time.sleep(0.5)
 
     return Response(listenForSongIsFinished(), mimetype="text/event-stream")
@@ -293,8 +313,8 @@ def songHasBeenDownloaded(songLink):
 # start server
 if __name__ == "__main__":
     #drop and init tables
-    databases.dropTables()
-    databases.initTables()
+    # databases.dropTables()
+    # databases.initTables()
 
     monitor = DBMonitor(None, None, None, None, None, None, None, None, True)
     monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, arduinoPortLoc, arduinoBluePin, arduinoGreenPin, arduinoRedPin, latency, False))
