@@ -201,36 +201,23 @@ def settings():
         responseData[constants.RESPONSE] = constants.SUCCESS
 
     elif request.method == 'POST':
+        def checkLength(checkString, checkLength):
+            if(len(checkString) > checkLength):
+                return checkString[:checkLength]
+            else:
+                return checkString + ' ' * (checkLength - len(checkString))
         responseData = {}
-        newBoardLocation = request.form['board']
-        newRedLocation   = request.form['red']
-        newGreenLocation = request.form['green']
-        newBlueLocation  = request.form['blue']
+        newBoardLocation = checkLength(request.form['board'], constants.ARD_PORT_LENGTH)
+        newRedLocation   = checkLength(request.form['red'], constants.ARD_PIN_LENGTH)
+        newGreenLocation = checkLength(request.form['green'], constants.ARD_PIN_LENGTH)
+        newBlueLocation  = checkLength(request.form['blue'], constants.ARD_PIN_LENGTH)
         newLatency       = request.form['latency']
-
-        # adjust lengths
-        if(len(newBoardLocation) > constants.ARD_PORT_LENGTH):
-            newBoardLocation = newBoardLocation[:constants.ARD_PORT_LENGTH]
-        else:
-            newBoardLocation = newBoardLocation + ' ' * (constants.ARD_PORT_LENGTH - len(newBoardLocation))
-        if(len(newRedLocation) > constants.ARD_PIN_LENGTH):
-            newRedLocation = newRedLocation[:constants.ARD_PIN_LENGTH]
-        else:
-            newRedLocation = newRedLocation + ' ' * (constants.ARD_PIN_LENGTH - len(newRedLocation))
-        if(len(newGreenLocation) > constants.ARD_PIN_LENGTH):
-            newGreenLocation = newGreenLocation[:constants.ARD_PIN_LENGTH]
-        else:
-            newGreenLocation = newGreenLocation + ' ' * (constants.ARD_PIN_LENGTH - len(newGreenLocation))
-        if(len(newBlueLocation) > constants.ARD_PIN_LENGTH):
-            newBlueLocation = newBlueLocation[:constants.ARD_PIN_LENGTH]
-        else:
-            newBlueLocation = newBlueLocation + ' ' * (constants.ARD_PIN_LENGTH - len(newBlueLocation))
 
         arduinoPortLoc[:]    = newBoardLocation[:]
         arduinoRedPin[:]     = newRedLocation[:]
         arduinoGreenPin[:]   = newGreenLocation[:]
         arduinoBluePin[:]    = newBlueLocation[:]
-        latency.value = float(newLatency)
+        latency.value        = float(newLatency)
 
         responseData['board']   = newBoardLocation
         responseData['red']     = newRedLocation

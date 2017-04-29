@@ -95,7 +95,14 @@ class DBMonitor:
             while(self.musicIsPlaying.value == constants.PLAY and databases.SongInQueue.select().wrapped_count() > 0):
                 if( instanceRed != ''.join(self.redLoc) or instanceBlue != ''.join(self.blueLoc) or
                     instanceGreen != ''.join(self.greenLoc) or instanceBoard != ''.join(self.boardLoc)):
-                    self.initBoard()
+                    try:
+                        self.initBoard()
+                        instanceRed   = ''.join(self.redLoc[:])
+                        instanceGreen = ''.join(self.greenLoc[:])
+                        instanceBlue  = ''.join(self.blueLoc[:])
+                        instanceBoard = ''.join(self.boardLoc[:])
+                    except:
+                        self.board = None
 
                 song = databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded).get()
                 self.songPlaying[:] = str(song.uuid)
