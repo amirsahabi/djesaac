@@ -13,7 +13,7 @@ body{
     margin: 0;
 }
 
-@media (min-width: 640px) {
+@media (min-width: 660px) {
     a.nav_link_icon {display:none}
     a.nav_link_text { }
 }
@@ -25,9 +25,10 @@ body{
         width:90%;
         margin-left: 5%;
     }
+    div.history{width:90%;}
 }
 
-@media (max-width: 640px) {
+@media (max-width: 660px) {
     a.nav_link_icon {}
     a.nav_link_text {display:none}
 }
