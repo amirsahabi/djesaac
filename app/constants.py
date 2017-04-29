@@ -1,17 +1,23 @@
 # constants.py
 # define some constants to be used in the program
 
+UUID_LENGTH                 = 36
+ARD_PORT_LENGTH             = 25
+ARD_PIN_LENGTH              = 10
+
 PORT                        = 3000
 DEBUGMODE                   = True
-EMPTY_UUID                  = ' ' * 36
+EMPTY_UUID                  = ' ' * UUID_LENGTH
 FAILED_UUID_STR             = '-1'
 
 ARDUINO_WINDOWS_LOC_DEFAULT = 'COM4'
 ARDUINO_OSX_LOC_DEFAULT     = '/dev/tty.usbmodem1421'
 ARDUINO_UBUNTU_LOC_DEFAULT  = '/dev/ttyACM0'
-ARDUINO_PIN1                = 'd:3:p'
-ARDUINO_PIN2                = 'd:5:p'
-ARDUINO_PIN3                = 'd:6:p'
+ARDUINO_DEFAULT_RED_PIN     = 'd:3:p'
+ARDUINO_DEFAULT_GREEN_PIN   = 'd:5:p'
+ARDUINO_DEFAULT_BLUE_PIN    = 'd:6:p'
+BOARD_UNINITIALIZED         = ' ' * ARD_PORT_LENGTH
+
 
 DB_NAME                     = 'djesaac.db'
 DB_PREPROC_PROCESS          = 'process'

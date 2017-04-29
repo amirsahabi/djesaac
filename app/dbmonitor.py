@@ -17,7 +17,7 @@ logging.basicConfig(level=constants.LOG_LEVEL)
 logger = logging.getLogger(__name__)
 
 class DBMonitor:
-    def __init__(self, musicIsPlayingValue, songPlayingValue, skipSongRequest, threadIssue):
+    def __init__(self, musicIsPlayingValue, songPlayingValue, skipSongRequest, port, blue, green, red, latencyVal, threadIssue):
         # I like the idea of encapsulation for all these functions and variables
         # but when the object is instantiated in the main thread, it instantiates
         # an object before the run() function is called in its new process
@@ -31,12 +31,34 @@ class DBMonitor:
         self.musicIsPlaying = musicIsPlayingValue      # multiprocessing.Value object
         self.skipSong       = skipSongRequest
         self.board          = None
-        self.pin3           = None
-        self.pin5           = None
-        self.pin6           = None
+        self.redPin         = None
+        self.greenPin       = None
+        self.bluePin        = None
+        self.boardLoc       = port
+        self.redLoc         = red
+        self.greenLoc       = green
+        self.blueLoc        = blue
+        self.latency        = latencyVal
 
         self.preprocessor = preprocessor.SongPreprocessor()
         self.preprocessor.start()
+
+        defaultPorts = [constants.ARDUINO_WINDOWS_LOC_DEFAULT, constants.ARDUINO_OSX_LOC_DEFAULT, constants.ARDUINO_UBUNTU_LOC_DEFAULT]
+
+        for defaultPort in defaultPorts:
+            try:
+                self.initBoard(defaultPort, constants.ARDUINO_DEFAULT_RED_PIN, constants.ARDUINO_DEFAULT_GREEN_PIN, constants.ARDUINO_DEFAULT_BLUE_PIN)
+                logger.info('Board initialized')
+                self.boardLoc[:] = defaultPort + ' ' * len(defaultPort)
+                self.blueLoc[:]  = constants.ARDUINO_DEFAULT_RED_PIN   + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_RED_PIN))
+                self.greenLoc[:] = constants.ARDUINO_DEFAULT_GREEN_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_GREEN_PIN))
+                self.redLoc[:]   = constatns.ARDUINO_DEFAULT_BLUE_PIN  + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_BLUE_PIN))
+                break
+            except:
+                pass
+        else:
+            self.board = None
+            self.boardLoc[:] = constants.BOARD_UNINITIALIZED
 
         # Initialize board and set pins using pyfirmata
         try:
@@ -57,9 +79,9 @@ class DBMonitor:
                     logger.info("Failed to initialize board, will only play music")
         logger.info("DBMonitor initialized")
 
-    def run(self, musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, threadIssue):
+    def run(self, musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, portProcArr, blueProcArr, greenProcArr, redProcArr, latencyProcVal, threadIssue):
         logger.info("Running DBMonitor")
-        self.__init__(musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, threadIssue)
+        self.__init__(musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, portProcArr, blueProcArr, greenProcArr, redProcArr, latencyProcVal, threadIssue)
 
         while(True):
             while(self.musicIsPlaying.value == constants.PLAY and databases.SongInQueue.select().wrapped_count() > 0):
@@ -107,8 +129,7 @@ class DBMonitor:
         pg.mixer.init(frequency=wavObj.getframerate(), size=wavObj.getsampwidth()*-8)
         pg.mixer.music.load(song)
         pg.mixer.music.play()
-        first = True
-        initVal = 0
+
         while(pg.mixer.music.get_busy() == True and self.musicIsPlaying.value == constants.PLAY):
             # check for skip
             if(self.skipSong[0] != ' '):
@@ -123,12 +144,9 @@ class DBMonitor:
             if(self.board is not None):
                 try:
                     pos = pg.mixer.music.get_pos()
-                    if first:
-                        initVal = pos
-                        first = False
-                    self.pin3.write(loval[(pos - initVal)/constants.WINDOW_SIZE_SEC])
-                    self.pin5.write(mdval[(pos - initVal)/constants.WINDOW_SIZE_SEC])
-                    self.pin6.write(hival[(pos - initVal)/constants.WINDOW_SIZE_SEC])
+                    self.redPin.write(loval[(pos - self.latency.value)/constants.WINDOW_SIZE_SEC])
+                    self.greenPin.write(mdval[(pos - self.latency.value)/constants.WINDOW_SIZE_SEC])
+                    self.bluePin.write(hival[(pos - self.latency.value)/constants.WINDOW_SIZE_SEC])
                 except:
                     logger.info('Don\'t go places you don\'t belong')
             else:
@@ -141,9 +159,9 @@ class DBMonitor:
             databases.PreprocessRequest.newDecomissionRequest(songUUID)
 
         if(self.board is not None):
-            self.pin3.write(0)
-            self.pin5.write(0)
-            self.pin6.write(0)
+            self.redPin.write(0)
+            self.greenPin.write(0)
+            self.bluePin.write(0)
         pg.mixer.quit()
 
     def standbyMode(self):
@@ -197,16 +215,16 @@ class DBMonitor:
 
     def writeToPinsAndSleep(self, pin1, pin2, pin3, sleepTime):
         if(pin1 is not None):
-            self.pin3.write(pin1)
+            self.redPin.write(pin1)
         if pin2 is not None:
-            self.pin5.write(pin2)
+            self.greenPin.write(pin2)
         if pin3 is not None:
-            self.pin6.write(pin3)
+            self.bluePin.write(pin3)
         if sleepTime is not None:
             time.sleep(sleepTime)
 
     def initBoard(self, _board, _pin3, _pin5, _pin6):
-        self.board = pf.Arduino(_board)         # init board
-        self.pin3  = self.board.get_pin(_pin3)  # R
-        self.pin5  = self.board.get_pin(_pin5)  # G
-        self.pin6  = self.board.get_pin(_pin6)  # B
+        self.board     = pf.Arduino(_board)         # init board
+        self.redPin    = self.board.get_pin(_pin3)  # R
+        self.greenPin  = self.board.get_pin(_pin5)  # G
+        self.bluePin   = self.board.get_pin(_pin6)  # B

@@ -15,9 +15,14 @@ logging.basicConfig(level=constants.LOG_LEVEL)
 # create app
 app = Flask(__name__)
 
-musicIsPlaying  = Value('d' , 1)
-songPlaying     = Array(ctypes.c_char_p, 36)
-skipSongRequest = Array(ctypes.c_char_p, 36)
+musicIsPlaying      = Value('d' , 1)
+songPlaying         = Array(ctypes.c_char_p, constants.UUID_LENGTH)
+skipSongRequest     = Array(ctypes.c_char_p, constants.UUID_LENGTH)
+arduinoPortLoc      = Array(ctypes.c_char_p, constants.ARD_PORT_LENGTH)
+arduinoBluePin      = Array(ctypes.c_char_p, constants.ARD_PIN_LENGTH)
+arduinoGreenPin     = Array(ctypes.c_char_p, constants.ARD_PIN_LENGTH)
+arduinoRedPin       = Array(ctypes.c_char_p, constants.ARD_PIN_LENGTH)
+latency             = Value('d', 0)
 songPlaying[:]      = constants.EMPTY_UUID
 skipSongRequest[:]  = constants.EMPTY_UUID
 monitor = None
@@ -184,6 +189,14 @@ def listener():
 
     return Response(listenForSongIsFinished(), mimetype="text/event-stream")
 
+@app.route("/settings/", methods=['GET','POST'])
+def settings():
+    if request.method == 'GET':
+        pass
+    elif request.method == 'POST':
+        pass
+
+
 def addSongToQueue(songLink):
     songUUID = constants.FAILED_UUID_STR
     try:
@@ -228,6 +241,8 @@ def addSongToQueue(songLink):
         return songUUID
 
     return songUUID
+
+
 def songHasBeenDownloaded(songLink):
     #check both history and songqueue for the song
     songs = databases.SongInQueue.select().where(databases.SongInQueue.songLink == songLink)
@@ -247,11 +262,11 @@ def songHasBeenDownloaded(songLink):
 # start server
 if __name__ == "__main__":
     #drop and init tables
-    # databases.dropTables()
-    # databases.initTables()
+    databases.dropTables()
+    databases.initTables()
 
-    monitor = DBMonitor(musicIsPlaying, songPlaying, skipSongRequest, True)
-    monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, False))
+    monitor = DBMonitor(None, None, None, None, None, None, None, None, True)
+    monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, arduinoPortLoc, arduinoBluePin, arduinoGreenPin, arduinoRedPin, latency, False))
     monitorProc.start()
 
     app.debug = constants.DEBUGMODE
