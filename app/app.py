@@ -192,10 +192,54 @@ def listener():
 @app.route("/settings/", methods=['GET','POST'])
 def settings():
     if request.method == 'GET':
-        pass
-    elif request.method == 'POST':
-        pass
+        responseData = {}
+        responseData['board']   = ''.join(boardLoc)
+        responseData['red']     = ''.join(redLoc)
+        responseData['green']   = ''.join(greenLoc)
+        responseData['blue']    = ''.join(blueLoc)
+        responseData['latency'] = str(latency.value)
+        responseData[constants.RESPONSE] = constants.SUCCESS
 
+    elif request.method == 'POST':
+        responseData = {}
+        newBoardLocation = request.form['board']
+        newRedLocation   = request.form['red']
+        newGreenLocation = request.form['green']
+        newBlueLocation  = request.form['blue']
+        newLatency       = request.form['latency']
+
+        # adjust lengths
+        if(len(newBoardLocation) > constants.ARD_PORT_LENGTH):
+            newBoardLocation = newBoardLocation[:constants.ARD_PORT_LENGTH]
+        else:
+            newBoardLocation = newBoardLocation + ' ' * (constants.ARD_PORT_LENGTH - len(newBoardLocation))
+        if(len(newRedLocation) > constants.ARD_PIN_LENGTH):
+            newRedLocation = newRedLocation[:constants.ARD_PIN_LENGTH]
+        else:
+            newRedLocation = newRedLocation + ' ' * (constants.ARD_PIN_LENGTH - len(newRedLocation))
+        if(len(newGreenLocation) > constants.ARD_PIN_LENGTH):
+            newGreenLocation = newGreenLocation[:constants.ARD_PIN_LENGTH]
+        else:
+            newGreenLocation = newGreenLocation + ' ' * (constants.ARD_PIN_LENGTH - len(newGreenLocation))
+        if(len(newBlueLocation) > constants.ARD_PIN_LENGTH):
+            newBlueLocation = newBlueLocation[:constants.ARD_PIN_LENGTH]
+        else:
+            newBlueLocation = newBlueLocation + ' ' * (constants.ARD_PIN_LENGTH - len(newBlueLocation))
+
+        boardLoc[:]   = newBoardLocation[:]
+        redLoc[:]     = newRedLocation[:]
+        greenLoc[:]   = newGreenLocation[:]
+        blueLoc[:]    = newBlueLocation[:]
+        latency.value = float(newLatency)
+
+        responseData['board']   = newBoardLocation
+        responseData['red']     = newRedLocation
+        responseData['green']   = newGreenLocation
+        responseData['blue']    = newBlueLocation
+        responseData['latency'] = newLatency
+        responseData[constants.RESPONSE] = constants.SUCCESS
+
+    return jsonify(responseData)
 
 def addSongToQueue(songLink):
     songUUID = constants.FAILED_UUID_STR

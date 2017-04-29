@@ -47,12 +47,13 @@ class DBMonitor:
 
         for defaultPort in defaultPorts:
             try:
-                self.initBoard(defaultPort, constants.ARDUINO_DEFAULT_RED_PIN, constants.ARDUINO_DEFAULT_GREEN_PIN, constants.ARDUINO_DEFAULT_BLUE_PIN)
-                logger.info('Board initialized')
                 self.boardLoc[:] = defaultPort + ' ' * len(defaultPort)
                 self.blueLoc[:]  = constants.ARDUINO_DEFAULT_RED_PIN   + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_RED_PIN))
                 self.greenLoc[:] = constants.ARDUINO_DEFAULT_GREEN_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_GREEN_PIN))
                 self.redLoc[:]   = constatns.ARDUINO_DEFAULT_BLUE_PIN  + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_BLUE_PIN))
+                self.initBoard(defaultPort)
+                logger.info('Board initialized')
+
                 break
             except:
                 pass
@@ -84,7 +85,15 @@ class DBMonitor:
         self.__init__(musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, portProcArr, blueProcArr, greenProcArr, redProcArr, latencyProcVal, threadIssue)
 
         while(True):
+            instanceRed   = ''.join(self.redLoc)
+            instanceGreen = ''.join(self.greenLoc[:])
+            instanceBlue  = ''.join(self.blueLoc[:])
+            instanceBoard = ''.join(self.boardLoc[:])
             while(self.musicIsPlaying.value == constants.PLAY and databases.SongInQueue.select().wrapped_count() > 0):
+                if( instanceRed != ''.join(self.redLoc) or instanceBlue != ''.join(self.blueLoc) or
+                    instanceGreen != ''.join(self.greenLoc) or instanceBoard != ''.join(self.boardLoc)):
+                    self.initBoard()
+
                 song = databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded).get()
                 self.songPlaying[:] = str(song.uuid)
 
@@ -223,8 +232,8 @@ class DBMonitor:
         if sleepTime is not None:
             time.sleep(sleepTime)
 
-    def initBoard(self, _board, _pin3, _pin5, _pin6):
-        self.board     = pf.Arduino(_board)         # init board
-        self.redPin    = self.board.get_pin(_pin3)  # R
-        self.greenPin  = self.board.get_pin(_pin5)  # G
-        self.bluePin   = self.board.get_pin(_pin6)  # B
+    def initBoard(self):
+        self.board     = pf.Arduino('',join(self.boardLoc[:]).strip())          # init board
+        self.redPin    = self.board.get_pin(''.join(self.redLoc[:]).strip())    # R
+        self.greenPin  = self.board.get_pin(''.join(self.greenLoc[:]).strip())  # G
+        self.bluePin   = self.board.get_pin(''.join(self.blueLoc[:]).strip())   # B
