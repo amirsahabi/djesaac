@@ -60,6 +60,9 @@ class DBMonitor:
         else:
             self.board = None
             self.boardLoc[:] = constants.BOARD_UNINITIALIZED
+            self.redLoc[:]   = constants.PIN_UNINITIALIZED
+            self.greenLoc[:] = constants.PIN_UNINITIALIZED
+            self.blueLoc[:]  = constants.PIN_UNINITIALIZED
 
         # Initialize board and set pins using pyfirmata
         try:
@@ -85,7 +88,7 @@ class DBMonitor:
         self.__init__(musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, portProcArr, blueProcArr, greenProcArr, redProcArr, latencyProcVal, threadIssue)
 
         while(True):
-            instanceRed   = ''.join(self.redLoc)
+            instanceRed   = ''.join(self.redLoc[:])
             instanceGreen = ''.join(self.greenLoc[:])
             instanceBlue  = ''.join(self.blueLoc[:])
             instanceBoard = ''.join(self.boardLoc[:])
