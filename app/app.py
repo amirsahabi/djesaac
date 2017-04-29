@@ -204,7 +204,7 @@ def listener():
                 flaskThreadSongObject  = newSongObject
                 flaskThreadSongPlayingTitle = newSongTitle
                 flaskThreadSongPlayingLink  = newSongLink
-                songInQueueCount -= 1
+                songsInQueueCount -= 1
             time.sleep(0.5)
 
     return Response(listenForSongIsFinished(), mimetype="text/event-stream")
