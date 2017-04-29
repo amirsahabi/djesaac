@@ -193,10 +193,10 @@ def listener():
 def settings():
     if request.method == 'GET':
         responseData = {}
-        responseData['board']   = ''.join(boardLoc)
-        responseData['red']     = ''.join(redLoc)
-        responseData['green']   = ''.join(greenLoc)
-        responseData['blue']    = ''.join(blueLoc)
+        responseData['board']   = ''.join(arduinoPortLoc[:])
+        responseData['red']     = ''.join(arduinoRedPin[:])
+        responseData['green']   = ''.join(arduinoGreenPin[:])
+        responseData['blue']    = ''.join(arduinoBluePin[:])
         responseData['latency'] = str(latency.value)
         responseData[constants.RESPONSE] = constants.SUCCESS
 
@@ -226,10 +226,10 @@ def settings():
         else:
             newBlueLocation = newBlueLocation + ' ' * (constants.ARD_PIN_LENGTH - len(newBlueLocation))
 
-        boardLoc[:]   = newBoardLocation[:]
-        redLoc[:]     = newRedLocation[:]
-        greenLoc[:]   = newGreenLocation[:]
-        blueLoc[:]    = newBlueLocation[:]
+        arduinoPortLoc[:]    = newBoardLocation[:]
+        arduinoRedPin[:]     = newRedLocation[:]
+        arduinoGreenPin[:]   = newGreenLocation[:]
+        arduinoBluePin[:]    = newBlueLocation[:]
         latency.value = float(newLatency)
 
         responseData['board']   = newBoardLocation
