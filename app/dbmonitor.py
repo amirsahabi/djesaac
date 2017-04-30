@@ -50,7 +50,7 @@ class DBMonitor:
                 self.boardLoc[:] = defaultPort + ' ' * len(defaultPort)
                 self.blueLoc[:]  = constants.ARDUINO_DEFAULT_RED_PIN   + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_RED_PIN))
                 self.greenLoc[:] = constants.ARDUINO_DEFAULT_GREEN_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_GREEN_PIN))
-                self.redLoc[:]   = constatns.ARDUINO_DEFAULT_BLUE_PIN  + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_BLUE_PIN))
+                self.redLoc[:]   = constants.ARDUINO_DEFAULT_BLUE_PIN  + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_BLUE_PIN))
                 self.initBoard(defaultPort)
                 logger.info('Board initialized')
 

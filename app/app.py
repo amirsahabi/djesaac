@@ -60,7 +60,7 @@ def home():
                 #delete from queue
                 try:
                     songToDelete = databases.SongInQueue.select().where(databases.SongInQueue.uuid == uuid).get()
-                    databases.newRemoveSong(songToDelete.songTitle, uuid, songToDelete.songLink)
+                    databases.ActionHistory.newRemoveSong(songToDelete.songTitle, uuid, songToDelete.songLink)
 
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == uuid).execute()
                     databases.PreprocessRequest.delete().where(databases.PreprocessRequest.songUUID == uuid).execute()
