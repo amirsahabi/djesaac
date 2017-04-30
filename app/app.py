@@ -16,25 +16,26 @@ logging.basicConfig(level=constants.LOG_LEVEL)
 # create app
 app = Flask(__name__)
 
-musicIsPlaying      = Value('d' , 1)
-songPlaying         = Array(ctypes.c_char_p, constants.UUID_LENGTH)
-skipSongRequest     = Array(ctypes.c_char_p, constants.UUID_LENGTH)
-arduinoPortLoc      = Array(ctypes.c_char_p, constants.ARD_PORT_LENGTH)
-arduinoBluePin      = Array(ctypes.c_char_p, constants.ARD_PIN_LENGTH)
-arduinoGreenPin     = Array(ctypes.c_char_p, constants.ARD_PIN_LENGTH)
-arduinoRedPin       = Array(ctypes.c_char_p, constants.ARD_PIN_LENGTH)
-latency             = Value('d', 0)
-songPlaying[:]      = constants.EMPTY_UUID
-skipSongRequest[:]  = constants.EMPTY_UUID
+musicIsPlaying = Value('d' , 1)
+songPlaying = Array(ctypes.c_char_p, constants.UUID_LENGTH)
+skipSongRequest = Array(ctypes.c_char_p, constants.UUID_LENGTH)
+arduinoPortLoc = Array(ctypes.c_char_p, constants.ARD_PORT_LENGTH)
+arduinoBluePin = Array(ctypes.c_char_p, constants.ARD_PIN_LENGTH)
+arduinoGreenPin = Array(ctypes.c_char_p, constants.ARD_PIN_LENGTH)
+arduinoRedPin = Array(ctypes.c_char_p, constants.ARD_PIN_LENGTH)
+latency = Value('d', 0)
+songPlaying[:] = constants.EMPTY_UUID
+skipSongRequest[:] = constants.EMPTY_UUID
 monitor = None
 logger = logging.getLogger(__name__)
 # home
 
 openConnections = []
 
+
 @app.route('/', methods=['GET','POST'])
 def home():
-    if(request.method == 'GET'):
+    if request.method == 'GET':
         # get songs from queue
         songsInQueue = []
         try:
@@ -49,15 +50,15 @@ def home():
         responseData = {}
         command = request.form['command']
         if command == "remove":
-            #do delete
+            # do delete
             uuid = str(request.form['songID'])
 
-            #verify the song isn't playing
+            # verify the song isn't playing
             if ''.join(songPlaying) == uuid and musicIsPlaying.value == constants.PLAY:
                 responseData[constants.RESPONSE] = constants.FAILURE
-                responseData[constants.ERROR]    = "Song can't be deleted, is currently playing"
+                responseData[constants.ERROR] = "Song can't be deleted, is currently playing"
             else:
-                #delete from queue
+                # delete from queue
                 try:
                     songToDelete = databases.SongInQueue.select().where(databases.SongInQueue.uuid == uuid).get()
                     databases.ActionHistory.newRemoveSong(songToDelete.songTitle, uuid, songToDelete.songLink)
@@ -67,14 +68,14 @@ def home():
                     responseData[constants.RESPONSE] = constants.SUCCESS
                 except:
                     responseData[constants.RESPONSE] = constants.FAILURE
-                    responseData[constants.ERROR]    = "Failed to remove from database"
+                    responseData[constants.ERROR] = "Failed to remove from database"
         elif command == "startstop":
             try:
                 musicIsPlaying.value = (musicIsPlaying.value + 1) % 2
                 responseData[constants.RESPONSE] = constants.SUCCESS
             except:
                 responseData[constants.RESPONSE] = constants.FAILURE
-                responseData[constants.ERROR]    = "Can't stop this beat"
+                responseData[constants.ERROR] = "Can't stop this beat"
         elif command == "next":
             uuid = str(request.form['songID'])
 
@@ -82,11 +83,11 @@ def home():
             if ''.join(songPlaying) == uuid:
                 # send next signal
                 skipSongRequest[:] = uuid
-                #add a new action event
+                # add a new action event
             responseData[constants.RESPONSE] = constants.SUCCESS
         else:
             responseData[constants.RESPONSE] = constants.FAILURE
-            responseData[constants.ERROR]    = "unknown command"
+            responseData[constants.ERROR] = "unknown command"
         return jsonify(responseData)
 
 
@@ -95,12 +96,13 @@ def add():
     responseData = {}
     songUUID = str(addSongToQueue(request.form['link']))
     if songUUID == constants.FAILED_UUID_STR:
-        responseData[constants.RESPONSE]    = constants.FAILURE
-        responseData["error"]       = "Could not add to database"
+        responseData[constants.RESPONSE] = constants.FAILURE
+        responseData["error"] = "Could not add to database"
     else:
-        responseData[constants.RESPONSE]    = constants.SUCCESS
-        responseData["songID"]      = songUUID
+        responseData[constants.RESPONSE] = constants.SUCCESS
+        responseData["songID"] = songUUID
     return jsonify(responseData)
+
 
 @app.route('/history/', methods=['GET','POST'])
 def history():
@@ -112,8 +114,6 @@ def history():
         except:
             logger.info("Exception hit in history()")
             return render_template('history.html')
-
-
         return render_template('history.html', history=history)
     else:
         responseData = {}
@@ -131,14 +131,15 @@ def history():
                 else:
                     newSongUUID = addSongToQueue(song.songLink)
                 responseData[constants.RESPONSE] = constants.SUCCESS
-                responseData["songID"]   = str(newSongUUID)
+                responseData["songID"] = str(newSongUUID)
             except:
                 responseData[constants.RESPONSE] = constants.FAILURE
-                responseData["error"]    = "Failed to insert new request into database"
+                responseData["error"] = "Failed to insert new request into database"
         else:
             responseData[constants.RESPONSE] = constants.FAILURE
-            responseData["error"]    = "Invalid song ID"
+            responseData["error"] = "Invalid song ID"
         return jsonify(responseData)
+
 
 @app.route('/updater/')
 def listener():
@@ -158,7 +159,7 @@ def listener():
 
         try:
             while True:
-                if(databases.ActionHistory.select().where(databases.ActionHistory.datetime > datetime).wrapped_count > 0):
+                if databases.ActionHistory.select().where(databases.ActionHistory.datetime > datetime).wrapped_count > 0:
                     newEvents = databases.ActionHistory.select().where(databases.ActionHistory.datetime > latestEvent).order_by(databases.ActionHistory.datetime)
                     for ev in newEvents:
                         if ev.eventType == constants.ACT_HIST_ADD:
@@ -193,6 +194,7 @@ def listener():
 
     return Response(listenForSongIsFinished(), mimetype="text/event-stream")
 
+
 @app.route("/settings/", methods=['GET','POST'])
 def settings():
     print openConnections
@@ -207,7 +209,7 @@ def settings():
 
     elif request.method == 'POST':
         def checkLength(checkString, checkLength):
-            if(len(checkString) > checkLength):
+            if len(checkString) > checkLength:
                 return checkString[:checkLength]
             else:
                 return checkString + ' ' * (checkLength - len(checkString))
@@ -282,11 +284,11 @@ def addSongToQueue(songLink):
 
 
 def songHasBeenDownloaded(songLink):
-    #check both history and songqueue for the song
+    # check both history and songqueue for the song
     songs = databases.SongInQueue.select().where(databases.SongInQueue.songLink == songLink)
     for song in songs:
         if os.path.isfile(song.songPath):
-            #has been downloaded
+            # has been downloaded
             return True
 
     songs = databases.History.select().where(databases.History.songLink == songLink)
@@ -299,7 +301,7 @@ def songHasBeenDownloaded(songLink):
 
 # start server
 if __name__ == "__main__":
-    #drop and init tables
+    # drop and init tables
     databases.dropTables()
     databases.initTables()
 
