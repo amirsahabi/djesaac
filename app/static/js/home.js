@@ -130,17 +130,17 @@ function addNewSongToQueue(parameters){
 function removeSongFromQueueFromUpdate(parameters){
     var songFound = false;
 
-    var rows = $('div.currently_playing').find('table').find('.tabledatarow');
+    var rows = $('div.playlist').find('table').find('.tabledatarow');
     rows.each(function(){
         if(songFound){
             var index = $(this).find('td.queueindexcolumn');
-            index.val(index.val() + 1);
+            index.text(parseInt(index.text()) - 1);
         } else {
             var songTitle = $(this).find('td.songtitlecolumn');
             var songlink  = $(this).find('td.songlinkcolumn').find('a');
             var songId    = $(this).find('td.removebuttoncolumn').find('span');
 
-            if(songTitle.val() == parameters.oldTitle && songlink.attr('href') == parameters.oldLink && songId.attr('id') == parameters.oldID){
+            if(songTitle.text() == parameters.oldTitle && songlink.attr('href') == parameters.oldLink && songId.attr('id') == parameters.oldID){
                 $(this).remove();
                 songFound = true;
             }

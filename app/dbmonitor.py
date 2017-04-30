@@ -59,6 +59,7 @@ class DBMonitor:
             except:
                 pass
         else:
+            logger.info('Failed to initialize board')
             self.board = None
             self.boardLoc[:] = constants.BOARD_UNINITIALIZED
             self.redLoc[:] = constants.PIN_UNINITIALIZED

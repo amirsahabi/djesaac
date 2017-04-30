@@ -74,7 +74,7 @@
             }else if(event.data == "ENDSONG"){
                 updateEventInProgress = false;
                 addNewSongToQueue(updateEventParameters);
-            }else if(event.data == "REMSONG"){
+            }else if(event.data == "ENDREM"){
                 updateEventInProgress = false;
                 removeSongFromQueueFromUpdate(updateEventParameters);
             }else if(updateEventInProgress){
