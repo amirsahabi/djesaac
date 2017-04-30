@@ -100,16 +100,32 @@ function reArrangeQueueTable(parameters){
 }
 
 function addNewSongToQueue(parameters){
-    //create new row
-    var newObj = $('<tr class="tabledatarow"></tr>');
-    newObj.append('<td class="queueindexcolumn">'+parameters.count+"</td>");
-    newObj.append('<td class="songtitlecolumn">'+parameters.newTitle+"</td>");
-    var link = $('<a id="table_link" href="'+parameters.newLink+'">Link</a>');
-    newObj.append($("<td></td>").append(link));
-    var remove = $('<i class="material-icons"><span class="remove" onclick="removeSongFromQueue("'+parameters.newID+'")">remove_circle_outline</span></i>');
-    newObj.append($("<td></td>").append(remove));
-    var table = $('div.playlist').find('table');
-    table.append(newObj);
+    //check song is playing
+    if($('.currently_playing').find('tr.tabledatarow').length > 0){
+        //create new row
+        var table = $('div.playlist').find('table');
+        var newObj = $('<tr class="tabledatarow"></tr>');
+        var count = table.find('tr.tabledatarow').length + 1
+        newObj.append('<td class="queueindexcolumn">'+count+"</td>");
+        newObj.append('<td class="songtitlecolumn">'+parameters.newTitle+"</td>");
+        var link = $('<a id="table_link" href="'+parameters.newLink+'">Link</a>');
+        newObj.append($("<td></td>").append(link));
+        var remove = $('<i class="material-icons"><span class="remove" onclick="removeSongFromQueue("'+parameters.newID+'")">remove_circle_outline</span></i>');
+        newObj.append($("<td></td>").append(remove));
+        table.append(newObj);
+    } else {
+        var table = $('.currently_playing').find('table');
+        var newObj = $('<tr class="tabledatarow"></tr>');
+        var icon = parameters.currentlyPlaying ? "pause_circle_outline" : "play_circle_outline";
+        var img = $('<i class="material-icons"><span class="play_stop" onclick="startStop()">'+icon+'</span></i>');
+        var next = $('<i class="material-icons"><span class="skipsong" onClick="skipSong(\''+parameters.newID+'\')">skip_next</span></i>');
+        var td = $('<td class="playstopnextcolumn"></td>');
+        td.append(img).append(next);
+        newObj.append(td);
+        newObj.append($('<td class="songtitlecolumn">'+parameters.newTitle+'</td>'));
+        newObj.append($('<td><a id="table_link" href="'+parameters.newLink+'">Link</a></td>'));
+        table.append(newObj);
+    }
 }
 
 $(function(){

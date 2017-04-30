@@ -106,10 +106,101 @@ class PreprocessRequest(Base):
         else:
             return PreprocessRequest.select().where(PreprocessRequest.uuid == reqID).wrapped_count() > 0
 
-TABLE_LIST = [SongInQueue, History, PreprocessRequest]
+class ActionHistory(Base):
+    uuid        = UUIDField()
+    newTitle    = CharField()
+    newID       = UUIDField(null=True)
+    newLink     = CharField()
+    oldTitle    = CharField()
+    oldID       = UUIDField(null=True)
+    oldLink     = CharField()
+    eventType   = CharField()
+    datetime    = DateTimeField()
+    canBeRemoved= BooleanField(default=True)
+
+    @staticmethod
+    def onStartUp():
+        try:
+            newAction           = ActionHistory()
+            newAction.uuid      = uuid.uuid1()
+            newAction.newTitle  = constants.EMPTY_INPUT
+            newAction.newLink   = constants.EMPTY_INPUT
+            newAction.oldTitle  = constants.EMPTY_INPUT
+            newAction.oldLink   = constants.EMPTY_INPUT
+            newAction.eventType = constants.EMPTY_INPUT
+            newAction.datetime = datetime.datetime.now()
+            newAction.canBeRemoved = False;
+            newAction.save()
+            return newAction.uuid
+        except:
+            return constants.FAILED_UUID_STR
+
+
+    @staticmethod
+    def cleanup(thresholdDateTime):
+        query = ActionHistory.delete().where(ActionHistory.datetime < thresholdDateTime, ActionHistory.canBeRemoved == True)
+        query.execute()
+
+    @staticmethod
+    def newNextSong(_newTitle, _newID, _newLink, _oldTitle, _oldID, _oldLink):
+        try:
+            newAction           = ActionHistory()
+            newAction.uuid      = uuid.uuid1()
+            newAction.newTitle  = _newTitle
+            if(_newID is not None):
+                newAction.newID = uuid.UUID(_newID)
+            newAction.newLink   = _newLink
+            newAction.oldTitle  = _oldTitle
+            newAction.oldID     = uuid.UUID(_oldID)
+            newAction.oldLink   = _oldLink
+            newAction.datetime  = datetime.datetime.now()
+            newAction.eventType = constants.ACT_HIST_NEXT
+            newAction.save()
+            return newAction.uuid
+        except:
+            return constants.FAILED_UUID_STR
+
+    @staticmethod
+    def newRemoveSong(_remTitle, _remID, _remLink):
+        try:
+            newAction           = ActionHistory()
+            newAction.uuid      = uuid.uuid1()
+            newAction.newTitle  = constants.EMPTY_INPUT
+            newAction.newLink   = constants.EMPTY_INPUT
+            newAction.oldTitle  = _remTitle
+            newAction.oldID     = uuid.UUID(_remID)
+            newAction.oldLink   = _remLink
+            newAction.datetime  = datetime.datetime.now()
+            newAction.eventType = constants.ACT_HIST_REM
+            newAction.save()
+            return newAction.uuid
+        except:
+            return constants.FAILED_UUID_STR
+
+    @staticmethod
+    def newAddSong(_addTitle, _addID, _addLink):
+        try:
+            newAction           = ActionHistory()
+            newAction.uuid      = uuid.uuid1()
+            newAction.newTitle  = _addTitle
+            newAction.newID     = uuid.UUID(_addID)
+            newAction.newLink   = _addLink
+            newAction.oldTitle  = constants.EMPTY_INPUT
+            newAction.oldLink   = constants.EMPTY_INPUT
+            newAction.datetime  = datetime.datetime.now()
+            newAction.eventType = constants.ACT_HIST_ADD
+            newAction.save()
+
+            return newAction.uuid
+        except:
+            return constants.FAILED_UUID_STR
+
+
+TABLE_LIST = [SongInQueue, History, PreprocessRequest, ActionHistory]
 
 def initTables():
     db.create_tables(TABLE_LIST)
+    ActionHistory.onStartUp()
 def dropTables():
     try:
         db.drop_tables(TABLE_LIST)

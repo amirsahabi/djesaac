@@ -5,6 +5,7 @@ from multiprocessing import Process, Value, Array
 from dbmonitor import *
 import youtube_dl
 import databases
+import datetime
 import os
 import logging
 import ctypes
@@ -28,6 +29,8 @@ skipSongRequest[:]  = constants.EMPTY_UUID
 monitor = None
 logger = logging.getLogger(__name__)
 # home
+
+openConnections = []
 
 @app.route('/', methods=['GET','POST'])
 def home():
@@ -56,6 +59,9 @@ def home():
             else:
                 #delete from queue
                 try:
+                    songToDelete = databases.SongInQueue.select().where(databases.SongInQueue.uuid == uuid).get()
+                    databases.newRemoveSong(songToDelete.songTitle, uuid, songToDelete.songLink)
+
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == uuid).execute()
                     databases.PreprocessRequest.delete().where(databases.PreprocessRequest.songUUID == uuid).execute()
                     responseData[constants.RESPONSE] = constants.SUCCESS
@@ -76,6 +82,7 @@ def home():
             if ''.join(songPlaying) == uuid:
                 # send next signal
                 skipSongRequest[:] = uuid
+                #add a new action event
             responseData[constants.RESPONSE] = constants.SUCCESS
         else:
             responseData[constants.RESPONSE] = constants.FAILURE
@@ -135,88 +142,66 @@ def history():
 
 @app.route('/updater/')
 def listener():
+    minDT = datetime.datetime.now()
+    curDT = minDT
+    for conn in openConnections:
+        if minDT > conn:
+            minDT = conn
+
+    if(minDT != curDT):
+        databases.ActionHistory.cleanup(minDT)
+
     def listenForSongIsFinished():
-        flaskThreadSongPlaying      = str(''.join(songPlaying))
-        flaskThreadSongObject       = databases.SongInQueue.select().where(databases.SongInQueue.uuid == flaskThreadSongPlaying).get() if flaskThreadSongPlaying != constants.EMPTY_UUID else None
-        flaskThreadSongPlayingTitle = str(flaskThreadSongObject.songTitle) if flaskThreadSongPlaying != constants.EMPTY_UUID else ''
-        flaskThreadSongPlayingLink  = str(flaskThreadSongObject.songLink)  if flaskThreadSongPlaying != constants.EMPTY_UUID else ''
-        songsInQueueCount           = databases.SongInQueue.select().wrapped_count()
+        entryDateTime = datetime.datetime.now()
+        openConnections.append(entryDateTime)
+        latestEvent = databases.ActionHistory.select().order_by(databases.ActionHistory.datetime.desc()).get().datetime
 
-        while True:
-            if(databases.SongInQueue.select().wrapped_count() > 0):
-                newSongs = []
-                if(songsInQueueCount < databases.SongInQueue.select().wrapped_count()):
-                    for song in databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded.desc()):
-                        newSongs.append(song)
-                        songsInQueueCount += 1
-                        if(songsInQueueCount == databases.SongInQueue.select().wrapped_count()):
-                            break
-                    for iterator in range(len(newSongs)-1, -1,-1):
-                        yield "data: NEWSONG\n\n"
-                        yield "data: newID: {}\n\n".format(newSongs[iterator].uuid)
-                        yield "data: newTitle: {}\n\n".format(newSongs[iterator].songTitle)
-                        yield "data: newLink: {}\n\n".format(newSongs[iterator].songLink)
-                        yield "data: count: {}\n\n".format(str(songsInQueueCount - iterator))
-                        yield "data: ENDSONG\n\n"
+        try:
+            while True:
+                if(databases.ActionHistory.select().where(databases.ActionHistory.datetime > datetime).wrapped_count > 0):
+                    newEvents = databases.ActionHistory.select().where(databases.ActionHistory.datetime > latestEvent).order_by(databases.ActionHistory.datetime)
+                    for ev in newEvents:
+                        if ev.eventType == constants.ACT_HIST_ADD:
+                            yield "data: NEWSONG\n\n"
+                        elif ev.eventType == constants.ACT_HIST_REM:
+                            yield "data: REMSONG\n\n"
+                        elif ev.eventType == constants.ACT_HIST_NEXT:
+                            yield "data: STARTUPDATE\n\n"
+                        else:
+                            # unknown event type
+                            continue
+                        yield "data: newID: {}\n\n".format(ev.newID if ev.newID is not None else constants.EMPTY_UUID)
+                        yield "data: newTitle: {}\n\n".format(ev.newTitle)
+                        yield "data: newLink: {}\n\n".format(ev.newLink)
+                        yield "data: oldID: {}\n\n".format(ev.oldID)
+                        yield "data: oldLink: {}\n\n".format(ev.oldLink)
+                        yield "data: oldTitle: {}\n\n".format(ev.oldTitle)
+                        yield "data: currentlyPlaying: {}\n\n".format(musicIsPlaying.value)
+                        if ev.eventType == constants.ACT_HIST_ADD:
+                            yield "data: ENDSONG\n\n"
+                        elif ev.eventType == constants.ACT_HIST_REM:
+                            yield "data: ENDREM\n\n"
+                        elif ev.eventType == constants.ACT_HIST_NEXT:
+                            yield "data: ENDUPDATE\n\n"
+                        latestEvent = ev.datetime
 
-
-                # check to see if previous song is current song
-                if(flaskThreadSongPlaying != ''.join(songPlaying)):
-                    # get new variables
-                    newSongID       = str(''.join(songPlaying))
-                    newSongObject   = databases.SongInQueue.select().where(databases.SongInQueue.uuid == newSongID).get()
-                    newSongTitle    = str(newSongObject.songTitle)
-                    newSongLink     = str(newSongObject.songLink)
-
-                    #song playing has changed, send data request
-                    # there's got to be a cleaner way to do this
-                    yield "data: STARTUPDATE\n\n"
-                    yield "data: oldID: {}\n\n".format(flaskThreadSongPlaying)
-                    yield "data: newID: {}\n\n".format(newSongID)
-                    yield "data: oldTitle: {}\n\n".format(flaskThreadSongPlayingTitle)
-                    yield "data: newTitle: {}\n\n".format(newSongTitle)
-                    yield "data: oldLink: {}\n\n".format(flaskThreadSongPlayingLink)
-                    yield "data: newLink: {}\n\n".format(newSongLink)
-                    yield "data: ENDUPDATE\n\n"
-                    # transition listening to data to new data
-                    flaskThreadSongPlaying      = newSongID
-                    flaskThreadSongObject       = newSongObject
-                    flaskThreadSongPlayingTitle = newSongTitle
-                    flaskThreadSongPlayingLink  = newSongLink
-                    songsInQueueCount -= 1
-            elif(flaskThreadSongPlaying != constants.EMPTY_UUID):
-                # no more songs playing but the last one finished, send an event
-                newSongID = constants.EMPTY_UUID
-                newSongObject = None
-                newSongTitle = ''
-                newSongLink = ''
-
-                yield "data: STARTUPDATE\n\n"
-                yield "data: oldID: {}\n\n".format(flaskThreadSongPlaying)
-                yield "data: newID: {}\n\n".format(newSongID)
-                yield "data: oldTitle: {}\n\n".format(flaskThreadSongPlayingTitle)
-                yield "data: newTitle: {}\n\n".format(newSongTitle)
-                yield "data: oldLink: {}\n\n".format(flaskThreadSongPlayingLink)
-                yield "data: newLink: {}\n\n".format(newSongLink)
-                yield "data: ENDUPDATE\n\n"
-
-                flaskThreadSongPlaying = newSongID
-                flaskThreadSongObject  = newSongObject
-                flaskThreadSongPlayingTitle = newSongTitle
-                flaskThreadSongPlayingLink  = newSongLink
-                songsInQueueCount -= 1
-            time.sleep(0.5)
+                else:
+                    time.sleep(0.5)
+        except:
+            openConnections.remove(entryDateTime)
+            return
 
     return Response(listenForSongIsFinished(), mimetype="text/event-stream")
 
 @app.route("/settings/", methods=['GET','POST'])
 def settings():
+    print openConnections
     if request.method == 'GET':
         responseData = {}
-        responseData['board']   = ''.join(arduinoPortLoc[:])
-        responseData['red']     = ''.join(arduinoRedPin[:])
-        responseData['green']   = ''.join(arduinoGreenPin[:])
-        responseData['blue']    = ''.join(arduinoBluePin[:])
+        responseData['board'] = ''.join(arduinoPortLoc[:])
+        responseData['red'] = ''.join(arduinoRedPin[:])
+        responseData['green'] = ''.join(arduinoGreenPin[:])
+        responseData['blue'] = ''.join(arduinoBluePin[:])
         responseData['latency'] = str(latency.value)
         responseData[constants.RESPONSE] = constants.SUCCESS
 
@@ -228,21 +213,21 @@ def settings():
                 return checkString + ' ' * (checkLength - len(checkString))
         responseData = {}
         newBoardLocation = checkLength(request.form['board'], constants.ARD_PORT_LENGTH)
-        newRedLocation   = checkLength(request.form['red'], constants.ARD_PIN_LENGTH)
+        newRedLocation = checkLength(request.form['red'], constants.ARD_PIN_LENGTH)
         newGreenLocation = checkLength(request.form['green'], constants.ARD_PIN_LENGTH)
-        newBlueLocation  = checkLength(request.form['blue'], constants.ARD_PIN_LENGTH)
-        newLatency       = request.form['latency']
+        newBlueLocation = checkLength(request.form['blue'], constants.ARD_PIN_LENGTH)
+        newLatency = request.form['latency']
 
-        arduinoPortLoc[:]    = newBoardLocation[:]
-        arduinoRedPin[:]     = newRedLocation[:]
-        arduinoGreenPin[:]   = newGreenLocation[:]
-        arduinoBluePin[:]    = newBlueLocation[:]
-        latency.value        = float(newLatency)
+        arduinoPortLoc[:] = newBoardLocation[:]
+        arduinoRedPin[:] = newRedLocation[:]
+        arduinoGreenPin[:] = newGreenLocation[:]
+        arduinoBluePin[:] = newBlueLocation[:]
+        latency.value = float(newLatency)
 
-        responseData['board']   = newBoardLocation
-        responseData['red']     = newRedLocation
-        responseData['green']   = newGreenLocation
-        responseData['blue']    = newBlueLocation
+        responseData['board'] = newBoardLocation
+        responseData['red'] = newRedLocation
+        responseData['green'] = newGreenLocation
+        responseData['blue'] = newBlueLocation
         responseData['latency'] = newLatency
         responseData[constants.RESPONSE] = constants.SUCCESS
 
@@ -285,6 +270,8 @@ def addSongToQueue(songLink):
         if songUUID != constants.FAILED_UUID_STR:
             # tell the preprocessor in the dbmonitor to preprocess it
             databases.PreprocessRequest.newPreProcessRequest('./music/'+metadata['id']+'.wav', songUUID)
+            # add a new action event
+            databases.ActionHistory.newAddSong(metadata['title'], songUUID, songLink)
         else:
             return songUUID
 
@@ -313,8 +300,8 @@ def songHasBeenDownloaded(songLink):
 # start server
 if __name__ == "__main__":
     #drop and init tables
-    # databases.dropTables()
-    # databases.initTables()
+    databases.dropTables()
+    databases.initTables()
 
     monitor = DBMonitor(None, None, None, None, None, None, None, None, True)
     monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, arduinoPortLoc, arduinoBluePin, arduinoGreenPin, arduinoRedPin, latency, False))

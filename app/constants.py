@@ -18,7 +18,10 @@ ARDUINO_DEFAULT_GREEN_PIN   = 'd:5:p'
 ARDUINO_DEFAULT_BLUE_PIN    = 'd:6:p'
 BOARD_UNINITIALIZED         = ' ' * ARD_PORT_LENGTH
 PIN_UNINITIALIZED           = ' ' * ARD_PIN_LENGTH
-
+EMPTY_INPUT                 = ''
+ACT_HIST_ADD                = 'add'
+ACT_HIST_NEXT               = 'next'
+ACT_HIST_REM                = 'rem'
 
 DB_NAME                     = 'djesaac.db'
 DB_PREPROC_PROCESS          = 'process'

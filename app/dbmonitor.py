@@ -92,6 +92,9 @@ class DBMonitor:
             instanceGreen = ''.join(self.greenLoc[:])
             instanceBlue  = ''.join(self.blueLoc[:])
             instanceBoard = ''.join(self.boardLoc[:])
+
+            oldSongTitle = constants.EMPTY_INPUT
+            oldSongLink  = constants.EMPTY_INPUT
             while(self.musicIsPlaying.value == constants.PLAY and databases.SongInQueue.select().wrapped_count() > 0):
                 if( instanceRed != ''.join(self.redLoc) or instanceBlue != ''.join(self.blueLoc) or
                     instanceGreen != ''.join(self.greenLoc) or instanceBoard != ''.join(self.boardLoc)):
@@ -105,7 +108,12 @@ class DBMonitor:
                         self.board = None
 
                 song = databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded).get()
+                if(''.join(self.songPlaying[:]) != str(song.uuid) and oldSongTitle != constants.EMPTY_INPUT and oldSongLink != constants.EMPTY_INPUT):
+                    databases.ActionHistory.newNextSong(song.songTitle, str(song.uuid), song.songLink, oldSongTitle, ''.join(self.songPlaying[:]), oldSongLink)
+
                 self.songPlaying[:] = str(song.uuid)
+                oldSongTitle = song.songTitle
+                oldSongLink  = song.songLink
 
                 self.playSong(song.songPath, ''.join(self.songPlaying[:]))
 
@@ -115,7 +123,11 @@ class DBMonitor:
 
                     # remove song from queue
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == song.uuid).execute()
-            if(self.musicIsPlaying.value == constants.PLAY):
+
+            if(oldSongTitle != constants.EMPTY_INPUT and oldSongLink != constants.EMPTY_INPUT and self.musicIsPlaying.value == constants.PLAY):
+                databases.ActionHistory.newNextSong(constants.EMPTY_INPUT, None, constants.EMPTY_INPUT, oldSongTitle, ''.join(self.songPlaying[:]), oldSongLink)
+                oldSongTitle = constants.EMPTY_INPUT
+                oldSongLink  = constants.EMPTY_INPUT
                 self.songPlaying[:] = constants.EMPTY_UUID
 
             if self.board is not None:
