@@ -13,9 +13,34 @@ body{
     margin: 0;
 }
 
+@media (min-width: 660px) {
+    a.nav_link_icon {display:none}
+    a.nav_link_text { }
+}
+
+@media (max-width: 1100px) {
+    div.currently_playing{width:90%;}
+    div.playlist{width:90%;}
+    div.nav_container{
+        width:90%;
+        margin-left: 5%;
+    }
+    div.history{width:90%;}
+}
+
+@media (max-width: 660px) {
+    a.nav_link_icon {}
+    a.nav_link_text {display:none}
+}
+
+
+
+
 .nav_container{
     width: 60%;
     margin-left: 20%;
+    height: 60px;
+    line-height: 60px;
 }
 
 .shadow {
@@ -36,24 +61,26 @@ body{
     background-color: #262B35;
 }
 
-.nav_link{
+.nav_link_text{
     text-decoration: none;
     /*color: #3F3F4A;*/
     /*color: #5E687F;*/
     color: #757980;
     font-size: 23px;
     font-weight: 400;
-    padding: 30px;
+    padding: 15px;
     font-family: Ubuntu;
 
 }
-.nav_link.current{
+.nav_link_text.current{
     /*color: #62A69F;*/
     color: #96B9CE;
 }
 
 #navLinks{
     float:left;
+    max-height: 100%;
+    padding-top: 5px;
 }
 #getSongLink{
     float:right;
@@ -71,11 +98,13 @@ body{
     border-left: 0;
     border-right: 0;
     border-bottom: 2px solid #FF9A52;
-    width: 85%;
+    width: 93%;
     margin: auto;
     font-size: 15px;
     font-family: Ubuntu;
     color: #DAE2F2;
+    float: left;
+    padding-top: 27px;
 }
 
 
@@ -105,9 +134,12 @@ input:focus {
 }
 
 .addSong{
+    position: relative;
     background-color: transparent;
-    border:0;
+    border: 0;
     padding: 0;
+    top: 27px;
+    float: right;
 }
 
 .loading {
@@ -139,6 +171,7 @@ input:focus {
 }
 
 .material-icons.blue { color: #96B9CE; }
+.material-icons.gray { color: #757980; }
 
 .currently_playing{
     position: relative;
@@ -210,6 +243,21 @@ td {
     padding: 8px;
     border-bottom: 1px solid #757980;
 }
+
+.table_alert_success {
+    font-family:Ubuntu;
+    font-size: 15px;
+    color: #FF9A52;
+    font-style: italic;
+}
+
+.table_alert_error {
+    font-family:Ubuntu;
+    font-size: 15px;
+    color: #FF4E4C;
+    font-style: italic;
+}
+
 .alert_success {
     font-family:Ubuntu;
     font-size: 15px;

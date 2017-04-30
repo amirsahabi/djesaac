@@ -15,13 +15,15 @@
 <div id="nav">
     <div class="nav_container">
         <div id="navLinks">
-            <a class="nav_link current" style="padding-left: 0;" href="/">HOME</a>
-            <a class="nav_link" href="history">HISTORY</a>
+            <a class="nav_link_text current" id='home'style="padding-left: 0;" href="/">HOME</a>
+            <a class="nav_link_icon current" id='home'style="padding-left: 0;" href="/"><i class='material-icons blue'>home</i></a>
+            <a class="nav_link_text" id='history' href="history">HISTORY</a>
+            <a class="nav_link_icon" id='history' href="history"><i class='material-icons gray'>history</i></a>
         </div>
 
         <div id="getSongLink">
             <input type="text" class="songLink" id="songLink" name="songLink" placeholder="ADD NEW SONG ...">
-            <button type="submit" class="addSong" style="position: relative; top: 10px;" id="submitButton" onclick="onSubmit()" value="Submit">
+            <button type="submit" class="addSong" id="submitButton" onclick="onSubmit()" value="Submit">
                 <i class="material-icons blue"><i class="material-icons">file_upload</i>
                 </i>
             </button>
@@ -46,7 +48,10 @@
     var updateEventParameters = {};
     $(document).ready(function(){
 
-
+        if ($(window).width() < 1100){
+            $('home').text("<i class='material-icons'>home</i>");
+            $('history').text('<i class="material-icons">history</i>');
+        }
 
         $(".play_stop").click(function(){
             $(this).text(function(i, v){

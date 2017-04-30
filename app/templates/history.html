@@ -39,19 +39,20 @@
 
         });
 
-
     </script>
 
     <div id="nav">
         <div class="nav_container">
             <div id="navLinks">
-                <a class="nav_link" style="padding-left: 0;" href="/">HOME</a>
-                <a class="nav_link current" href="">HISTORY</a>
+                <a class="nav_link_text" style="padding-left: 0;" href="/">HOME</a>
+                <a class="nav_link_icon" style="padding-left: 0;" href="/"><i class='material-icons gray'>home</i></a>
+                <a class="nav_link_text current" href="">HISTORY</a>
+                <a class="nav_link_icon current" href=""><i class='material-icons blue'>history</i></a>
             </div>
 
             <div id="getSongLink">
                 <input type="text" class="songLink" id="songLink" name="songLink" placeholder="ADD NEW SONG ...">
-                <button type="submit" class="addSong" style="position: relative; top: 10px;" id="submitButton" onclick="onSubmit()" value="Submit">
+                <button type="submit" class="addSong" id="submitButton" onclick="onSubmit()" value="Submit">
                     <i class="material-icons blue"><i class="material-icons">file_upload</i>
                     </i>
                 </button>
@@ -74,10 +75,10 @@
     <div class="history">
         <table>
             <tr class="tableheaderrow">
-                <th>#</th>
+                <th width="35px;">#</th>
                 <th>Title</th>
-                <th>Link</th>
-                <th></th>
+                <th width="30px;">Link</th>
+                <th width="30px;"></th>
             </tr>
             <tbody>
                 {% for event in history %}
