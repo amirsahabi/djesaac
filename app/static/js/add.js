@@ -31,9 +31,14 @@ function onSubmit(){
             if(data.response === 'success'){
                 $("#loadingSongLink").fadeOut(500).promise().done(function(){
                     $("#add_suc").fadeIn().promise().done(function(){
-                        // setTimeout(function () {
-                        //     window.location.href = (window.location.origin);
-                        // }, 2000); //redirect in 2sec
+                         setTimeout(function () {
+                             $("#add_suc").fadeOut().promise().done(function(){
+                                 document.getElementById("songLink").value = "";
+                                 $('#songLink').removeClass('hide');
+                                 $('#submitButton').removeClass('hide');
+                             });
+
+                         }, 2000);
                     });
                 });
 
@@ -41,6 +46,7 @@ function onSubmit(){
                 $("#loadingSongLink").fadeOut(500).promise().done(function(){
                     $("#add_fail").fadeIn().delay(1000).fadeOut().promise().done(function(){
                         setTimeout(function () {
+                            document.getElementById("songLink").value = "";
                             $('#songLink').removeClass('hide');
                             $('#submitButton').removeClass('hide');
                         }, 500);
@@ -53,6 +59,7 @@ function onSubmit(){
             $("#loadingSongLink").fadeOut(500).promise().done(function(){
                 $("#add_fail").fadeIn().delay(1000).fadeOut().promise().done(function(){
                     setTimeout(function () {
+                        document.getElementById("songLink").value = "";
                         $('#songLink').removeClass('hide');
                         $('#submitButton').removeClass('hide');
                     }, 500);
