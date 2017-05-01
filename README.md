@@ -15,6 +15,10 @@ The server is written in python and depends on the libraries
 [pyfirmata](https://pypi.python.org/pypi/pyFirmata), [pygame](https://www.pygame.org) and [pydub](https://pypi.python.org/pypi/pydub) (all of which are
 available to install through pip). youtube_dl and pydub also rely on [ffmpeg](https://ffmpeg.org/) which an be installed on OS X through brew, on linux through the package manager.
 
+### Arduino
+
+The Arduino Uno may be programmed through the Arduino IDE (v1.6.3). The sketch StandardFirmata.ino is available in the IDE under  File>Examples>Firmata>StandardFirmata (The sketch is also provided in this repository under Arduino>StandardFirmata.ino). As documeted in app>constants.py the pin configuration uses three PWM digital output pins.
+
 ## How to Run
 
 From the app folder, start the server from a command line with the following command
