@@ -16,7 +16,7 @@ logging.basicConfig(level=constants.LOG_LEVEL)
 # create app
 app = Flask(__name__)
 
-musicIsPlaying = Value('d' , 1)
+musicIsPlaying = Value('d', 1)
 songPlaying = Array(ctypes.c_char_p, constants.UUID_LENGTH)
 skipSongRequest = Array(ctypes.c_char_p, constants.UUID_LENGTH)
 arduinoPortLoc = Array(ctypes.c_char_p, constants.ARD_PORT_LENGTH)
@@ -149,7 +149,7 @@ def listener():
         if minDT > conn:
             minDT = conn
 
-    if(minDT != curDT):
+    if minDT != curDT:
         databases.ActionHistory.cleanup(minDT)
 
     def listenForSongIsFinished():
@@ -235,6 +235,7 @@ def settings():
 
     return jsonify(responseData)
 
+
 def addSongToQueue(songLink):
     songUUID = constants.FAILED_UUID_STR
     try:
@@ -302,8 +303,8 @@ def songHasBeenDownloaded(songLink):
 # start server
 if __name__ == "__main__":
     # drop and init tables
-    # databases.dropTables()
-    # databases.initTables()
+    databases.dropTables()
+    databases.initTables()
 
     monitor = DBMonitor(None, None, None, None, None, None, None, None, True)
     monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, arduinoPortLoc, arduinoBluePin, arduinoGreenPin, arduinoRedPin, latency, False))
