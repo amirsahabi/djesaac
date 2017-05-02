@@ -3,6 +3,7 @@ from scipy.io import wavfile as wf
 from multiprocessing import Value
 import time
 import numpy as np
+from serial import SerialException
 import math as m
 import pyfirmata as pf
 import pygame as pg
@@ -52,11 +53,11 @@ class DBMonitor:
                 self.blueLoc[:] = constants.ARDUINO_DEFAULT_RED_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_RED_PIN))
                 self.greenLoc[:] = constants.ARDUINO_DEFAULT_GREEN_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_GREEN_PIN))
                 self.redLoc[:] = constants.ARDUINO_DEFAULT_BLUE_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_BLUE_PIN))
-                self.initBoard(defaultPort)
+                self.initBoard()
                 logger.info('Board initialized')
 
                 break
-            except:
+            except SerialException:
                 pass
         else:
             logger.info('Failed to initialize board')
@@ -79,7 +80,6 @@ class DBMonitor:
         oldSongTitle = constants.EMPTY_INPUT
         oldSongLink = constants.EMPTY_INPUT
         while True:
-
             while self.musicIsPlaying.value == constants.PLAY and databases.SongInQueue.select().wrapped_count() > 0:
                 if(instanceRed != ''.join(self.redLoc) or instanceBlue != ''.join(self.blueLoc) or
                 instanceGreen != ''.join(self.greenLoc) or instanceBoard != ''.join(self.boardLoc)):
@@ -89,7 +89,7 @@ class DBMonitor:
                         instanceBlue = ''.join(self.blueLoc[:])
                         instanceBoard = ''.join(self.boardLoc[:])
                         self.initBoard()
-                    except:
+                    except SerialException:
                         self.board = None
 
                 song = databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded).get()
@@ -163,7 +163,7 @@ class DBMonitor:
                     self.redPin.write(loval[(pos - self.latency.value)/constants.WINDOW_SIZE_SEC])
                     self.greenPin.write(mdval[(pos - self.latency.value)/constants.WINDOW_SIZE_SEC])
                     self.bluePin.write(hival[(pos - self.latency.value)/constants.WINDOW_SIZE_SEC])
-                except:
+                except IndexError:
                     logger.info('Don\'t go places you don\'t belong')
             else:
                 time.sleep(0.1)
