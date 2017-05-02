@@ -48,7 +48,7 @@ class DBMonitor:
 
         for defaultPort in defaultPorts:
             try:
-                self.boardLoc[:] = defaultPort + ' ' * len(defaultPort)
+                self.boardLoc[:] = defaultPort + ' ' * (constants.ARD_PORT_LENGTH - len(defaultPort))
                 self.blueLoc[:] = constants.ARDUINO_DEFAULT_RED_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_RED_PIN))
                 self.greenLoc[:] = constants.ARDUINO_DEFAULT_GREEN_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_GREEN_PIN))
                 self.redLoc[:] = constants.ARDUINO_DEFAULT_BLUE_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_BLUE_PIN))
@@ -183,7 +183,7 @@ class DBMonitor:
     def standbyMode(self):
         logger.info('Standby Mode')
         cycles=20
-        while databases.SongInQueue.select().wrapped_count() == 0 or self.musicIsPlaying.value == constants.PLAY:
+        while databases.SongInQueue.select().wrapped_count() == 0 or self.musicIsPlaying.value == constants.STOP:
             if cycles < 20:
                 # sine wave
                 for i in range(0, 314, 2):
