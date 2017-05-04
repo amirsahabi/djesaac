@@ -1,16 +1,18 @@
 function sendReplayRequest(songID, rowID){
-    // disable submit button again
-    $('#'+songID).prop('disabled', true);
+
+    var originalRow = $('<tr class="tabledatarow" id='+rowID+'>'+ $('#'+rowID).html() + '</tr>');
 
     // send id to server to add to queue
     $.ajax({
         method: 'POST',
         data: {"song":songID},
+        beforeSend: function() {
+            $('#'+songID).prop('disabled', true);
+        },
         success: function(data){
-            if(data.response === 'success'){
-                var successAlert = $('<tr class="table_alert_success" id=rowID> <td colspan="4">Successfully added song to playlist</td></tr>');
-                var originalRow = $('<tr class="tabledatarow">'+ $('#'+rowID).html() + '</tr>');
 
+            if(data.response === 'success'){
+                var successAlert = $('<tr class="table_alert_success"> <td colspan="4">Successfully added song to playlist</td></tr>');
                 $('#'+rowID).fadeOut('slow', function(){
                     successAlert.insertAfter($(this)).hide();
                     $(this).remove();
@@ -24,7 +26,7 @@ function sendReplayRequest(songID, rowID){
                 });
 
             } else if(data.response === 'failure'){
-                var errorAlert = $('<tr class="table_alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
+                var errorAlert = $('<tr class="table_alert_error"> <td colspan="4">Error when adding song to playlist</td></tr>');
                 $('#'+rowID).fadeOut('slow', function(){
                     errorAlert.insertAfter($(this)).hide();
                     $(this).remove();
@@ -43,7 +45,7 @@ function sendReplayRequest(songID, rowID){
 
         },
         error: function(){
-            var errorAlert = $('<tr class="table_alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
+            var errorAlert = $('<tr class="table_alert_error"> <td colspan="4">Error when adding song to playlist</td></tr>');
             $('#'+rowID).fadeOut('slow', function(){
                 errorAlert.insertAfter($(this)).hide();
                 $(this).remove();
