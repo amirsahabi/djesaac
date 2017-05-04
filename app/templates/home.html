@@ -95,7 +95,6 @@
         <tr class="tableheaderrow" >
             <th>#</th>
             <th>Title</th>
-            <th>Link</th>
         </tr>
         {% if songs|length != 0 %}
             {% for i in range(1)%}
@@ -108,8 +107,8 @@
                 {% endif %}
                 <i class="material-icons"><span class='skipsong' onClick='skipSong("{{songs[0].uuid}}")'>skip_next</span></i>
                 </td>
-                <td class="songtitlecolumn">{{songs[i].songTitle}}</td>
-                <td class="songlinkcolumn"><a id=table_link href="{{songs[i].songLink}}">Link</a></td>
+                <td class="songtitlecolumn"> <a id=table_link href="{{songs[i].songLink}}">{{songs[i].songTitle}}</a> </td>
+
             </tr>
             {% endfor %}
         {% endif %}
@@ -121,15 +120,13 @@
         <tr class="tableheaderrow">
             <th>#</th>
             <th>Title</th>
-            <th>Link</th>
             <th></th>
         </tr>
         {% if songs|length != 0 %}
             {% for i in range(1,songs|length)%}
             <tr class="tabledatarow">
                 <td class="queueindexcolumn">{{loop.index0+1}}</td>
-                <td class="songtitlecolumn">{{songs[i].songTitle}}</td>
-                <td class="songlinkcolumn"><a id="table_link" href="{{songs[i].songLink}}">Link</a></td>
+                <td class="songtitlecolumn"> <a id=table_link href="{{songs[i].songLink}}">{{songs[i].songTitle}}</a> </td>
                 <td class="removebuttoncolumn"><i class="material-icons"><span class='remove' id="{{songs[i].uuid}}" onclick="removeSongFromQueue('{{songs[i].uuid}}')">remove_circle_outline</span></i></td>
             </tr>
             {% endfor %}
