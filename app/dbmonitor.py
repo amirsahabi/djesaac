@@ -50,9 +50,9 @@ class DBMonitor:
         for defaultPort in defaultPorts:
             try:
                 self.boardLoc[:] = defaultPort + ' ' * (constants.ARD_PORT_LENGTH - len(defaultPort))
-                self.blueLoc[:] = constants.ARDUINO_DEFAULT_RED_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_RED_PIN))
+                self.redLoc[:] = constants.ARDUINO_DEFAULT_RED_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_RED_PIN))
                 self.greenLoc[:] = constants.ARDUINO_DEFAULT_GREEN_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_GREEN_PIN))
-                self.redLoc[:] = constants.ARDUINO_DEFAULT_BLUE_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_BLUE_PIN))
+                self.blueLoc[:] = constants.ARDUINO_DEFAULT_BLUE_PIN + ' ' * (constants.ARD_PIN_LENGTH - len(constants.ARDUINO_DEFAULT_BLUE_PIN))
                 self.initBoard()
                 logger.info('Board initialized')
 
@@ -193,17 +193,17 @@ class DBMonitor:
             elif cycles < 40:
                 # heartbeat
                 for i in range(0, 120, 2):
-                    writeVal = m.sin(i/100.0)/2.0
-                    self.writeToPinsAndSleep(None, writeVal, writeVal, 0.025)
+                    writeVal = m.sin(i/100.0)/3.0+.01
+                    self.writeToPinsAndSleep(None, None, writeVal, 0.025)
                 # beat
-                self.writeToPinsAndSleep(0.3, None, None, 0.04)
-                self.writeToPinsAndSleep(0.0, None, None, 0.5)
-                self.writeToPinsAndSleep(0.3, None, None, 0.04)
-                self.writeToPinsAndSleep(0.0, None, None, 0.5)
+                self.writeToPinsAndSleep(0.3, None, writeVal, 0.04)
+                self.writeToPinsAndSleep(0.0, None, writeVal, 0.5)
+                self.writeToPinsAndSleep(0.3, None, writeVal, 0.04)
+                self.writeToPinsAndSleep(0.0, None, writeVal, 0.5)
 
                 for i in range(120, 0, -2):
-                    writeVal = m.sin(i/100.0)/2.0
-                    self.writeToPinsAndSleep(None, writeVal, writeVal, 0.025)
+                    writeVal = m.sin(i/100.0)/3.0+.01
+                    self.writeToPinsAndSleep(None, None, writeVal, 0.025)
 
             elif cycles < 60:
                 # color wheel
