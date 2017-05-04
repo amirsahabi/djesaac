@@ -160,9 +160,9 @@ class DBMonitor:
             if self.board is not None:
                 try:
                     pos = pg.mixer.music.get_pos()
-                    self.redPin.write(loval[(pos - self.latency.value)/constants.WINDOW_SIZE_SEC])
-                    self.greenPin.write(mdval[(pos - self.latency.value)/constants.WINDOW_SIZE_SEC])
-                    self.bluePin.write(hival[(pos - self.latency.value)/constants.WINDOW_SIZE_SEC])
+                    self.redPin.write(loval[int((pos - self.latency.value)/constants.WINDOW_SIZE_SEC)])
+                    self.greenPin.write(mdval[int((pos - self.latency.value)/constants.WINDOW_SIZE_SEC)])
+                    self.bluePin.write(hival[int((pos - self.latency.value)/constants.WINDOW_SIZE_SEC)])
                 except IndexError:
                     logger.info('Don\'t go places you don\'t belong')
             else:
@@ -207,26 +207,37 @@ class DBMonitor:
 
             elif cycles < 60:
                 # color wheel
-                # red up
-                for i in range(30, 60, 2):
-                    self.writeToPinsAndSleep(i/100.0, None, None, 0.05)
-                # green down
-                for i in range(60, 30, 2):
-                    self.writeToPinsAndSleep(i/100.0, None, None, 0.05)
-                # blue up
-                for i in range(30, 60, 2):
-                    self.writeToPinsAndSleep(None, None, i/100.0, 0.05)
-                # red down
-                for i in range(60, 30, 2):
-                    self.writeToPinsAndSleep(i/100.0, None, None, 0.05)
-                # green up
-                for i in range(30, 60, 2):
-                    self.writeToPinsAndSleep(None, i/100.0, None, 0.05)
-                # blue down
-                for i in range(60, 30, 2):
-                    self.writeToPinsAndSleep(None, None, i/100.0, 0.05)
+                # red
+                self.colorwheel(False, True, True)
+                # green/red
+                self.colorwheel(False,False,True)
+                # green
+                self.colorwheel(True,False,True)
+                # green/blue
+                self.colorwheel(True,False,False)
+                # blue
+                self.colorwheel(True,True,False)
+                # blue/red
+                self.colorwheel(False,True,False)
             cycles = (cycles + 1) % 60
-
+    def colorwheel(self, red, green, blue):
+        maxval=260
+        d=2.0
+        s=.01
+        for i in range(260, 368, 1):
+            if red:
+                redi=i
+            else:
+                redi=maxval
+            if green:
+                greeni=i
+            else:
+                greeni=maxval
+            if blue:
+                bluei=i
+            else:
+                bluei=maxval
+            self.writeToPinsAndSleep(abs(m.sin(redi/100.0))/d+s, abs(m.sin(greeni/100.0))/d+s, abs(m.sin(bluei/100.0))/d+s, 0.03)
     def writeToPinsAndSleep(self, pin1, pin2, pin3, sleepTime):
         if pin1 is not None:
             self.redPin.write(pin1)
