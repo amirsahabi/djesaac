@@ -73,6 +73,7 @@ def home():
             try:
                 musicIsPlaying.value = (musicIsPlaying.value + 1) % 2
                 responseData[constants.RESPONSE] = constants.SUCCESS
+                databases.ActionHistory.newPlayStop()
             except:
                 responseData[constants.RESPONSE] = constants.FAILURE
                 responseData[constants.ERROR] = "Can't stop this beat"
@@ -168,6 +169,8 @@ def listener():
                             yield "data: REMSONG\n\n"
                         elif ev.eventType == constants.ACT_HIST_NEXT:
                             yield "data: STARTUPDATE\n\n"
+                        elif ev.eventType == constants.ACT_HIST_PLAY_STOP:
+                            yield "data: PLAYSTOP\n\n"
                         else:
                             # unknown event type
                             continue
@@ -184,6 +187,8 @@ def listener():
                             yield "data: ENDREM\n\n"
                         elif ev.eventType == constants.ACT_HIST_NEXT:
                             yield "data: ENDUPDATE\n\n"
+                        elif ev.eventType == constants.ACT_HIST_PLAY_STOP:
+                            yield "data: ENDPLAYSTOP\n\n"
                         latestEvent = ev.datetime
 
                 else:
