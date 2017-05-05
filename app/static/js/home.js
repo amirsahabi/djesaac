@@ -106,8 +106,6 @@ function addNewSongToQueue(parameters){
         var count = table.find('tr.tabledatarow').length + 1
         newObj.append('<td class="queueindexcolumn">'+count+"</td>");
         newObj.append('<td class="songtitlecolumn">'+parameters.newTitle+"</td>");
-        var link = $('<a id="table_link" href="'+parameters.newLink+'">Link</a>');
-        newObj.append($("<td></td>").append(link));
         var remove = $('<i class="material-icons"><span class="remove" id="'+parameters.newID+'"onclick="removeSongFromQueue("'+parameters.newID+'")">remove_circle_outline</span></i>');
         newObj.append($("<td></td>").append(remove));
         table.append(newObj);
