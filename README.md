@@ -17,7 +17,7 @@ available to install through pip). youtube_dl and pydub also rely on [ffmpeg](ht
 
 ### Arduino
 
-The Arduino Uno may be programmed through the Arduino IDE (v1.6.3). The sketch StandardFirmata.ino is available in the IDE under  File>Examples>Firmata>StandardFirmata (The sketch is also provided in this repository under Arduino>StandardFirmata.ino). As documeted in app>constants.py the pin configuration uses three PWM digital output pins.
+The Arduino Uno may be programmed through the Arduino IDE (v1.6.3). The sketch StandardFirmata.ino is available in the IDE under  File>Examples>Firmata>StandardFirmata (The sketch is also provided in this repository under Arduino>StandardFirmata.ino). As documented in app>constants.py the pin configuration uses three PWM digital output pins.
 
 ## How to Run
 
