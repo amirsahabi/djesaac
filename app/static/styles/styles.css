@@ -34,13 +34,50 @@ body{
 }
 
 
+/* Smartphones (portrait and landscape) ----------- */
+@media only screen
+and (min-device-width : 320px)
+and (max-device-width : 480px) {
+    a.nav_link_text{font-size: 150%}
+    td.queueindexcolumn, a#table_link{font-size: 25px;}
+    tr.tableheaderrow{font-size: 27px;}
+    input.songLink{
+        font-size: 25px;
+        width: calc(100% - 52px);
+    }
+    i.material-icons{
+        font-size: 39px;
+    }
+    h3{
+        font-size: 30px;
+    }
+}
+ 
+/* Smartphones (landscape) ----------- */
+@media only screen
+and (min-width : 321px) {
+    td {font-size: 16px;}
+}
+ 
+/* Smartphones (portrait) ----------- */
+@media only screen
+and (max-width : 320px) {
+    td {font-size: 16px;}
+}
+ 
+/* iPads (portrait and landscape) ----------- */
+@media only screen
+and (min-device-width : 768px)
+and (max-device-width : 1024px) {
+    /* Styles */
+}
 
 
 .nav_container{
+    display: table;
     width: 60%;
     margin-left: 20%;
-    height: 60px;
-    line-height: 60px;
+    height: 100%;
 }
 
 .shadow {
@@ -49,62 +86,83 @@ body{
 
 #nav {
     position: fixed;
-    display: block;
+    display: table;
     top: 0;
     width: 100%;
     font-size: 2em;
     vertical-align: middle;
-    min-height: 60px;
-    line-height: 60px;
     transition: all 0.5s linear;
     z-index: 9000;
     background-color: #262B35;
+    height: 88px;
+}
+
+#nav_link_container{
+    float:left;
+    height: 100%;
+    display: table;
 }
 
 .nav_link_text{
+    display: table-cell;
+    vertical-align: middle;
     text-decoration: none;
     /*color: #3F3F4A;*/
     /*color: #5E687F;*/
     color: #757980;
     font-size: 23px;
     font-weight: 400;
-    padding: 15px;
+    padding-right: 15px;
     font-family: Ubuntu;
 
+}
+.nav_link_icon{
+    display: table-cell;
+    vertical-align: middle;
+    text-decoration: none;
+    /*color: #3F3F4A;*/
+    /*color: #5E687F;*/
+    color: #757980;
+    font-size: 23px;
+    font-weight: 400;
+    padding-right: 15px;
+    font-family: Ubuntu;
 }
 .nav_link_text.current{
     /*color: #62A69F;*/
     color: #96B9CE;
 }
 
-#navLinks{
-    float:left;
-    max-height: 100%;
-    padding-top: 5px;
-}
-#getSongLink{
-    float:right;
-    width: 375;
-    vertical-align: middle;
-}
+/*#getSongLink{*/
+    /*float:right;*/
+    /*width: 375;*/
+    /*vertical-align: middle;*/
+/*}*/
 .hide  { display:none; }
 .open_add {
     background-color:#262B35;
 }
-
+#add_song_container{
+    /*float:right;*/
+    height: 100%;
+    width:50%;
+    display: table-cell;
+    vertical-align: middle;
+}
 .songLink {
     background-color: transparent;
     border-top: 0;
     border-left: 0;
     border-right: 0;
     border-bottom: 2px solid #FF9A52;
-    width: 345px;
+    border-radius: 0;
+    width: calc(100% - 30px);
     margin: auto;
     font-size: 15px;
     font-family: Ubuntu;
     color: #DAE2F2;
     float: left;
-    padding-top: 27px;
+    /*padding-top: 27px;*/
 }
 
 
@@ -138,19 +196,39 @@ input:focus {
     background-color: transparent;
     border: 0;
     padding: 0;
-    top: 27px;
     float: right;
 }
 
-.loading {
-    position:absolute;
+.add_song_events{
+    display: table-cell;
+    vertical-align: middle;
+}
+
+#loadingSongLink {
     font-family: Ubuntu;
     font-size: 15px;
     color: #96B9CE;
     margin-bottom: 0;
     font-style: italic;
+    float: left;
+}
+
+.alert_success {
+    font-family:Ubuntu;
+    font-size: 15px;
+    color: #FF9A52;
+    font-style: italic;
     float: right;
 }
+
+.alert_error {
+    font-family:Ubuntu;
+    font-size: 15px;
+    color: #FF4E4C;
+    font-style: italic;
+    float: right;
+}
+
 
 #footer {
     display: block;
@@ -258,23 +336,8 @@ td {
     font-style: italic;
 }
 
-.alert_success {
-    font-family:Ubuntu;
-    font-size: 15px;
-    color: #FF9A52;
-    font-style: italic;
-    float: right;
-}
-
-.alert_error {
-    font-family:Ubuntu;
-    font-size: 15px;
-    color: #FF4E4C;
-    font-style: italic;
-    float: right;
-}
-
 #table_link{
+    font-size: 15px;
     text-decoration: none;
     color: #BABFDB;
 }

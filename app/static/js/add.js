@@ -6,14 +6,14 @@ function onSubmit(){
     $('#submitButton').addClass('hide');
 
     $("#loadingSongLink").fadeIn();
-    var originalText = $("#loading").text(),
+    var originalText = $("#loadingSongLink").text(),
         i  = 0;
     setInterval(function() {
-        $("#loading").append(".");
+        $("#loadingSongLink").append(".");
         i++;
         if(i == 4)
         {
-            $("#loading").html(originalText);
+            $("#loadingSongLink").html(originalText);
             i = 0;
         }
     }, 500);

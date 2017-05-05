@@ -14,30 +14,28 @@
 <body>
 <div id="nav">
     <div class="nav_container">
-        <div id="navLinks">
+        <div id="nav_link_container">
             <a class="nav_link_text current" id='home'style="padding-left: 0;" href="/">HOME</a>
             <a class="nav_link_icon current" id='home'style="padding-left: 0;" href="/"><i class='material-icons blue'>home</i></a>
             <a class="nav_link_text" id='history' href="history">HISTORY</a>
             <a class="nav_link_icon" id='history' href="history"><i class='material-icons gray'>history</i></a>
         </div>
+        <div id="add_song_container">
+            <!--<div id="getSongLink">-->
+                <input type="text" class="songLink" id="songLink" name="songLink" placeholder="ADD NEW SONG ...">
+                <button type="submit" class="addSong" id="submitButton" onclick="onSubmit()" value="Submit">
+                    <i class="material-icons blue"><i class="material-icons">file_upload</i>
+                    </i>
+                </button>
+                <div class="add_song_events">
+                    <a class="hide" id="loadingSongLink">loading</a>
+                    <a class="alert_success hide" id="add_suc">successfully added song</a>
+                    <a class="alert_error hide" id="add_fail">there was an error</a>
+                </div>
 
-        <div id="getSongLink">
-            <input type="text" class="songLink" id="songLink" name="songLink" placeholder="ADD NEW SONG ...">
-            <button type="submit" class="addSong" id="submitButton" onclick="onSubmit()" value="Submit">
-                <i class="material-icons blue"><i class="material-icons">file_upload</i>
-                </i>
-            </button>
-
-            <div class="loading hide" id="loadingSongLink">
-                <a id="loading">loading</a>
-            </div>
-            <div class="hide" id="add_suc">
-                <a class="alert_success">successfully added song</a>
-            </div>
-            <div class="hide" id="add_fail">
-                <a class="alert_error">there was an error</a>
-            </div>
+            <!--</div>-->
         </div>
+
 
     </div>
 </div>
@@ -108,7 +106,6 @@
                 <i class="material-icons"><span class='skipsong' onClick='skipSong("{{songs[0].uuid}}")'>skip_next</span></i>
                 </td>
                 <td class="songtitlecolumn"> <a id=table_link href="{{songs[i].songLink}}">{{songs[i].songTitle}}</a> </td>
-
             </tr>
             {% endfor %}
         {% endif %}
