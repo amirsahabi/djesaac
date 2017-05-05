@@ -146,54 +146,70 @@ class ActionHistory(Base):
     @staticmethod
     def newNextSong(_newTitle, _newID, _newLink, _oldTitle, _oldID, _oldLink):
         try:
-            newAction = ActionHistory()
-            newAction.uuid = uuid.uuid1()
-            newAction.newTitle = _newTitle
+            new_action = ActionHistory()
+            new_action.uuid = uuid.uuid1()
+            new_action.newTitle = _newTitle
             if _newID is not None:
-                newAction.newID = uuid.UUID(_newID)
-            newAction.newLink = _newLink
-            newAction.oldTitle = _oldTitle
-            newAction.oldID = uuid.UUID(_oldID)
-            newAction.oldLink = _oldLink
-            newAction.datetime = datetime.datetime.now()
-            newAction.eventType = constants.ACT_HIST_NEXT
-            newAction.save()
-            return newAction.uuid
+                new_action.newID = uuid.UUID(_newID)
+            new_action.newLink = _newLink
+            new_action.oldTitle = _oldTitle
+            new_action.oldID = uuid.UUID(_oldID)
+            new_action.oldLink = _oldLink
+            new_action.datetime = datetime.datetime.now()
+            new_action.eventType = constants.ACT_HIST_NEXT
+            new_action.save()
+            return new_action.uuid
         except:
             return constants.FAILED_UUID_STR
 
     @staticmethod
     def newRemoveSong(_remTitle, _remID, _remLink):
         try:
-            newAction = ActionHistory()
-            newAction.uuid = uuid.uuid1()
-            newAction.newTitle = constants.EMPTY_INPUT
-            newAction.newLink = constants.EMPTY_INPUT
-            newAction.oldTitle = _remTitle
-            newAction.oldID = uuid.UUID(_remID)
-            newAction.oldLink = _remLink
-            newAction.datetime = datetime.datetime.now()
-            newAction.eventType = constants.ACT_HIST_REM
-            newAction.save()
-            return newAction.uuid
+            new_action = ActionHistory()
+            new_action.uuid = uuid.uuid1()
+            new_action.newTitle = constants.EMPTY_INPUT
+            new_action.oldTitle = _remTitle
+            new_action.oldID = uuid.UUID(_remID)
+            new_action.oldLink = _remLink
+            new_action.datetime = datetime.datetime.now()
+            new_action.eventType = constants.ACT_HIST_REM
+            new_action.save()
+            return new_action.uuid
         except:
             return constants.FAILED_UUID_STR
 
     @staticmethod
     def newAddSong(_addTitle, _addID, _addLink):
         try:
-            newAction = ActionHistory()
-            newAction.uuid = uuid.uuid1()
-            newAction.newTitle = _addTitle
-            newAction.newID = uuid.UUID(_addID)
-            newAction.newLink = _addLink
-            newAction.oldTitle = constants.EMPTY_INPUT
-            newAction.oldLink = constants.EMPTY_INPUT
-            newAction.datetime = datetime.datetime.now()
-            newAction.eventType = constants.ACT_HIST_ADD
-            newAction.save()
+            new_action = ActionHistory()
+            new_action.uuid = uuid.uuid1()
+            new_action.newTitle = _addTitle
+            new_action.newID = uuid.UUID(_addID)
+            new_action.newLink = _addLink
+            new_action.oldTitle = constants.EMPTY_INPUT
+            new_action.oldLink = constants.EMPTY_INPUT
+            new_action.datetime = datetime.datetime.now()
+            new_action.eventType = constants.ACT_HIST_ADD
+            new_action.save()
 
-            return newAction.uuid
+            return new_action.uuid
+        except:
+            return constants.FAILED_UUID_STR
+
+    @staticmethod
+    def newPlayStop():
+        try:
+            new_action = ActionHistory()
+            new_action.uuid = uuid.uuid1()
+            new_action.newTitle = constants.EMPTY_INPUT
+            new_action.newLink = constants.EMPTY_INPUT
+            new_action.oldTitle = constants.EMPTY_INPUT
+            new_action.oldLink = constants.EMPTY_INPUT
+            new_action.datetime = datetime.datetime.now()
+            new_action.eventType = constants.ACT_HIST_PLAY_STOP
+            new_action.save()
+
+            return new_action.uuid
         except:
             return constants.FAILED_UUID_STR
 

@@ -22,6 +22,7 @@ EMPTY_INPUT = ''
 ACT_HIST_ADD = 'add'
 ACT_HIST_NEXT = 'next'
 ACT_HIST_REM = 'rem'
+ACT_HIST_PLAY_STOP = 'playstop'
 
 DB_NAME = 'djesaac.db'
 DB_PREPROC_PROCESS = 'process'

@@ -51,18 +51,11 @@
             $('history').text('<i class="material-icons">history</i>');
         }
 
-        $(".play_stop").click(function(){
-            $(this).text(function(i, v){
-                return v === 'pause_circle_outline' ? 'play_circle_outline' : 'pause_circle_outline'
-            });
-        });
-
-
         var eventSource = new EventSource("/updater");
         eventSource.onmessage = function(event) {
             //reload the page for now, in the future hopefully it's dynamic
             // window.location.reload()
-            if(event.data == "STARTUPDATE" || event.data == "NEWSONG" || event.data == "REMSONG"){
+            if(event.data == "STARTUPDATE" || event.data == "NEWSONG" || event.data == "REMSONG" || event.data == 'PLAYSTOP'){
                 updateEventInProgress = true;
                 updateEventParameters = {};
             }else if(event.data == "ENDUPDATE"){
@@ -75,6 +68,9 @@
             }else if(event.data == "ENDREM"){
                 updateEventInProgress = false;
                 removeSongFromQueueFromUpdate(updateEventParameters);
+            }else if(event.data == "ENDPLAYSTOP"){
+                updateEventInProgress = false;
+                stopPlayChange(updateEventParameters);
             }else if(updateEventInProgress){
                 var parameterStart = event.data.indexOf(": ");
                 var parameterName  = event.data.substring(0,parameterStart);

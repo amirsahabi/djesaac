@@ -182,7 +182,7 @@ class DBMonitor:
 
     def standbyMode(self):
         logger.info('Standby Mode')
-        cycles=20
+        cycles = 20
         while databases.SongInQueue.select().wrapped_count() == 0 or self.musicIsPlaying.value == constants.STOP:
             if cycles < 20:
                 # sine wave
@@ -210,34 +210,36 @@ class DBMonitor:
                 # red
                 self.colorwheel(False, True, True)
                 # green/red
-                self.colorwheel(False,False,True)
+                self.colorwheel(False, False, True)
                 # green
-                self.colorwheel(True,False,True)
+                self.colorwheel(True, False, True)
                 # green/blue
-                self.colorwheel(True,False,False)
+                self.colorwheel(True, False, False)
                 # blue
-                self.colorwheel(True,True,False)
+                self.colorwheel(True, True, False)
                 # blue/red
-                self.colorwheel(False,True,False)
+                self.colorwheel(False, True, False)
             cycles = (cycles + 1) % 60
+
     def colorwheel(self, red, green, blue):
-        maxval=260
-        d=2.0
-        s=.01
+        maxval = 260
+        d = 2.0
+        s = .01
         for i in range(260, 368, 1):
             if red:
-                redi=i
+                redi = i
             else:
-                redi=maxval
+                redi = maxval
             if green:
-                greeni=i
+                greeni = i
             else:
-                greeni=maxval
+                greeni = maxval
             if blue:
-                bluei=i
+                bluei = i
             else:
-                bluei=maxval
+                bluei = maxval
             self.writeToPinsAndSleep(abs(m.sin(redi/100.0))/d+s, abs(m.sin(greeni/100.0))/d+s, abs(m.sin(bluei/100.0))/d+s, 0.03)
+
     def writeToPinsAndSleep(self, pin1, pin2, pin3, sleepTime):
         if pin1 is not None:
             self.redPin.write(pin1)

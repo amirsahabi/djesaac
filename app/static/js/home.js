@@ -57,8 +57,7 @@ function startStop(){
         },
         success: function(data){
             if(data.response === "success"){
-                //reload page I guess?
-                window.location.reload();
+                // taken care of by back end ActionHistory
             } else if(data.response === "failure") {
                 alert("Received error: " + data.error);
                 $('#startStop').prop('disabled', false);
@@ -148,6 +147,15 @@ function removeSongFromQueueFromUpdate(parameters){
     });
 }
 
+function stopPlayChange(parameters){
+    if(parameters.currentlyPlaying == '1.0'){
+        //play
+        $('span.play_stop').text('pause_circle_outline');
+    } else {
+        //stop
+        $('span.play_stop').text('play_circle_outline');
+    }
+}
 
 $(function(){
 
