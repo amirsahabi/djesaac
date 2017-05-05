@@ -22,7 +22,6 @@ function sendReplayRequest(songID, rowID){
                     });
 
                 });
-
             } else if(data.response === 'failure'){
                 var errorAlert = $('<tr class="table_alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
                 $('#'+rowID).fadeOut('slow', function(){
@@ -38,9 +37,6 @@ function sendReplayRequest(songID, rowID){
                 });
             }
             $('#'+songID).prop('disabled', false);
-
-
-
         },
         error: function(){
             var errorAlert = $('<tr class="table_alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
@@ -53,9 +49,7 @@ function sendReplayRequest(songID, rowID){
                     errorAlert.remove();
                     originalRow.fadeIn('slow');
                 });
-
             });
-
             $('#' + songID).prop('disabled', false);
         }
     });
@@ -80,16 +74,12 @@ function rearrangeHistoryTable(parameters){
         newRow.append(indexColumn);
         var titleColumn = $(document.createElement('td'));
         titleColumn.attr('class', 'titlecolumn');
-        titleColumn.text(parameters.oldTitle);
-        newRow.append(titleColumn);
-        var linkColumn = $(document.createElement('td'));
-        linkColumn.attr('class', 'linkcolumn');
         var linkRef = $(document.createElement('a'));
         linkRef.attr('id', 'table_link');
         linkRef.attr('href', parameters.oldLink);
-        linkRef.text('Link');
-        linkColumn.append(linkRef);
-        newRow.append(linkColumn);
+        linkRef.text(parameters.oldTitle);
+        titleColumn.append(linkRef);
+        newRow.append(titleColumn);
         var replayColumn = $(document.createElement('td'));
         replayColumn.attr('class', 'replaycolumn');
         var icon = $(document.createElement('i'));
@@ -100,7 +90,7 @@ function rearrangeHistoryTable(parameters){
         playStop.text('replay');
         icon.append(playStop);
         replayColumn.append(icon);
-        newRow.append(replayColumn);;
+        newRow.append(replayColumn);
 
         //insert new element into table
         dataRows.parent().prepend(newRow);
