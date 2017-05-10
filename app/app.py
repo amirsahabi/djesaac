@@ -131,6 +131,9 @@ def history():
                     databases.PreprocessRequest.newPreProcessRequest(song.songPath, str(newSongUUID))
                 else:
                     newSongUUID = addSongToQueue(song.songLink)
+                    # send update to client
+                    databases.ActionHistory.newAddSong(song.songTitle, newSongUUID, song.songLink)
+
                 responseData[constants.RESPONSE] = constants.SUCCESS
                 responseData["songID"] = str(newSongUUID)
             except:
