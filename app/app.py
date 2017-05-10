@@ -33,7 +33,7 @@ logger = logging.getLogger(__name__)
 openConnections = []
 
 
-@app.route('/', methods=['GET','POST'])
+@app.route('/', methods=['GET', 'POST'])
 def home():
     if request.method == 'GET':
         # get songs from queue
@@ -105,7 +105,7 @@ def add():
     return jsonify(responseData)
 
 
-@app.route('/history/', methods=['GET','POST'])
+@app.route('/history/', methods=['GET', 'POST'])
 def history():
     if request.method == 'GET':
         history = []
@@ -129,10 +129,10 @@ def history():
                     newSongUUID = databases.SongInQueue.addSongToQueue(song.songPath, song.songTitle, song.songLink)
                     # needs to be reprocessed
                     databases.PreprocessRequest.newPreProcessRequest(song.songPath, str(newSongUUID))
+                    #send update to client
+                    databases.ActionHistory.newAddSong(song.songTitle, str(newSongUUID), song.songLink)
                 else:
                     newSongUUID = addSongToQueue(song.songLink)
-                    # send update to client
-                    databases.ActionHistory.newAddSong(song.songTitle, newSongUUID, song.songLink)
 
                 responseData[constants.RESPONSE] = constants.SUCCESS
                 responseData["songID"] = str(newSongUUID)
