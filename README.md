@@ -12,8 +12,10 @@ controlled by an arduino along to the music
 The server is written in python and depends on the libraries
 [flask](http://flask.pocoo.org/), [peewee](https://pypi.python.org/pypi/peewee),
 [youtube_dl](https://pypi.python.org/pypi/youtube_dl), [scipy](https://www.scipy.org/),
-[pyfirmata](https://pypi.python.org/pypi/pyFirmata), [pygame](https://www.pygame.org) and [pydub](https://pypi.python.org/pypi/pydub) (all of which are
-available to install through pip). youtube_dl and pydub also rely on [ffmpeg](https://ffmpeg.org/) which an be installed on OS X through brew, on linux through the package manager.
+[pyfirmata](https://pypi.python.org/pypi/pyFirmata), [pygame](https://www.pygame.org), 
+[pysoundfile](https://pysoundfile.readthedocs.io/en/0.9.0/) and [pydub](https://pypi.python.org/pypi/pydub) 
+(all of which are available to install through pip). youtube_dl and pydub also rely on [ffmpeg](https://ffmpeg.org/)
+which can be installed on OS X through brew, on linux through your favorite package manager.
 
 ### Arduino
 
