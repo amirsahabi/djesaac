@@ -1,7 +1,7 @@
 from scipy.io import wavfile as wf
 import threading
 import wave
-import os
+import soundfile
 import databases
 import numpy as np
 import math as m
@@ -64,12 +64,10 @@ class SongPreprocessor(threading.Thread):
         startTime = time.time()
         counter = 0             # counter of samples
         window = constants.WINDOW_SIZE_MSEC # window size = 0.02 seconds
-        Fs = wave.open(songPath).getframerate()                # default frequency for audio files
+        y, Fs = soundfile.read(songPath)                # default frequency for audio files
         winsamples = int(window*Fs)    # number of samples per window
 
         # Import sound file using scipy
-        raw = wf.read(songPath)    # raw comes in default format
-        y = np.array(raw[1])        # convert y to numpy array
         orig = y                  # keep an original copy of y
         songlength = len(y)       # total number of samples in y
         numsamps = int(songlength/winsamples)

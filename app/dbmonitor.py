@@ -10,7 +10,7 @@ import pygame as pg
 import wave
 import preprocessor
 import logging
-import os
+import soundfile
 import constants
 import databases
 
@@ -140,13 +140,13 @@ class DBMonitor:
         hival = self.preprocessor.hivals[songUUID]
 
         logger.info("Finished analysis, playing song")
-        wavObj = wave.open(song)
+        _, frame_rate = soundfile.read(song)
         # Play audio and sync up light values
-        pg.mixer.init(frequency=wavObj.getframerate(), size=wavObj.getsampwidth()*-8)
+        pg.mixer.init(frequency=frame_rate)
         pg.mixer.music.load(song)
         pg.mixer.music.play()
 
-        while pg.mixer.music.get_busy() == True and self.musicIsPlaying.value == constants.PLAY:
+        while pg.mixer.music.get_busy() == constants.PLAY and self.musicIsPlaying.value == constants.PLAY:
             # check for skip
             if self.skipSong[0] != ' ':
                 # skip song requested verify it's this song

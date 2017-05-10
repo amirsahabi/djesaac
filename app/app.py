@@ -200,7 +200,7 @@ def listener():
     return Response(listenForSongIsFinished(), mimetype="text/event-stream")
 
 
-@app.route("/settings/", methods=['GET','POST'])
+@app.route("/settings/", methods=['GET', 'POST'])
 def settings():
     print openConnections
     if request.method == 'GET':
@@ -248,10 +248,10 @@ def addSongToQueue(songLink):
         # set options
         dlOptions = {
             'format': 'bestaudio',
-            'extractaudio' : True,
-            'audioformat' : 'wav',
-            'outtmpl' : 'music/%(id)s',
-            'noplaylist' : True,
+            'extractaudio': True,
+            'audioformat': 'wav',
+            'outtmpl': 'music/%(id)s',
+            'noplaylist': True,
         }
 
         # create youtubedl object
@@ -263,7 +263,7 @@ def addSongToQueue(songLink):
             metadata = ydl.extract_info(songLink, download=True)
 
             # convert the song from mp3 to wav for reasons
-            AudioSegment.from_file('./music/'+metadata['id']).export('./music/'+metadata['id']+'.wav', format='wav')
+            AudioSegment.from_file('./music/'+metadata['id']).export('./music/'+metadata['id']+constants.SONG_FORMAT_EXTENSION, format=constants.SONG_FORMAT)
 
             # remove original
             os.remove('./music/'+metadata['id'])
@@ -273,11 +273,11 @@ def addSongToQueue(songLink):
             metadata = ydl.extract_info(songLink, download=False)
 
         # given metadata, log to database
-        songUUID = str(databases.SongInQueue.addSongToQueue('./music/'+metadata['id']+'.wav', metadata['title'], songLink))
+        songUUID = str(databases.SongInQueue.addSongToQueue('./music/'+metadata['id']+constants.SONG_FORMAT_EXTENSION, metadata['title'], songLink))
 
         if songUUID != constants.FAILED_UUID_STR:
             # tell the preprocessor in the dbmonitor to preprocess it
-            databases.PreprocessRequest.newPreProcessRequest('./music/'+metadata['id']+'.wav', songUUID)
+            databases.PreprocessRequest.newPreProcessRequest('./music/'+metadata['id']+constants.SONG_FORMAT_EXTENSION, songUUID)
             # add a new action event
             databases.ActionHistory.newAddSong(metadata['title'], songUUID, songLink)
         else:
