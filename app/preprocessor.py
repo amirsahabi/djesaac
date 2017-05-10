@@ -1,6 +1,4 @@
-from scipy.io import wavfile as wf
 import threading
-import wave
 import soundfile
 import databases
 import numpy as np

@@ -1,5 +1,4 @@
 # dbmonitor.py
-from scipy.io import wavfile as wf
 from multiprocessing import Value
 import time
 from serial import SerialException
