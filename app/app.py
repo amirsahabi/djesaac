@@ -202,7 +202,6 @@ def listener():
 
 @app.route("/settings/", methods=['GET', 'POST'])
 def settings():
-    print openConnections
     if request.method == 'GET':
         responseData = {}
         responseData['board'] = ''.join(arduinoPortLoc[:])

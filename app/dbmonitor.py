@@ -2,12 +2,10 @@
 from scipy.io import wavfile as wf
 from multiprocessing import Value
 import time
-import numpy as np
 from serial import SerialException
 import math as m
 import pyfirmata as pf
 import pygame as pg
-import wave
 import preprocessor
 import logging
 import soundfile
