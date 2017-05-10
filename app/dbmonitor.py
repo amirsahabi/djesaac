@@ -41,6 +41,7 @@ class DBMonitor:
         self.greenLoc = green
         self.blueLoc = blue
         self.latency = latencyVal
+        self.song_position = constants.SONG_BEGINNING_TIME
 
         self.preprocessor = preprocessor.SongPreprocessor()
         self.preprocessor.start()
@@ -118,7 +119,7 @@ class DBMonitor:
             if self.board is not None:
                 self.standbyMode()
             else:
-                time.sleep(3)
+                time.sleep(0.2)
 
     def playSong(self, song, songUUID):
         logger.info("Received song request")
@@ -144,7 +145,7 @@ class DBMonitor:
         # Play audio and sync up light values
         pg.mixer.init(frequency=frame_rate)
         pg.mixer.music.load(song)
-        pg.mixer.music.play()
+        pg.mixer.music.play(0, self.song_position / 1000.0)
 
         while pg.mixer.music.get_busy() == constants.PLAY and self.musicIsPlaying.value == constants.PLAY:
             # check for skip
@@ -157,9 +158,10 @@ class DBMonitor:
                 else:
                     self.skipSong[:] = constants.EMPTY_UUID
 
+            self.song_position = pg.mixer.music.get_pos()
             if self.board is not None:
                 try:
-                    pos = pg.mixer.music.get_pos()
+                    pos = self.song_position
                     self.redPin.write(loval[int((pos - self.latency.value)/constants.WINDOW_SIZE_SEC)])
                     self.greenPin.write(mdval[int((pos - self.latency.value)/constants.WINDOW_SIZE_SEC)])
                     self.bluePin.write(hival[int((pos - self.latency.value)/constants.WINDOW_SIZE_SEC)])
@@ -173,6 +175,7 @@ class DBMonitor:
         else:
             # music stopped naturally, remove the preprocessing
             databases.PreprocessRequest.newDecomissionRequest(songUUID)
+            self.song_position = 0
 
         if self.board is not None:
             self.redPin.write(0)
