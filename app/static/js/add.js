@@ -42,6 +42,7 @@ function onSubmit(){
                     });
                 });
 
+
             } else if(data.response === 'failure') {
                 $("#loadingSongLink").fadeOut(500).promise().done(function(){
                     $("#add_fail").fadeIn().delay(1000).fadeOut().promise().done(function(){
@@ -52,8 +53,9 @@ function onSubmit(){
                         }, 500);
                     });
                 });
-                $('#submitButton').prop('disabled', false);
             }
+            $('#submitButton').attr('disabled', false);
+
         },
         error: function(){
             $("#loadingSongLink").fadeOut(500).promise().done(function(){
@@ -65,7 +67,7 @@ function onSubmit(){
                     }, 500);
                 });
             });
-            $('#submitButton').prop('disabled', false);
+            $('#submitButton').attr('disabled', false);
         }
     });
 }
