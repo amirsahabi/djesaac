@@ -42,3 +42,9 @@ LOG_LEVEL = 20 # 0: NOT, 10: DEBUG, 20: INFO, 30: WARNING, 40: ERROR, 50: CRITIC
 PLAY = 1
 STOP = 0
 SONG_BEGINNING_TIME = 0.0
+
+YOUTUBE = 'youtube.com'
+SOUNDCLOUD = 'soundcloud.com'
+CONTENT_LINK = 'content-link'
+SIDE_BAR = 'soundBadge__avatarLink'
+HTTPS = 'https://www.'
