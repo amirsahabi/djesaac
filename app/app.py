@@ -242,6 +242,7 @@ def settings():
         responseData['green'] = newGreenLocation
         responseData['blue'] = newBlueLocation
         responseData['latency'] = newLatency
+        responseData['autoplay'] = new_autoplay
         responseData[constants.RESPONSE] = constants.SUCCESS
 
     return jsonify(responseData)
