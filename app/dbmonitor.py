@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 class DBMonitor:
-    def __init__(self, musicIsPlayingValue, songPlayingValue, skipSongRequest, port, blue, green, red, latencyVal, threadIssue):
+    def __init__(self, musicIsPlayingValue, songPlayingValue, skipSongRequest, port, blue, green, red, latencyVal, auto_play, threadIssue):
         # I like the idea of encapsulation for all these functions and variables
         # but when the object is instantiated in the main thread, it instantiates
         # an object before the run() function is called in its new process
@@ -38,6 +38,7 @@ class DBMonitor:
         self.greenLoc = green
         self.blueLoc = blue
         self.latency = latencyVal
+        self.autoplay_music = auto_play
         self.song_position = constants.SONG_BEGINNING_TIME
 
         self.preprocessor = preprocessor.SongPreprocessor()
@@ -67,9 +68,9 @@ class DBMonitor:
 
         logger.info("DBMonitor initialized")
 
-    def run(self, musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, portProcArr, blueProcArr, greenProcArr, redProcArr, latencyProcVal, threadIssue):
+    def run(self, musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, portProcArr, blueProcArr, greenProcArr, redProcArr, latencyProcVal, auto_play_val, threadIssue):
         logger.info("Running DBMonitor")
-        self.__init__(musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, portProcArr, blueProcArr, greenProcArr, redProcArr, latencyProcVal, threadIssue)
+        self.__init__(musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, portProcArr, blueProcArr, greenProcArr, redProcArr, latencyProcVal, auto_play_val, threadIssue)
         instanceRed = ''.join(self.redLoc[:])
         instanceGreen = ''.join(self.greenLoc[:])
         instanceBlue = ''.join(self.blueLoc[:])

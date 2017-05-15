@@ -24,6 +24,7 @@ arduinoBluePin = Array(ctypes.c_char_p, constants.ARD_PIN_LENGTH)
 arduinoGreenPin = Array(ctypes.c_char_p, constants.ARD_PIN_LENGTH)
 arduinoRedPin = Array(ctypes.c_char_p, constants.ARD_PIN_LENGTH)
 latency = Value('d', 0)
+autoPlayMusic = Value('d', 0)
 songPlaying[:] = constants.EMPTY_UUID
 skipSongRequest[:] = constants.EMPTY_UUID
 monitor = None
@@ -212,6 +213,7 @@ def settings():
         responseData['green'] = ''.join(arduinoGreenPin[:])
         responseData['blue'] = ''.join(arduinoBluePin[:])
         responseData['latency'] = str(latency.value)
+        responseData['autoplay'] = str(autoPlayMusic.value)
         responseData[constants.RESPONSE] = constants.SUCCESS
 
     elif request.method == 'POST':
@@ -226,12 +228,14 @@ def settings():
         newGreenLocation = checkLength(request.form['green'], constants.ARD_PIN_LENGTH)
         newBlueLocation = checkLength(request.form['blue'], constants.ARD_PIN_LENGTH)
         newLatency = request.form['latency']
+        new_autoplay = request.form['autoplay']
 
         arduinoPortLoc[:] = newBoardLocation[:]
         arduinoRedPin[:] = newRedLocation[:]
         arduinoGreenPin[:] = newGreenLocation[:]
         arduinoBluePin[:] = newBlueLocation[:]
         latency.value = float(newLatency)
+        autoPlayMusic.value = float(new_autoplay)
 
         responseData['board'] = newBoardLocation
         responseData['red'] = newRedLocation
@@ -313,8 +317,8 @@ if __name__ == "__main__":
     databases.dropTables()
     databases.initTables()
 
-    monitor = DBMonitor(None, None, None, None, None, None, None, None, True)
-    monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, arduinoPortLoc, arduinoBluePin, arduinoGreenPin, arduinoRedPin, latency, False))
+    monitor = DBMonitor(None, None, None, None, None, None, None, None, None, True)
+    monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, arduinoPortLoc, arduinoBluePin, arduinoGreenPin, arduinoRedPin, latency, autoPlayMusic, False))
     monitorProc.start()
 
     app.debug = constants.DEBUGMODE
