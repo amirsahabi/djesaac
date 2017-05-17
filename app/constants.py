@@ -48,3 +48,11 @@ SOUNDCLOUD = 'soundcloud.com'
 CONTENT_LINK = 'content-link'
 SIDE_BAR = 'soundBadge__avatarLink'
 HTTPS = 'https://www.'
+
+YDL_OPTIONS = {
+            'format': 'bestaudio',
+            'extractaudio': True,
+            'audioformat': 'wav',
+            'outtmpl': 'music/%(id)s',
+            'noplaylist': True,
+        }

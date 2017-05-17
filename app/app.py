@@ -1,15 +1,14 @@
 from __future__ import unicode_literals
 from flask import Flask, request, render_template, Response, jsonify
-from pydub import AudioSegment
 from multiprocessing import Process, Value, Array
 from dbmonitor import *
-import youtube_dl
 import databases
 import datetime
 import os
 import logging
 import ctypes
 import constants
+import song_utilities
 
 logging.basicConfig(level=constants.LOG_LEVEL)
 
@@ -96,7 +95,7 @@ def home():
 @app.route('/add/', methods=['POST'])
 def add():
     responseData = {}
-    songUUID = str(addSongToQueue(request.form['link']))
+    songUUID = str(song_utilities.addSongToQueue(request.form['link']))
     if songUUID == constants.FAILED_UUID_STR:
         responseData[constants.RESPONSE] = constants.FAILURE
         responseData["error"] = "Could not add to database"
@@ -133,7 +132,7 @@ def history():
                     #send update to client
                     databases.ActionHistory.newAddSong(song.songTitle, str(newSongUUID), song.songLink)
                 else:
-                    newSongUUID = addSongToQueue(song.songLink)
+                    newSongUUID = song_utilities.addSongToQueue(song.songLink)
 
                 responseData[constants.RESPONSE] = constants.SUCCESS
                 responseData["songID"] = str(newSongUUID)
@@ -246,70 +245,6 @@ def settings():
         responseData[constants.RESPONSE] = constants.SUCCESS
 
     return jsonify(responseData)
-
-
-def addSongToQueue(songLink):
-    songUUID = constants.FAILED_UUID_STR
-    try:
-        # given songlink, use youtubedl to download it
-        # set options
-        dlOptions = {
-            'format': 'bestaudio',
-            'extractaudio': True,
-            'audioformat': 'wav',
-            'outtmpl': 'music/%(id)s',
-            'noplaylist': True,
-        }
-
-        # create youtubedl object
-        ydl = youtube_dl.YoutubeDL(dlOptions)
-
-        if not songHasBeenDownloaded(songLink):
-
-            # get metadata and download song while we're at it
-            metadata = ydl.extract_info(songLink, download=True)
-
-            # convert the song from mp3 to wav for reasons
-            AudioSegment.from_file('./music/'+metadata['id']).export('./music/'+metadata['id']+constants.SONG_FORMAT_EXTENSION, format=constants.SONG_FORMAT)
-
-            # remove original
-            os.remove('./music/'+metadata['id'])
-        else:
-            logger.info("Song existed, no need to redownload")
-
-            metadata = ydl.extract_info(songLink, download=False)
-
-        # given metadata, log to database
-        songUUID = str(databases.SongInQueue.addSongToQueue('./music/'+metadata['id']+constants.SONG_FORMAT_EXTENSION, metadata['title'], songLink))
-
-        if songUUID != constants.FAILED_UUID_STR:
-            # tell the preprocessor in the dbmonitor to preprocess it
-            databases.PreprocessRequest.newPreProcessRequest('./music/'+metadata['id']+constants.SONG_FORMAT_EXTENSION, songUUID)
-            # add a new action event
-            databases.ActionHistory.newAddSong(metadata['title'], songUUID, songLink)
-        else:
-            return songUUID
-
-    except:
-        return songUUID
-
-    return songUUID
-
-
-def songHasBeenDownloaded(songLink):
-    # check both history and songqueue for the song
-    songs = databases.SongInQueue.select().where(databases.SongInQueue.songLink == songLink)
-    for song in songs:
-        if os.path.isfile(song.songPath):
-            # has been downloaded
-            return True
-
-    songs = databases.History.select().where(databases.History.songLink == songLink)
-    for song in songs:
-        if os.path.isfile(song.songPath):
-            return True
-
-    return False
 
 
 # start server
