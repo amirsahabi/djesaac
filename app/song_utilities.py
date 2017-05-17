@@ -1,12 +1,15 @@
 from __future__ import unicode_literals
 from bs4 import BeautifulSoup as bs
 from pydub import AudioSegment
+from pydub.utils import which
 import requests
 import constants
 import databases
 import youtube_dl
 import os
 import logging
+
+AudioSegment.converter = which("ffmpeg")
 
 logging.basicConfig(level=constants.LOG_LEVEL)
 logger = logging.getLogger(__name__)
