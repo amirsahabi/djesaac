@@ -10,6 +10,7 @@ import logging
 import soundfile
 import constants
 import databases
+import song_utilities
 
 logging.basicConfig(level=constants.LOG_LEVEL)
 logger = logging.getLogger(__name__)
@@ -78,6 +79,7 @@ class DBMonitor:
 
         oldSongTitle = constants.EMPTY_INPUT
         oldSongLink = constants.EMPTY_INPUT
+        last_song_played = None
         while True:
             while self.musicIsPlaying.value == constants.PLAY and databases.SongInQueue.select().wrapped_count() > 0:
                 if(instanceRed != ''.join(self.redLoc) or instanceBlue != ''.join(self.blueLoc) or
@@ -98,6 +100,7 @@ class DBMonitor:
                 self.songPlaying[:] = str(song.uuid)
                 oldSongTitle = song.songTitle
                 oldSongLink = song.songLink
+                last_song_played = song.songLink
 
                 self.playSong(song.songPath, ''.join(self.songPlaying[:]))
 
@@ -114,10 +117,15 @@ class DBMonitor:
                 oldSongLink = constants.EMPTY_INPUT
                 self.songPlaying[:] = constants.EMPTY_UUID
 
-            if self.board is not None:
-                self.standbyMode()
+            if self.autoplay_music.value == 1.0 and last_song_played is not None:
+                # autoplay music
+                new_song_link = song_utilities.get_related_video_url(last_song_played)
+                song_utilities.addSongToQueue(new_song_link)
             else:
-                time.sleep(0.2)
+                if self.board is not None:
+                    self.standbyMode()
+                else:
+                    time.sleep(0.2)
 
     def playSong(self, song, songUUID):
         logger.info("Received song request")
@@ -184,7 +192,7 @@ class DBMonitor:
     def standbyMode(self):
         logger.info('Standby Mode')
         cycles = 20
-        while databases.SongInQueue.select().wrapped_count() == 0 or self.musicIsPlaying.value == constants.STOP:
+        while self.autoplay_music != 1.0 and (databases.SongInQueue.select().wrapped_count() == 0 or self.musicIsPlaying.value == constants.STOP):
             if cycles < 20:
                 # sine wave
                 for i in range(0, 314, 2):

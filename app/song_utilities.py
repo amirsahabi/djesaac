@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 def get_related_video_url(input_url):
+    logger.info('autoplaying next song from ' + input_url)
     # check if is youtube or soundcloud link
     return_link = constants.EMPTY_INPUT
 
@@ -37,6 +38,7 @@ def get_related_video_url(input_url):
         return_link = constants.HTTPS + send_url + related_links[0].get('href')
 
     return return_link
+
 
 def addSongToQueue(songLink):
     songUUID = constants.FAILED_UUID_STR
