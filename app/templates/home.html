@@ -5,11 +5,14 @@
     <script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.2.0.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/home.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/add.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/settings.js')}}"></script>
     <script src="../static/js/jquery-3.2.0.js"></script>
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Ubuntu" />
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Cookie" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="../static/styles/styles.css" />
+    <link rel="stylesheet" href="../static/styles/dialog.css" />
+
 </head>
 <body>
 <div id="nav">
@@ -19,6 +22,7 @@
             <a class="nav_link_icon current" id='home'style="padding-left: 0;" href="/"><i class='material-icons blue'>home</i></a>
             <a class="nav_link_text" id='history' href="history">HISTORY</a>
             <a class="nav_link_icon" id='history' href="history"><i class='material-icons gray'>history</i></a>
+            <a class="nav_link_text" id="settings" onclick="getAndDisplaySettings();">SETTINGS</a>
         </div>
         <div id="add_song_container">
             <!--<div id="getSongLink">-->
@@ -82,6 +86,48 @@
         };
     });
 </script>
+
+<div class="modal">
+    <div class="modal-object">
+        <div class="modal-content">
+            <span class="close" onclick="$('div.modal').css('display', 'none');">&times;</span>
+            <h2 style="text-align: center;">settings</h2>
+        </div>
+        <div class="modal-body">
+            <table id="settings-table">
+                <tbody>
+                    <tr>
+                        <td>board</td>
+                        <td><input id="board-src"/></td>
+                    </tr>
+                    <tr>
+                        <td>red</td>
+                        <td><input id="red-src"/></td>
+                    </tr>
+                    <tr>
+                        <td>blue</td>
+                        <td><input id="blue-src"/></td>
+                    </tr>
+                    <tr>
+                        <td>green</td>
+                        <td><input id="green-src"/></td>
+                    </tr>
+                    <tr>
+                        <td>latency</td>
+                        <td><input id="latency"/></td>
+                    </tr>
+                    <tr>
+                        <td>autoplay</td>
+                        <td><input id="autoplay" type="checkbox"/></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="modal-footer">
+            <input style="ver" id="submit-settings-change" type="button" value="save" onclick="saveSettings();"/>
+        </div>
+    </div>
+</div>
 
 <div class="currently_playing">
     <h3 style="margin-bottom: 0; text-transform: uppercase; color: #757980; font-weight: 100;">currently playing</h3>

@@ -235,7 +235,7 @@ def settings():
         arduinoGreenPin[:] = newGreenLocation[:]
         arduinoBluePin[:] = newBlueLocation[:]
         latency.value = float(newLatency)
-        autoPlayMusic.value = float(new_autoplay)
+        autoPlayMusic.value = float(str(new_autoplay) == 'true')
 
         responseData['board'] = newBoardLocation
         responseData['red'] = newRedLocation
