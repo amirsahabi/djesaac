@@ -1,7 +1,6 @@
 import unittest
 import constants_testing as ct
-# from app import app, databases, constants
-from app import app, constants, databases, dbmonitor
+from app import app, constants, databases
 import logging
 import json
 
