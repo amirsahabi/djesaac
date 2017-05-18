@@ -1,7 +1,7 @@
 import unittest
 import constants_testing as ct
 # from app import app, databases, constants
-from app import app, constants, databases
+from app import app, constants, databases, dbmonitor
 import logging
 import json
 
@@ -20,8 +20,10 @@ class TestAppMethods(unittest.TestCase):
         databases.dropTables()
         databases.initTables()
 
+        app.init_background_procs()
+
     def tearDown(self):
-        pass
+        app.monitorProc.terminate()
 
     def test_get_home_page(self):
         logger.info('test_get_home_page')
@@ -60,6 +62,27 @@ class TestAppMethods(unittest.TestCase):
         assert initial_music_playing != app.musicIsPlaying.value
         assert initial_music_playing == (1 + app.musicIsPlaying.value) % 2
 
+    def test_get_settings(self):
+        logger.info('test_get_settings')
+
+        # test empty get
+        init_board = ''.join(app.arduinoPortLoc[:])
+        init_red = ''.join(app.arduinoRedPin[:])
+        init_blue = ''.join(app.arduinoBluePin[:])
+        init_green = ''.join(app.arduinoGreenPin[:])
+        init_latency = app.latency.value
+        init_autoplay = app.autoPlayMusic.value
+
+        response = self.app.get('/settings/')
+        response_data = json.loads(response.data)
+
+        assert response.status == ct.RESPONSE_OK
+        assert response_data[constants.ARDUINO_BOARD] == init_board
+        assert response_data[constants.ARDUINO_RED] == init_red
+        assert response_data[constants.ARDUINO_BLUE] == init_blue
+        assert response_data[constants.ARDUINO_GREEN] == init_green
+        assert response_data[constants.AUTOPLAY] == str(init_autoplay)
+        assert response_data[constants.LATENCY] == str(init_latency)
 
 
 if __name__ == "__main__":

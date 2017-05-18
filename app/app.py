@@ -27,6 +27,7 @@ autoPlayMusic = Value('d', 0)
 songPlaying[:] = constants.EMPTY_UUID
 skipSongRequest[:] = constants.EMPTY_UUID
 monitor = None
+monitorProc = None
 logger = logging.getLogger(__name__)
 # home
 
@@ -207,12 +208,12 @@ def listener():
 def settings():
     if request.method == 'GET':
         responseData = {}
-        responseData['board'] = ''.join(arduinoPortLoc[:])
-        responseData['red'] = ''.join(arduinoRedPin[:])
-        responseData['green'] = ''.join(arduinoGreenPin[:])
-        responseData['blue'] = ''.join(arduinoBluePin[:])
-        responseData['latency'] = str(latency.value)
-        responseData['autoplay'] = str(autoPlayMusic.value)
+        responseData[constants.ARDUINO_BOARD] = ''.join(arduinoPortLoc[:])
+        responseData[constants.ARDUINO_RED] = ''.join(arduinoRedPin[:])
+        responseData[constants.ARDUINO_GREEN] = ''.join(arduinoGreenPin[:])
+        responseData[constants.ARDUINO_BLUE] = ''.join(arduinoBluePin[:])
+        responseData[constants.LATENCY] = str(latency.value)
+        responseData[constants.AUTOPLAY] = str(autoPlayMusic.value)
         responseData[constants.RESPONSE] = constants.SUCCESS
 
     elif request.method == 'POST':
@@ -222,12 +223,12 @@ def settings():
             else:
                 return checkString + ' ' * (checkLength - len(checkString))
         responseData = {}
-        newBoardLocation = checkLength(request.form['board'], constants.ARD_PORT_LENGTH)
-        newRedLocation = checkLength(request.form['red'], constants.ARD_PIN_LENGTH)
-        newGreenLocation = checkLength(request.form['green'], constants.ARD_PIN_LENGTH)
-        newBlueLocation = checkLength(request.form['blue'], constants.ARD_PIN_LENGTH)
-        newLatency = request.form['latency']
-        new_autoplay = request.form['autoplay']
+        newBoardLocation = checkLength(request.form[constants.ARDUINO_BOARD], constants.ARD_PORT_LENGTH)
+        newRedLocation = checkLength(request.form[constants.ARDUINO_RED], constants.ARD_PIN_LENGTH)
+        newGreenLocation = checkLength(request.form[constants.ARDUINO_GREEN], constants.ARD_PIN_LENGTH)
+        newBlueLocation = checkLength(request.form[constants.ARDUINO_BLUE], constants.ARD_PIN_LENGTH)
+        newLatency = request.form[constants.LATENCY]
+        new_autoplay = request.form[constants.AUTOPLAY]
 
         arduinoPortLoc[:] = newBoardLocation[:]
         arduinoRedPin[:] = newRedLocation[:]
@@ -236,15 +237,22 @@ def settings():
         latency.value = float(newLatency)
         autoPlayMusic.value = float(str(new_autoplay) == 'true')
 
-        responseData['board'] = newBoardLocation
-        responseData['red'] = newRedLocation
-        responseData['green'] = newGreenLocation
-        responseData['blue'] = newBlueLocation
-        responseData['latency'] = newLatency
-        responseData['autoplay'] = new_autoplay
+        responseData[constants.ARDUINO_BOARD] = newBoardLocation
+        responseData[constants.ARDUINO_RED] = newRedLocation
+        responseData[constants.ARDUINO_GREEN] = newGreenLocation
+        responseData[constants.ARDUINO_BLUE] = newBlueLocation
+        responseData[constants.LATENCY] = newLatency
+        responseData[constants.AUTOPLAY] = new_autoplay
         responseData[constants.RESPONSE] = constants.SUCCESS
 
     return jsonify(responseData)
+
+
+def init_background_procs():
+    global monitor, monitorProc
+    monitor = DBMonitor(None, None, None, None, None, None, None, None, None, True)
+    monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, arduinoPortLoc, arduinoBluePin, arduinoGreenPin, arduinoRedPin, latency, autoPlayMusic, False))
+    monitorProc.start()
 
 
 # start server
@@ -253,9 +261,7 @@ if __name__ == "__main__":
     databases.dropTables()
     databases.initTables()
 
-    monitor = DBMonitor(None, None, None, None, None, None, None, None, None, True)
-    monitorProc = Process(target=monitor.run, args=(musicIsPlaying, songPlaying, skipSongRequest, arduinoPortLoc, arduinoBluePin, arduinoGreenPin, arduinoRedPin, latency, autoPlayMusic, False))
-    monitorProc.start()
+    init_background_procs()
 
     app.debug = constants.DEBUGMODE
     app.run(threaded=True, port=constants.PORT, host='0.0.0.0', use_reloader=False)

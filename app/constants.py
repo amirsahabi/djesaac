@@ -58,3 +58,11 @@ YDL_OPTIONS = {
             'outtmpl': 'music/%(id)s',
             'noplaylist': True,
         }
+
+
+ARDUINO_BOARD = 'board'
+ARDUINO_RED = 'red'
+ARDUINO_BLUE = 'blue'
+ARDUINO_GREEN = 'green'
+AUTOPLAY = 'autoplay'
+LATENCY = 'latency'
