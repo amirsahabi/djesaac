@@ -90,14 +90,14 @@
 <div class="modal">
     <div class="modal-object">
         <div class="modal-content">
-            <span class="close" onclick="$('div.modal').css('display', 'none');">&times;</span>
-            <h2 style="text-align: center;">settings</h2>
+            <span class="close" onclick="$('div.modal').css('display', 'none');"><i class="material-icons">close</i></span>
+            <h2 style="display: table; position: relative; top: -15px;text-align: center; margin: 0; text-transform: uppercase; color: #757980; font-weight: 100; width: 100%;">settings</h2>
         </div>
         <div class="modal-body">
             <table id="settings-table">
                 <tbody>
                     <tr>
-                        <td>board</td>
+                        <td style="width:25%;">board</td>
                         <td><input id="board-src"/></td>
                     </tr>
                     <tr>
@@ -118,13 +118,16 @@
                     </tr>
                     <tr>
                         <td>autoplay</td>
-                        <td><input id="autoplay" type="checkbox"/></td>
+                        <td>
+                            <input id="autoplay" type="checkbox"  name="set-name" class="switch-input" />
+                            <label for="autoplay" class="switch-label"></label>
+                        </td>
                     </tr>
                 </tbody>
             </table>
         </div>
         <div class="modal-footer">
-            <input style="ver" id="submit-settings-change" type="button" value="save" onclick="saveSettings();"/>
+            <input id="submit-settings-change" type="button" value="SAVE" onclick="saveSettings();"/>
         </div>
     </div>
 </div>
