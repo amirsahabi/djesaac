@@ -139,6 +139,44 @@ class TestAppMethods(unittest.TestCase):
         assert response_data[constants.AUTOPLAY] != init_autoplay
         assert response_data[constants.AUTOPLAY] == changed_autoplay
 
+    def test_invalid_latency_settings_post(self):
+
+        # test a bad post (invalid latency)
+        init_board = ''.join(app.arduinoPortLoc[:])
+        init_red = ''.join(app.arduinoRedPin[:])
+        init_blue = ''.join(app.arduinoBluePin[:])
+        init_green = ''.join(app.arduinoGreenPin[:])
+        init_latency = app.latency.value
+        init_autoplay = app.autoPlayMusic.value
+
+        set_string = 'asdfsa'
+        new_board = set_string
+        new_red = set_string
+        new_blue = set_string
+        new_green = set_string
+        new_latency = set_string
+        new_autoplay = set_string
+
+        response = self.app.post('/settings/', data={
+            constants.ARDUINO_BOARD: new_board,
+            constants.ARDUINO_RED: new_red,
+            constants.ARDUINO_BLUE: new_blue,
+            constants.ARDUINO_GREEN: new_green,
+            constants.LATENCY: new_latency,
+            constants.AUTOPLAY: new_autoplay
+        })
+
+        response_data = json.loads(response.data)
+
+        assert response.status == ct.RESPONSE_OK
+        assert response_data[constants.RESPONSE] == constants.FAILURE
+        assert ''.join(app.arduinoPortLoc[:]) == init_board
+        assert ''.join(app.arduinoRedPin[:]) == init_red
+        assert ''.join(app.arduinoBluePin[:]) == init_blue
+        assert ''.join(app.arduinoGreenPin[:]) == init_green
+        assert app.autoPlayMusic.value == init_autoplay
+        assert app.latency.value == init_latency
+
 
 if __name__ == "__main__":
     unittest.main()

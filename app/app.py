@@ -222,28 +222,32 @@ def settings():
                 return checkString[:checkLength]
             else:
                 return checkString + ' ' * (checkLength - len(checkString))
-        responseData = {}
-        newBoardLocation = checkLength(request.form[constants.ARDUINO_BOARD], constants.ARD_PORT_LENGTH)
-        newRedLocation = checkLength(request.form[constants.ARDUINO_RED], constants.ARD_PIN_LENGTH)
-        newGreenLocation = checkLength(request.form[constants.ARDUINO_GREEN], constants.ARD_PIN_LENGTH)
-        newBlueLocation = checkLength(request.form[constants.ARDUINO_BLUE], constants.ARD_PIN_LENGTH)
-        newLatency = request.form[constants.LATENCY]
-        new_autoplay = request.form[constants.AUTOPLAY]
+        try:
+            responseData = {}
+            newBoardLocation = checkLength(request.form[constants.ARDUINO_BOARD], constants.ARD_PORT_LENGTH)
+            newRedLocation = checkLength(request.form[constants.ARDUINO_RED], constants.ARD_PIN_LENGTH)
+            newGreenLocation = checkLength(request.form[constants.ARDUINO_GREEN], constants.ARD_PIN_LENGTH)
+            newBlueLocation = checkLength(request.form[constants.ARDUINO_BLUE], constants.ARD_PIN_LENGTH)
+            newLatency = request.form[constants.LATENCY]
+            new_autoplay = request.form[constants.AUTOPLAY]
 
-        arduinoPortLoc[:] = newBoardLocation[:]
-        arduinoRedPin[:] = newRedLocation[:]
-        arduinoGreenPin[:] = newGreenLocation[:]
-        arduinoBluePin[:] = newBlueLocation[:]
-        latency.value = float(newLatency)
-        autoPlayMusic.value = float(str(new_autoplay) == 'true')
+            arduinoPortLoc[:] = newBoardLocation[:]
+            arduinoRedPin[:] = newRedLocation[:]
+            arduinoGreenPin[:] = newGreenLocation[:]
+            arduinoBluePin[:] = newBlueLocation[:]
+            latency.value = float(newLatency)
+            autoPlayMusic.value = float(str(new_autoplay) == 'true')
 
-        responseData[constants.ARDUINO_BOARD] = newBoardLocation
-        responseData[constants.ARDUINO_RED] = newRedLocation
-        responseData[constants.ARDUINO_GREEN] = newGreenLocation
-        responseData[constants.ARDUINO_BLUE] = newBlueLocation
-        responseData[constants.LATENCY] = newLatency
-        responseData[constants.AUTOPLAY] = new_autoplay
-        responseData[constants.RESPONSE] = constants.SUCCESS
+            responseData[constants.ARDUINO_BOARD] = newBoardLocation
+            responseData[constants.ARDUINO_RED] = newRedLocation
+            responseData[constants.ARDUINO_GREEN] = newGreenLocation
+            responseData[constants.ARDUINO_BLUE] = newBlueLocation
+            responseData[constants.LATENCY] = newLatency
+            responseData[constants.AUTOPLAY] = new_autoplay
+            responseData[constants.RESPONSE] = constants.SUCCESS
+        except ValueError:
+            # bad arguments for latency or autoplay
+            responseData[constants.RESPONSE] = constants.FAILURE
 
     return jsonify(responseData)
 
