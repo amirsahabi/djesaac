@@ -88,7 +88,7 @@ def home():
             responseData[constants.RESPONSE] = constants.SUCCESS
         else:
             responseData[constants.RESPONSE] = constants.FAILURE
-            responseData[constants.ERROR] = "unknown command"
+            responseData[constants.ERROR] = constants.UNKNOWN_COMMAND
         return jsonify(responseData)
 
 

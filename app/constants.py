@@ -29,6 +29,7 @@ ACT_HIST_PLAY_STOP = 'playstop'
 DB_NAME = 'djesaac.db'
 DB_PREPROC_PROCESS = 'process'
 DB_PREPROC_DECOMISSION = 'decomission'
+UNKNOWN_COMMAND = 'unknown command'
 
 RESPONSE = 'response'
 ERROR = 'error'
