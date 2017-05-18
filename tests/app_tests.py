@@ -3,6 +3,7 @@ import constants_testing as ct
 from app import app, constants, databases
 import logging
 import json
+import os
 
 
 logging.basicConfig(level=ct.LOG_LEVEL)
@@ -83,6 +84,62 @@ class TestAppMethods(unittest.TestCase):
         assert response_data[constants.AUTOPLAY] == str(init_autoplay)
         assert response_data[constants.LATENCY] == str(init_latency)
 
+    def test_post_settings(self):
+        logger.info('test_post_settings')
+
+        # test empty post
+        response = self.app.post('/settings/')
+        assert response.status == ct.RESPONSE_BAD
+
+        # test a good post
+        init_board = ''.join(app.arduinoPortLoc[:])
+        init_red = ''.join(app.arduinoRedPin[:])
+        init_blue = ''.join(app.arduinoBluePin[:])
+        init_green = ''.join(app.arduinoGreenPin[:])
+        init_latency = app.latency.value
+        init_autoplay = app.autoPlayMusic.value
+
+        set_string = 'asdfsa'
+        new_board = set_string
+        new_red = set_string
+        new_blue = set_string
+        new_green = set_string
+        new_latency = 123.0
+        new_autoplay = 'true' if init_autoplay == 1.0 else 'false'
+
+        response = self.app.post('/settings/', data={
+            constants.ARDUINO_BOARD: new_board,
+            constants.ARDUINO_RED: new_red,
+            constants.ARDUINO_BLUE: new_blue,
+            constants.ARDUINO_GREEN: new_green,
+            constants.LATENCY: new_latency,
+            constants.AUTOPLAY: new_autoplay
+        })
+
+        response_data = json.loads(response.data)
+
+        changed_board = ''.join(app.arduinoPortLoc[:])
+        changed_red = ''.join(app.arduinoRedPin[:])
+        changed_blue = ''.join(app.arduinoBluePin[:])
+        changed_green = ''.join(app.arduinoGreenPin[:])
+        changed_latency = app.latency.value
+        changed_autoplay = 'true' if app.autoPlayMusic.value == 1.0 else 'false'
+
+        assert response.status == ct.RESPONSE_OK
+        assert response_data[constants.ARDUINO_BOARD] != init_board
+        assert response_data[constants.ARDUINO_BOARD] == changed_board
+        assert response_data[constants.ARDUINO_BLUE] != init_blue
+        assert response_data[constants.ARDUINO_BLUE] == changed_blue
+        assert response_data[constants.ARDUINO_RED] != init_red
+        assert response_data[constants.ARDUINO_RED] == changed_red
+        assert response_data[constants.ARDUINO_GREEN] != init_green
+        assert response_data[constants.ARDUINO_GREEN] == changed_green
+        assert response_data[constants.LATENCY] != init_latency
+        assert response_data[constants.LATENCY] == str(changed_latency)
+        assert response_data[constants.AUTOPLAY] != init_autoplay
+        assert response_data[constants.AUTOPLAY] == changed_autoplay
+
 
 if __name__ == "__main__":
     unittest.main()
+    os.remove(constants.DB_NAME)
