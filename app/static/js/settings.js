@@ -40,7 +40,41 @@ function saveSettings(){
             'autoplay' : autoplay
         },
         success : function(data){
+            var $elem = $("#submit-settings-change"),
+                x = 2000,
+                originalColor = $elem.css("color");
+            if(data.response === 'success'){
+                console.log("in here");
+
+
+                $elem.css("color", "#148652");
+                setTimeout(function(){
+                    $elem.css("color", originalColor);
+                }, x);
+            }
+            else{
+                console.log("in err");
+
+
+                $elem.css("color", "#FF4E4C");
+                setTimeout(function(){
+                    $elem.css("color", originalColor);
+                }, x);
+            }
+            getAndDisplaySettings();
+        },
+        error: function(){
+            var $elem = $("#submit-settings-change"),
+                x = 2000,
+                originalColor = $elem.css("color");
+
+            $elem.css("color", "#FF4E4C");
+            setTimeout(function(){
+                $elem.css("color", originalColor);
+            }, x);
+
             getAndDisplaySettings();
         }
+
     })
 }
