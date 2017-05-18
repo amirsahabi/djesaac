@@ -1,6 +1,7 @@
 import unittest
 import constants_testing as ct
-from app import app, databases, constants
+# from app import app, databases, constants
+from app import app, constants, databases
 import logging
 import json
 
@@ -8,12 +9,13 @@ import json
 logging.basicConfig(level=ct.LOG_LEVEL)
 logger = logging.getLogger(__name__)
 
+
 class TestAppMethods(unittest.TestCase):
 
     def setUp(self):
         # create testing app
-        app.config['TESTING'] = True
-        self.app = app.test_client()
+        app.app.config['TESTING'] = True
+        self.app = app.app.test_client()
         # create database relation
         databases.dropTables()
         databases.initTables()
@@ -23,7 +25,8 @@ class TestAppMethods(unittest.TestCase):
 
     def test_get_home_page(self):
         logger.info('test_get_home_page')
-        #test empty get
+
+        # test empty get
         response = self.app.get('/')
         assert response.status == ct.RESPONSE_OK
 
@@ -43,6 +46,20 @@ class TestAppMethods(unittest.TestCase):
         assert response.status == ct.RESPONSE_OK
         assert response_data[constants.RESPONSE] == constants.FAILURE
         assert response_data[constants.ERROR] == constants.UNKNOWN_COMMAND
+
+        # test start/stop request
+        initial_music_playing = app.musicIsPlaying.value
+
+        response = self.app.post('/', data={
+            'command' : constants.START_STOP
+        })
+
+        response_data = json.loads(response.data)
+        assert response.status == ct.RESPONSE_OK
+        assert response_data[constants.RESPONSE] == constants.SUCCESS
+        assert initial_music_playing != app.musicIsPlaying.value
+        assert initial_music_playing == (1 + app.musicIsPlaying.value) % 2
+
 
 
 if __name__ == "__main__":

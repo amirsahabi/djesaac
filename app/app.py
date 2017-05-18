@@ -69,7 +69,7 @@ def home():
                 except:
                     responseData[constants.RESPONSE] = constants.FAILURE
                     responseData[constants.ERROR] = "Failed to remove from database"
-        elif command == "startstop":
+        elif command == constants.START_STOP:
             try:
                 musicIsPlaying.value = (musicIsPlaying.value + 1) % 2
                 responseData[constants.RESPONSE] = constants.SUCCESS

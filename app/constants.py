@@ -25,6 +25,7 @@ ACT_HIST_ADD = 'add'
 ACT_HIST_NEXT = 'next'
 ACT_HIST_REM = 'rem'
 ACT_HIST_PLAY_STOP = 'playstop'
+START_STOP = 'startstop'
 
 DB_NAME = 'djesaac.db'
 DB_PREPROC_PROCESS = 'process'
