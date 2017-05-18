@@ -2,7 +2,7 @@
     display: none;
     position: fixed;
     z-index: 1;
-    padding-top: 100px;
+    padding-top: 85px;
     left: 0;
     top: 0;
     width: 100%;
@@ -12,6 +12,11 @@
 }
 
 .modal-object{
+    webkit-animation-name: animatetop;
+    -webkit-animation-duration: 0.4s;
+    animation-name: animatetop;
+    animation-duration: 0.4s
+    background-color: #262B35;
     width: 50%;
     margin: 0 auto;
 }
@@ -21,12 +26,6 @@
     background-color: #262B35;
     margin: auto;
     padding: 0;
-    width: 80%;
-    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
-    -webkit-animation-name: animatetop;
-    -webkit-animation-duration: 0.4s;
-    animation-name: animatetop;
-    animation-duration: 0.4s
 }
 
 @-webkit-keyframes animatetop {
@@ -40,6 +39,7 @@
 }
 
 .close {
+    padding: 10px;
     color: white;
     float: right;
     font-size: 28px;
@@ -55,7 +55,6 @@
 
 .modal-header {
     padding: 2px 16px;
-    background-color: #5cb85c;
     color: white;
 }
 
@@ -65,7 +64,110 @@
 }
 
 .modal-footer {
-    padding: 2px 16px;
+    padding: 0 26px 20px;
     background: #262B35;
     text-align: center;
+}
+
+/* SETTINGS TABLE STYLING*/
+#settings-table td{
+    border-bottom: 0;
+    color: #DAE2F2;
+}
+#settings-table tr{
+    height:30px;
+}
+#settings-table th:nth-child(1), td:nth-child(1){
+    text-align: right;
+}
+
+#settings-table input{
+    background-color: transparent;
+    border-top: 0;
+    border-left: 0;
+    border-right: 0;
+    border-bottom: 1px solid #96B9CE;
+    font-family: Ubuntu, sans-serif;
+    color: #757980;
+    width: 80%;
+    font-size: 15px;
+}
+
+
+
+/* AUTOPLAY SWITCH */
+.switch-input {
+    display: none;
+}
+.switch-label {
+    position: relative;
+    display: inline-block;
+    min-width: 100px;
+    cursor: pointer;
+    text-align: left;
+}
+.switch-label:before, .switch-label:after {
+    content: "";
+    position: absolute;
+    margin: 0;
+    outline: 0;
+    top: 50%;
+    -ms-transform: translate(0, -50%);
+    -webkit-transform: translate(0, -50%);
+    transform: translate(0, -50%);
+    -webkit-transition: all 0.3s ease;
+    transition: all 0.3s ease;
+}
+.switch-label:before {
+    left: 1px;
+    width: 34px;
+    height: 14px;
+    background-color: #9E9E9E;
+    border-radius: 8px;
+}
+.switch-label:after {
+    left: 0;
+    width: 20px;
+    height: 20px;
+    background-color: #FAFAFA;
+    border-radius: 50%;
+    box-shadow: 0 3px 1px -2px rgba(0, 0, 0, 0.14), 0 2px 2px 0 rgba(0, 0, 0, 0.098), 0 1px 5px 0 rgba(0, 0, 0, 0.084);
+}
+.switch-label .toggle--on {
+    display: none;
+}
+.switch-label .toggle--off {
+    display: inline-block;
+}
+.switch-input:checked + .switch-label:before {
+    background-color: #ffc3a0;
+}
+.switch-input:checked + .switch-label:after {
+    background-color: #FF9A52;
+    -ms-transform: translate(80%, -50%);
+    -webkit-transform: translate(80%, -50%);
+    transform: translate(80%, -50%);
+}
+.switch-input:checked + .switch-label .toggle--on {
+    display: inline-block;
+}
+.switch-input:checked + .switch-label .toggle--off {
+    display: none;
+}
+
+
+
+/* SAVE BUTTON */
+input[type=button] {
+    padding:5px 15px;
+    background: transparent;
+    border:0 none;
+    cursor:pointer;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    font-size: 20px;
+    color: #FF9A52;
+}
+input[type=button]:hover{
+    color: #96B9CE;
 }

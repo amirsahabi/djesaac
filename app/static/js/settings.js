@@ -11,7 +11,7 @@ function getAndDisplaySettings(){
                 $('input#blue-src').val(data.blue.trim());
                 $('input#green-src').val(data.green.trim());
                 $('input#latency').val(data.latency);
-                $('input#autoplay').attr('checked', data.autoplay == true)
+                $('input#autoplay').attr('checked', data.autoplay == true);
                 $('div.modal').css('display', 'block');
             }
         }
