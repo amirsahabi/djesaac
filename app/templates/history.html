@@ -5,6 +5,8 @@
     <script type="text/javascript" src="{{url_for('static', filename='js/jquery-3.2.0.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/history.js')}}"></script>
     <script type="text/javascript" src="{{url_for('static', filename='js/add.js')}}"></script>
+    <script type="text/javascript" src="{{url_for('static', filename='js/settings.js')}}"></script>
+
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Ubuntu" />
     <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Cookie" />
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -48,7 +50,9 @@
                 <a class="nav_link_text" style="padding-left: 0;" href="/">HOME</a>
                 <a class="nav_link_icon" style="padding-left: 0;" href="/"><i class='material-icons gray'>home</i></a>
                 <a class="nav_link_text current" href="">HISTORY</a>
-                <a class="nav_link_icon current" href=""><i class='material-icons blue'>history</i></a>
+                <a class="nav_link_icon current" href=""><i class='material-icons blue'>view_list</i></a>
+                <a class="nav_link_text" id="settings" onclick="getAndDisplaySettings();">SETTINGS</a>
+                <a class="nav_link_icon" id='settings' onclick="getAndDisplaySettings();"><i class='material-icons gray'>settings</i></a>
             </div>
 
             <div id="add_song_container">
@@ -67,6 +71,51 @@
                 <!--</div>-->
             </div>
 
+        </div>
+    </div>
+
+    <div class="modal">
+        <div class="modal-object">
+            <div class="modal-content">
+                <span class="close" onclick="$('div.modal').css('display', 'none');"><i class="material-icons">close</i></span>
+                <h2 style="display: table; position: relative; top: -15px;text-align: center; margin: 0; text-transform: uppercase; color: #757980; font-weight: 100; width: 100%;">settings</h2>
+            </div>
+            <div class="modal-body">
+                <table id="settings-table">
+                    <tbody>
+                    <tr>
+                        <td style="width:25%;">board</td>
+                        <td><input id="board-src"/></td>
+                    </tr>
+                    <tr>
+                        <td>red</td>
+                        <td><input id="red-src"/></td>
+                    </tr>
+                    <tr>
+                        <td>blue</td>
+                        <td><input id="blue-src"/></td>
+                    </tr>
+                    <tr>
+                        <td>green</td>
+                        <td><input id="green-src"/></td>
+                    </tr>
+                    <tr>
+                        <td>latency</td>
+                        <td><input id="latency"/></td>
+                    </tr>
+                    <tr>
+                        <td>autoplay</td>
+                        <td>
+                            <input id="autoplay" type="checkbox"  name="set-name" class="switch-input" />
+                            <label for="autoplay" class="switch-label"></label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <input id="submit-settings-change" type="button" value="SAVE" onclick="saveSettings();"/>
+            </div>
         </div>
     </div>
 
