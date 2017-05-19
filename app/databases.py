@@ -134,7 +134,7 @@ class ActionHistory(Base):
             newAction.oldLink = constants.EMPTY_INPUT
             newAction.eventType = constants.EMPTY_INPUT
             newAction.datetime = datetime.datetime.now()
-            newAction.canBeRemoved = False;
+            newAction.canBeRemoved = False
             newAction.save()
             return newAction.uuid
         except:
@@ -142,7 +142,8 @@ class ActionHistory(Base):
 
     @staticmethod
     def cleanup(thresholdDateTime):
-        ActionHistory.delete().where(ActionHistory.datetime < thresholdDateTime, ActionHistory.canBeRemoved is True).execute()
+        query = ActionHistory.delete().where(ActionHistory.datetime < thresholdDateTime, ActionHistory.canBeRemoved == True)
+        query.execute()
 
     @staticmethod
     def newNextSong(_newTitle, _newID, _newLink, _oldTitle, _oldID, _oldLink):
@@ -169,6 +170,7 @@ class ActionHistory(Base):
             new_action = ActionHistory()
             new_action.uuid = uuid.uuid1()
             new_action.newTitle = constants.EMPTY_INPUT
+            new_action.newLink = constants.EMPTY_INPUT
             new_action.oldTitle = _remTitle
             new_action.oldID = uuid.UUID(_remID)
             new_action.oldLink = _remLink

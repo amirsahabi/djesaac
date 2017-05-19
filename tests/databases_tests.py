@@ -3,7 +3,9 @@ import unittest
 import constants_testing as ct
 import logging
 import uuid
+import datetime
 import os
+import time
 
 logging.basicConfig(level=ct.LOG_LEVEL)
 logger = logging.getLogger(__name__)
@@ -131,6 +133,163 @@ class TestDatabasesMethods(unittest.TestCase):
         # verify has been processed
         response = databases.PreprocessRequest.hasntBeenProcessed(req_id)
         assert response is False
+
+    def test_action_history_valid_startup(self):
+
+        init_obj = databases.ActionHistory.select().get()
+        assert init_obj is not None
+        assert init_obj.newTitle == constants.EMPTY_INPUT
+        assert init_obj.newLink == constants.EMPTY_INPUT
+        assert init_obj.oldTitle == constants.EMPTY_INPUT
+        assert init_obj.oldLink == constants.EMPTY_INPUT
+        assert init_obj.canBeRemoved is False
+
+    def test_action_history_test_new_start_stop(self):
+
+        response = databases.ActionHistory.newPlayStop()
+        assert response != constants.FAILED_UUID_STR
+
+        verify_obj = databases.ActionHistory.select().where(databases.ActionHistory.uuid == response).get()
+        assert verify_obj.uuid == response
+        assert verify_obj.newTitle == constants.EMPTY_INPUT
+        assert verify_obj.newLink == constants.EMPTY_INPUT
+        assert verify_obj.oldTitle == constants.EMPTY_INPUT
+        assert verify_obj.oldLink == constants.EMPTY_INPUT
+        assert verify_obj.eventType == constants.ACT_HIST_PLAY_STOP
+        assert verify_obj.canBeRemoved is True
+
+    def test_action_history_cleanup(self):
+
+        # insert a few elements
+        clear_elements = 3
+        insert_elements = 10
+        for iterator in range(insert_elements):
+            if iterator == clear_elements:
+                clear_datetime = datetime.datetime.now()
+            databases.ActionHistory.newPlayStop()
+
+        # verify there are 10 elements added
+        count = databases.ActionHistory.select().wrapped_count()
+        assert count == insert_elements + 1
+
+        # cleanup
+        databases.ActionHistory.cleanup(clear_datetime)
+        count = databases.ActionHistory.select().wrapped_count()
+        assert count == (insert_elements - clear_elements + 1)
+
+    def test_bad_add_song(self):
+
+        response_one = databases.ActionHistory.newAddSong(None, None, None)
+        response_two = databases.ActionHistory.newAddSong("junk", None, None)
+        response_three = databases.ActionHistory.newAddSong(None, "junk", None)
+        response_four = databases.ActionHistory.newAddSong(None, None, "junk")
+        response_five = databases.ActionHistory.newAddSong(None, "junk", "junk")
+        response_six = databases.ActionHistory.newAddSong("junk", None, "junk")
+        response_seven = databases.ActionHistory.newAddSong("junk", "junk", None)
+
+        assert response_one == constants.FAILED_UUID_STR
+        assert response_two == constants.FAILED_UUID_STR
+        assert response_three == constants.FAILED_UUID_STR
+        assert response_four == constants.FAILED_UUID_STR
+        assert response_five == constants.FAILED_UUID_STR
+        assert response_six == constants.FAILED_UUID_STR
+        assert response_seven == constants.FAILED_UUID_STR
+
+
+    def test_good_add_song(self):
+        use_uuid = str(uuid.uuid1())
+        response_uuid = databases.ActionHistory.newAddSong(ct.VALID_DATABASE_STRING, use_uuid, ct.VALID_DATABASE_STRING)
+
+        assert response_uuid != constants.FAILED_UUID_STR
+
+        response = databases.ActionHistory.select().where(databases.ActionHistory.uuid == response_uuid).get()
+
+        assert str(response.newID) == use_uuid
+        assert response.newTitle == ct.VALID_DATABASE_STRING
+        assert response.newLink == ct.VALID_DATABASE_STRING
+        assert response.oldID is None
+        assert response.oldTitle == constants.EMPTY_INPUT
+        assert response.oldLink == constants.EMPTY_INPUT
+        assert response.eventType == constants.ACT_HIST_ADD
+
+    def test_bad_remove_song(self):
+        response_one = databases.ActionHistory.newRemoveSong(None, None, None)
+        response_two = databases.ActionHistory.newRemoveSong("junk", None, None)
+        response_three = databases.ActionHistory.newRemoveSong(None, "junk", None)
+        response_four = databases.ActionHistory.newRemoveSong(None, None, "junk")
+        response_five = databases.ActionHistory.newRemoveSong(None, "junk", "junk")
+        response_six = databases.ActionHistory.newRemoveSong("junk", None, "junk")
+        response_seven = databases.ActionHistory.newRemoveSong("junk", "junk", None)
+
+        assert response_one == constants.FAILED_UUID_STR
+        assert response_two == constants.FAILED_UUID_STR
+        assert response_three == constants.FAILED_UUID_STR
+        assert response_four == constants.FAILED_UUID_STR
+        assert response_five == constants.FAILED_UUID_STR
+        assert response_six == constants.FAILED_UUID_STR
+        assert response_seven == constants.FAILED_UUID_STR
+
+    def test_good_remove_song(self):
+        use_uuid = str(uuid.uuid1())
+        response_uuid = databases.ActionHistory.newRemoveSong(ct.VALID_DATABASE_STRING, use_uuid, ct.VALID_DATABASE_STRING)
+        assert response_uuid != constants.FAILED_UUID_STR
+
+        response = databases.ActionHistory.select().where(databases.ActionHistory.uuid == response_uuid).get()
+
+        assert response.newID is None
+        assert response.oldTitle == ct.VALID_DATABASE_STRING
+        assert response.oldLink == ct.VALID_DATABASE_STRING
+        assert str(response.oldID) == use_uuid
+        assert response.newTitle == constants.EMPTY_INPUT
+        assert response.newLink == constants.EMPTY_INPUT
+        assert response.eventType == constants.ACT_HIST_REM
+
+    def test_bad_next_song(self):
+
+        responses = []
+        use_items = [None, "junk"]
+        for a in range(2):
+            for b in range(2):
+                for c in range(2):
+                    for d in range(2):
+                        for e in range(2):
+                            for f in range(2):
+                                responses.insert(len(responses),
+                                    databases.ActionHistory.newNextSong(
+                                        use_items[a],
+                                        use_items[b],
+                                        use_items[c],
+                                        use_items[d],
+                                        use_items[e],
+                                        use_items[f]
+                                    )
+                                )
+        for iterator in range(len(responses)):
+            assert responses[iterator] == constants.FAILED_UUID_STR
+
+    def test_good_next_song(self):
+        old_uuid = uuid.uuid1()
+        new_uuid = uuid.uuid1()
+
+        resp_uuid = databases.ActionHistory.newNextSong(ct.VALID_DATABASE_STRING,
+                                                        str(new_uuid),
+                                                        ct.VALID_DATABASE_STRING,
+                                                        ct.VALID_DATABASE_STRING,
+                                                        str(old_uuid),
+                                                        ct.VALID_DATABASE_STRING)
+
+        assert resp_uuid != constants.FAILED_UUID_STR
+        # get the object and validate inputs
+
+        response = databases.ActionHistory.select().where(databases.ActionHistory.uuid == resp_uuid).get()
+        assert str(response.uuid) == resp_uuid
+        assert response.oldLink == ct.VALID_DATABASE_STRING
+        assert response.oldTitle == ct.VALID_DATABASE_STRING
+        assert response.oldID == old_uuid
+        assert response.newLink == ct.VALID_DATABASE_STRING
+        assert response.newLink == ct.VALID_DATABASE_STRING
+        assert response.newID == new_uuid
+        assert response.eventType == constants.ACT_HIST_NEXT
 
 
 if __name__ == "__main__":
