@@ -114,6 +114,7 @@ and (max-device-width : 1024px) {
     font-weight: 400;
     padding-right: 15px;
     font-family: Ubuntu;
+    cursor: pointer;
 
 }
 .nav_link_icon{
@@ -127,6 +128,7 @@ and (max-device-width : 1024px) {
     font-weight: 400;
     padding-right: 15px;
     font-family: Ubuntu;
+    cursor: pointer;
 }
 .nav_link_text.current{
     /*color: #62A69F;*/
