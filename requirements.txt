@@ -1,0 +1,8 @@
+bs4
+flask
+peewee
+youtube_dl
+pyfirmata
+pygame
+pysoundfile
+pydub
