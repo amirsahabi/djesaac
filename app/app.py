@@ -9,8 +9,6 @@ import logging
 import ctypes
 import constants
 import song_utilities
-import signal
-import sys
 
 logging.basicConfig(level=constants.LOG_LEVEL)
 
@@ -32,16 +30,6 @@ monitor = None
 monitorProc = None
 logger = logging.getLogger(__name__)
 # home
-
-
-def killapp(signum, frame):
-    logger.error('Received SIGINT')
-    logger.error('Killing DBMONITOR proc')
-    if monitorProc is not None:
-        monitorProc.terminate()
-    logger.error('Killing APP proc')
-    sys.exit(0)
-
 
 openConnections = []
 
@@ -278,7 +266,6 @@ if __name__ == "__main__":
     databases.initTables()
 
     init_background_procs()
-    signal.signal(signal.SIGINT, killapp)
 
     app.debug = constants.DEBUGMODE
     app.run(threaded=True, port=constants.PORT, host='0.0.0.0', use_reloader=False)
