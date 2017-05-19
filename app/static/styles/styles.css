@@ -115,8 +115,8 @@ and (max-device-width : 1024px) {
     padding-right: 15px;
     font-family: Ubuntu;
     cursor: pointer;
-
 }
+
 .nav_link_icon{
     display: table-cell;
     vertical-align: middle;
@@ -130,6 +130,14 @@ and (max-device-width : 1024px) {
     font-family: Ubuntu;
     cursor: pointer;
 }
+
+.nav_link_text:hover{
+    color: #b5b9c0;
+}
+.nav_link_text:hover{
+    color: #b5b9c0;
+}
+
 .nav_link_text.current{
     /*color: #62A69F;*/
     color: #96B9CE;
@@ -249,9 +257,11 @@ input:focus {
 .material-icons {
     cursor: pointer;
 }
+.material-icons:hover{color: #787b92}
 
 .material-icons.blue { color: #96B9CE; }
 .material-icons.gray { color: #757980; }
+.material-icons.gray:hover{color: #b5b9c0;}
 
 .currently_playing{
     position: relative;
@@ -342,6 +352,10 @@ td {
     font-size: 15px;
     text-decoration: none;
     color: #BABFDB;
+}
+
+#table_link:hover{
+    color: #787b92;
 }
 
 #now_playing{

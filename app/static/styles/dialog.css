@@ -74,10 +74,13 @@
     border-bottom: 0;
     color: #DAE2F2;
 }
+#settings-table td:nth-child(1){
+    text-align: right;
+}
 #settings-table tr{
     height:30px;
 }
-#settings-table th:nth-child(1), td:nth-child(1){
+#settings-table th:nth-child(1){
     text-align: right;
 }
 
