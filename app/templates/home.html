@@ -17,6 +17,9 @@
 <body>
 <div id="nav">
     <div class="nav_container">
+        <div id="logo">
+            dj<mark>esaac</mark>
+        </div>
         <div id="nav_link_container">
             <a class="nav_link_text current" id='home'style="padding-left: 0;" href="/">HOME</a>
             <a class="nav_link_icon current" id='home'style="padding-left: 0;" href="/"><i class='material-icons blue'>home</i></a>
@@ -132,40 +135,40 @@
         </div>
     </div>
 </div>
-
-<div class="currently_playing">
-    <h3 style="margin-bottom: 0; text-transform: uppercase; color: #757980; font-weight: 100;">currently playing</h3>
-    <table>
-        <tr class="tableheaderrow" >
-            <th>#</th>
-            <th>Title</th>
-        </tr>
-        {% if songs|length != 0 %}
+<div class="wrapper">
+    <div class="currently_playing">
+        <h3 style="margin-bottom: 0; text-transform: uppercase; color: #757980; font-weight: 100;">currently playing</h3>
+        <table>
+            <tr class="tableheaderrow" >
+                <th>#</th>
+                <th>Title</th>
+            </tr>
+            {% if songs|length != 0 %}
             {% for i in range(1)%}
             <tr class="tabledatarow">
                 <td class="playstopnextcolumn">
-                {% if musicIsPlaying %}
-                        <i class="material-icons"><span class='play_stop' onclick="startStop()">pause_circle_outline</span></i>
-                {% else %}
-                        <i class="material-icons"><span class='play_stop' onclick="startStop()">play_circle_outline</span></i>
-                {% endif %}
-                <i class="material-icons"><span class='skipsong' onClick='skipSong("{{songs[0].uuid}}")'>skip_next</span></i>
+                    {% if musicIsPlaying %}
+                    <i class="material-icons"><span class='play_stop' onclick="startStop()">pause_circle_outline</span></i>
+                    {% else %}
+                    <i class="material-icons"><span class='play_stop' onclick="startStop()">play_circle_outline</span></i>
+                    {% endif %}
+                    <i class="material-icons"><span class='skipsong' onClick='skipSong("{{songs[0].uuid}}")'>skip_next</span></i>
                 </td>
                 <td class="songtitlecolumn"> <a id=table_link href="{{songs[i].songLink}}">{{songs[i].songTitle}}</a> </td>
             </tr>
             {% endfor %}
-        {% endif %}
-    </table>
-</div>
-<div class="playlist">
-    <h3 style="margin-bottom: 0; text-transform: uppercase; color: #757980; font-weight: 100; ">playlist</h3>
-    <table>
-        <tr class="tableheaderrow">
-            <th>#</th>
-            <th>Title</th>
-            <th></th>
-        </tr>
-        {% if songs|length != 0 %}
+            {% endif %}
+        </table>
+    </div>
+    <div class="playlist">
+        <h3 style="margin-bottom: 0; text-transform: uppercase; color: #757980; font-weight: 100; ">playlist</h3>
+        <table>
+            <tr class="tableheaderrow">
+                <th>#</th>
+                <th>Title</th>
+                <th></th>
+            </tr>
+            {% if songs|length != 0 %}
             {% for i in range(1,songs|length)%}
             <tr class="tabledatarow">
                 <td class="queueindexcolumn">{{loop.index0+1}}</td>
@@ -173,9 +176,11 @@
                 <td class="removebuttoncolumn"><i class="material-icons"><span class='remove' id="{{songs[i].uuid}}" onclick="removeSongFromQueue('{{songs[i].uuid}}')">remove_circle_outline</span></i></td>
             </tr>
             {% endfor %}
-        {% endif %}
-    </table>
+            {% endif %}
+        </table>
+    </div>
 </div>
+
 <div id="footer">
 
 </div>

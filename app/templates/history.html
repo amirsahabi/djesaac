@@ -46,6 +46,9 @@
 
     <div id="nav">
         <div class="nav_container">
+            <div id="logo">
+                dj<mark>esaac</mark>
+            </div>
             <div id="nav_link_container">
                 <a class="nav_link_text" style="padding-left: 0;" href="/">HOME</a>
                 <a class="nav_link_icon" style="padding-left: 0;" href="/"><i class='material-icons gray'>home</i></a>
@@ -119,15 +122,15 @@
         </div>
     </div>
 
-
-    <div class="history">
-        <table>
-            <tr class="tableheaderrow">
-                <th width="35px;">#</th>
-                <th>Title</th>
-                <th width="30px;"></th>
-            </tr>
-            <tbody>
+    <div class="wrapper">
+        <div class="history">
+            <table>
+                <tr class="tableheaderrow">
+                    <th width="35px;">#</th>
+                    <th>Title</th>
+                    <th width="30px;"></th>
+                </tr>
+                <tbody>
                 {% for event in history %}
                 <tr class="tabledatarow" id="{{loop.index0}}">
                     <td class="indexcolumn">{{loop.index0}}</td>
@@ -135,11 +138,13 @@
                     <td class="replaycolumn"><i class="material-icons"><span class='play_stop' onclick="sendReplayRequest('{{event.uuid}}', '{{loop.index0}}')">replay</span></i></td>
                 </tr>
                 {% endfor %}
-            </tbody>
+                </tbody>
 
 
-    </table>
-</div>
+            </table>
+        </div>
+    </div>
+
 
 
 </body>
