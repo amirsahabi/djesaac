@@ -28,32 +28,20 @@ function onSubmit(){
         method: 'POST',
         data: {"link":linkStr},
         success: function(data){
-            if(data.response === 'success'){
-                $("#loadingSongLink").fadeOut(500).promise().done(function(){
-                    $("#add_suc").fadeIn().promise().done(function(){
-                         setTimeout(function () {
-                             $("#add_suc").fadeOut().promise().done(function(){
-                                 document.getElementById("songLink").value = "";
-                                 $('#songLink').removeClass('hide');
-                                 $('#submitButton').removeClass('hide');
-                             });
-
-                         }, 2000);
-                    });
-                });
-
-
-            } else if(data.response === 'failure') {
-                $("#loadingSongLink").fadeOut(500).promise().done(function(){
-                    $("#add_fail").fadeIn().delay(1000).fadeOut().promise().done(function(){
-                        setTimeout(function () {
+            var alert_res = (data.response === 'success' ? $("#add_suc") : $("#add_fail"));
+            $("#loadingSongLink").fadeOut(500).promise().done(function(){
+                alert_res.fadeIn().promise().done(function(){
+                    setTimeout(function () {
+                        alert_res.fadeOut().promise().done(function(){
                             document.getElementById("songLink").value = "";
                             $('#songLink').removeClass('hide');
                             $('#submitButton').removeClass('hide');
-                        }, 500);
-                    });
+                        });
+
+                    }, 2000);
                 });
-            }
+            });
+
             $('#submitButton').attr('disabled', false);
 
         },

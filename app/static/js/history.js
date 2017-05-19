@@ -7,38 +7,25 @@ function sendReplayRequest(songID, rowID){
         method: 'POST',
         data: {"song":songID},
         success: function(data){
-            if(data.response === 'success'){
-                var successAlert = $('<tr class="table_alert_success" id=rowID> <td colspan="4">Successfully added song to playlist</td></tr>');
-                var originalRow = $('<tr class="tabledatarow">'+ $('#'+rowID).html() + '</tr>');
-
-                $('#'+rowID).fadeOut('slow', function(){
-                    successAlert.insertAfter($(this)).hide();
-                    $(this).remove();
-                    successAlert.fadeIn('slow', function(){});
-                    successAlert.delay(1000).fadeOut('slow', function(){
-                        originalRow.insertAfter(successAlert).hide();
-                        successAlert.remove();
-                        originalRow.fadeIn('slow');
-                    });
-
+            var originalRow = $('<tr class="tabledatarow">'+ $('#'+rowID).html() + '</tr>');
+            var successAlert = $('<tr class="table_alert_success" id=rowID> <td colspan="4">Successfully added song to playlist</td></tr>');
+            var errorAlert = $('<tr class="table_alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
+            var alert_rep = (data.response === 'success' ? successAlert : errorAlert);
+            $('#'+rowID).fadeOut('slow', function(){
+                successAlert.insertAfter($(this)).hide();
+                $(this).remove();
+                alert_rep.fadeIn('slow', function(){});
+                alert_rep.delay(1000).fadeOut('slow', function(){
+                    originalRow.insertAfter(alert_rep).hide();
+                    alert_rep.remove();
+                    originalRow.fadeIn('slow');
                 });
-            } else if(data.response === 'failure'){
-                var errorAlert = $('<tr class="table_alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
-                $('#'+rowID).fadeOut('slow', function(){
-                    errorAlert.insertAfter($(this)).hide();
-                    $(this).remove();
-                    errorAlert.fadeIn('slow', function(){});
-                    errorAlert.delay(1000).fadeOut('slow', function(){
-                        originalRow.insertAfter(errorAlert).hide();
-                        errorAlert.remove();
-                        originalRow.fadeIn('slow');
-                    });
 
-                });
-            }
+            });
             $('#'+songID).prop('disabled', false);
         },
         error: function(){
+            var originalRow = $('<tr class="tabledatarow">'+ $('#'+rowID).html() + '</tr>');
             var errorAlert = $('<tr class="table_alert_error" id=rowID> <td colspan="4">Error when adding song to playlist</td></tr>');
             $('#'+rowID).fadeOut('slow', function(){
                 errorAlert.insertAfter($(this)).hide();
@@ -97,15 +84,11 @@ function rearrangeHistoryTable(parameters){
     }
 }
 
-$(function(){
-
-    $(window).on('scroll', function(){
-        if ( ! $(document).scrollTop()){ //top of page
-            $('#nav').removeClass('shadow');
-        }
-        else {
-            $('#nav').addClass('shadow');
-        }
-    });
-
+$(window).on('scroll', function(){
+    if ( ! $(document).scrollTop()){ //top of page
+        $('#nav').removeClass('shadow');
+    }
+    else {
+        $('#nav').addClass('shadow');
+    }
 });

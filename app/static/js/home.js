@@ -158,23 +158,13 @@ function stopPlayChange(parameters){
     }
 }
 
-$(function(){
-
-    $(window).on('scroll', function(){
-        if ( ! $(document).scrollTop()){ //top of page
-            $('#nav').removeClass('shadow');
-        }
-        else {
-            $('#nav').addClass('shadow');
-        }
-    });
-
+$(window).on('scroll', function(){
+    if ( ! $(document).scrollTop()){ //top of page
+        $('#nav').removeClass('shadow');
+    }
+    else {
+        $('#nav').addClass('shadow');
+    }
 });
 
 
-
-$(function(){
-    $("#add").click(function(){
-        $("p").slideDown();
-    });
-});
