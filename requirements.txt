@@ -6,3 +6,5 @@ pyfirmata
 pygame
 pysoundfile
 pydub
+numpy
+requests
