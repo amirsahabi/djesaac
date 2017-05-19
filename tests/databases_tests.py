@@ -5,7 +5,6 @@ import logging
 import uuid
 import datetime
 import os
-import time
 
 logging.basicConfig(level=ct.LOG_LEVEL)
 logger = logging.getLogger(__name__)
@@ -282,7 +281,7 @@ class TestDatabasesMethods(unittest.TestCase):
         # get the object and validate inputs
 
         response = databases.ActionHistory.select().where(databases.ActionHistory.uuid == resp_uuid).get()
-        assert str(response.uuid) == resp_uuid
+        assert response.uuid == resp_uuid
         assert response.oldLink == ct.VALID_DATABASE_STRING
         assert response.oldTitle == ct.VALID_DATABASE_STRING
         assert response.oldID == old_uuid
