@@ -15,7 +15,7 @@ logging.basicConfig(level=constants.LOG_LEVEL)
 # create app
 app = Flask(__name__)
 
-musicIsPlaying = Value('d', 1)
+musicIsPlaying = Value('d', -1)
 songPlaying = Array(ctypes.c_char_p, constants.UUID_LENGTH)
 skipSongRequest = Array(ctypes.c_char_p, constants.UUID_LENGTH)
 arduinoPortLoc = Array(ctypes.c_char_p, constants.ARD_PORT_LENGTH)
@@ -228,15 +228,15 @@ def settings():
             newRedLocation = checkLength(request.form[constants.ARDUINO_RED], constants.ARD_PIN_LENGTH)
             newGreenLocation = checkLength(request.form[constants.ARDUINO_GREEN], constants.ARD_PIN_LENGTH)
             newBlueLocation = checkLength(request.form[constants.ARDUINO_BLUE], constants.ARD_PIN_LENGTH)
-            newLatency = request.form[constants.LATENCY]
-            new_autoplay = request.form[constants.AUTOPLAY]
+            newLatency = float(request.form[constants.LATENCY])
+            new_autoplay = float(str(request.form[constants.AUTOPLAY]) == 'true')
 
             arduinoPortLoc[:] = newBoardLocation[:]
             arduinoRedPin[:] = newRedLocation[:]
             arduinoGreenPin[:] = newGreenLocation[:]
             arduinoBluePin[:] = newBlueLocation[:]
-            latency.value = float(newLatency)
-            autoPlayMusic.value = float(str(new_autoplay) == 'true')
+            latency.value = newLatency
+            autoPlayMusic.value = new_autoplay
 
             responseData[constants.ARDUINO_BOARD] = newBoardLocation
             responseData[constants.ARDUINO_RED] = newRedLocation

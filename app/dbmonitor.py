@@ -67,6 +67,8 @@ class DBMonitor:
             self.greenLoc[:] = constants.PIN_UNINITIALIZED
             self.blueLoc[:] = constants.PIN_UNINITIALIZED
 
+        self.musicIsPlaying.value = 1.0
+
         logger.info("DBMonitor initialized")
 
     def run(self, musicIsPlayingMultiProcVal, songIsPlayingMultiProcVal, skipSongRequestArr, portProcArr, blueProcArr, greenProcArr, redProcArr, latencyProcVal, auto_play_val, threadIssue):

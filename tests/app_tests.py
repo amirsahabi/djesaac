@@ -20,7 +20,12 @@ class TestAppMethods(unittest.TestCase):
         databases.dropTables()
         databases.initTables()
 
+        app.musicIsPlaying.value = -1
         app.init_background_procs()
+
+        # wait for dbmonitor to init
+        while app.musicIsPlaying.value == -1:
+            pass
 
     def tearDown(self):
         app.monitorProc.terminate()
@@ -105,7 +110,7 @@ class TestAppMethods(unittest.TestCase):
         new_blue = set_string
         new_green = set_string
         new_latency = 123.0
-        new_autoplay = 'true' if init_autoplay == 1.0 else 'false'
+        new_autoplay = 'false' if init_autoplay == 1.0 else 'true'
 
         response = self.app.post('/settings/', data={
             constants.ARDUINO_BOARD: new_board,
@@ -123,7 +128,7 @@ class TestAppMethods(unittest.TestCase):
         changed_blue = ''.join(app.arduinoBluePin[:])
         changed_green = ''.join(app.arduinoGreenPin[:])
         changed_latency = app.latency.value
-        changed_autoplay = 'true' if app.autoPlayMusic.value == 1.0 else 'false'
+        changed_autoplay = app.autoPlayMusic.value
 
         assert response.status == ct.RESPONSE_OK
         assert response_data[constants.ARDUINO_BOARD] != init_board
@@ -135,7 +140,7 @@ class TestAppMethods(unittest.TestCase):
         assert response_data[constants.ARDUINO_GREEN] != init_green
         assert response_data[constants.ARDUINO_GREEN] == changed_green
         assert response_data[constants.LATENCY] != init_latency
-        assert response_data[constants.LATENCY] == str(changed_latency)
+        assert response_data[constants.LATENCY] == changed_latency
         assert response_data[constants.AUTOPLAY] != init_autoplay
         assert response_data[constants.AUTOPLAY] == changed_autoplay
 

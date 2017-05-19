@@ -18,6 +18,7 @@ class Base(Model):
     class Meta:
         database = db
 
+
 class History(Base):
     uuid = UUIDField()
     songTitle = CharField()
