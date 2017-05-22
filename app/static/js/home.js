@@ -137,10 +137,13 @@ function removeSongFromQueueFromUpdate(parameters){
             index.text(parseInt(index.text()) - 1);
         } else {
             var songTitle = $(this).find('td.songtitlecolumn');
-            var songlink  = $(this).find('td.songlinkcolumn').find('a');
+            var songlink  = $(this).find('td.songtitlecolumn').find('a');
             var songId    = $(this).find('td.removebuttoncolumn').find('span');
 
-            if(songTitle.text() == parameters.oldTitle && songlink.attr('href') == parameters.oldLink && songId.attr('id') == parameters.oldID){
+            if(songTitle.text().trim() == parameters.oldTitle &&
+                songlink.attr('href') == parameters.oldLink &&
+                songId.attr('id') == parameters.oldID){
+
                 $(this).remove();
                 songFound = true;
             }

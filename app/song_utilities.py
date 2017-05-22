@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 from bs4 import BeautifulSoup as bs
 from pydub import AudioSegment
 from pydub.utils import which
+import datetime
 import requests
 import constants
 import databases
@@ -57,11 +58,18 @@ def addSongToQueue(songLink):
             # get metadata and download song while we're at it
             metadata = ydl.extract_info(songLink, download=True)
 
+            # log
+            logger.info('Finished downloading song, converting to designated format')
+            start_time = datetime.datetime.now()
+
             # convert the song from mp3 to wav for reasons
-            AudioSegment.from_file('./music/'+metadata['id']).export('./music/'+metadata['id']+constants.SONG_FORMAT_EXTENSION, format=constants.SONG_FORMAT)
+            AudioSegment.from_file('./music/'+metadata['id']).export('./music/'+metadata['id']+constants.SONG_FORMAT_EXTENSION, format=constants.SONG_FORMAT, bitrate=constants.SONG_BITRATE)
 
             # remove original
             os.remove('./music/'+metadata['id'])
+
+            # log finished
+            logger.info('Finished converting song in ' + str(datetime.datetime.now() - start_time) + 'seconds')
         else:
             logger.info("Song existed, no need to redownload")
 
