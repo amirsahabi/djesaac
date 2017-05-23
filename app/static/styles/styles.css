@@ -399,5 +399,7 @@ td {
 
 th:nth-child(1), td:nth-child(1) {
     text-align: center;
+    width: 15%;
+    min-width: 90px;
 }
 
