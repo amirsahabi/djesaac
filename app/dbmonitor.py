@@ -237,19 +237,11 @@ class DBMonitor:
         d = 2.0
         s = .01
         for i in range(260, 368, 1):
-            if red:
-                redi = i
-            else:
-                redi = maxval
-            if green:
-                greeni = i
-            else:
-                greeni = maxval
-            if blue:
-                bluei = i
-            else:
-                bluei = maxval
-            self.writeToPinsAndSleep(abs(m.sin(redi/100.0))/d+s, abs(m.sin(greeni/100.0))/d+s, abs(m.sin(bluei/100.0))/d+s, 0.03)
+            iter_red = i if red else maxval
+            iter_green = i if green else maxval
+            iter_blue = i if blue else maxval
+
+            self.writeToPinsAndSleep(abs(m.sin(iter_red/100.0))/d+s, abs(m.sin(iter_green/100.0))/d+s, abs(m.sin(iter_blue/100.0))/d+s, 0.03)
 
     def writeToPinsAndSleep(self, pin1, pin2, pin3, sleepTime):
         if pin1 is not None:
