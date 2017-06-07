@@ -182,6 +182,19 @@ class TestAppMethods(unittest.TestCase):
         assert app.autoPlayMusic.value == init_autoplay
         assert app.latency.value == init_latency
 
+    def test_get_history_page(self):
+        logger.info('test_get_history_page')
+
+        # test empty get
+        response = self.app.get('/history/')
+        assert response.status == ct.RESPONSE_OK
+
+    def test_get_history_page_redirect(self):
+        logger.info('test_get_history_page_redirect')
+
+        response = self.app.get('/history')
+        assert response.status == ct.RESPONSE_MOVED
+
 
 if __name__ == "__main__":
     unittest.main()
