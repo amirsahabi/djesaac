@@ -80,10 +80,9 @@ function reArrangeQueueTable(parameters){
             //no next song, just remove the column
             currentlyPlayingRow.remove();
         } else {
-            //acocomodate next song
+            //accommodate  next song
             currentlyPlayingRow.find('.skipsong').attr('onclick', "skipSong('"+parameters.newID+"')");
-            currentlyPlayingRow.find('.songtitlecolumn').text(parameters.newTitle);
-            currentlyPlayingRow.find('#table_link').attr('href', parameters.newLink);
+            currentlyPlayingRow.find('.songtitlecolumn').html('<a id="table_link" href="'+parameters.newLink+'">'+parameters.newTitle+'</a>');
         }
     }
     var playlistRows = $('.playlist').find('tr.tabledatarow');
