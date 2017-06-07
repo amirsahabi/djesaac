@@ -76,13 +76,13 @@ def addSongToQueue(songLink):
             metadata = ydl.extract_info(songLink, download=False)
 
         # given metadata, log to database
-        songUUID = str(databases.SongInQueue.addSongToQueue('./music/'+metadata['id']+constants.SONG_FORMAT_EXTENSION, metadata['title'], songLink))
+        songUUID = str(databases.SongInQueue.addSongToQueue('./music/'+metadata['id']+constants.SONG_FORMAT_EXTENSION, metadata['title'], songLink, metadata['duration']))
 
         if songUUID != constants.FAILED_UUID_STR:
             # tell the preprocessor in the dbmonitor to preprocess it
             databases.PreprocessRequest.newPreProcessRequest('./music/'+metadata['id']+constants.SONG_FORMAT_EXTENSION, songUUID)
             # add a new action event
-            databases.ActionHistory.newAddSong(metadata['title'], songUUID, songLink)
+            databases.ActionHistory.newAddSong(metadata['title'], songUUID, songLink, metadata['duration'])
         else:
             return songUUID
 

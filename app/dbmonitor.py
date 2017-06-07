@@ -97,7 +97,7 @@ class DBMonitor:
 
                 song = databases.SongInQueue.select().order_by(databases.SongInQueue.dateAdded).get()
                 if ''.join(self.songPlaying[:]) != str(song.uuid) and oldSongTitle != constants.EMPTY_INPUT and oldSongLink != constants.EMPTY_INPUT:
-                    databases.ActionHistory.newNextSong(song.songTitle, str(song.uuid), song.songLink, oldSongTitle, ''.join(self.songPlaying[:]), oldSongLink)
+                    databases.ActionHistory.newNextSong(song.songTitle, str(song.uuid), song.songLink, song.songLength, oldSongTitle, ''.join(self.songPlaying[:]), oldSongLink)
 
                 self.songPlaying[:] = str(song.uuid)
                 oldSongTitle = song.songTitle
@@ -108,13 +108,13 @@ class DBMonitor:
 
                 if self.musicIsPlaying.value == constants.PLAY:
                     # add to History
-                    databases.History.addSongToHistory(song.songTitle, song.songLink, song.songPath)
+                    databases.History.addSongToHistory(song.songTitle, song.songLink, song.songPath, song.songLength)
 
                     # remove song from queue
                     databases.SongInQueue.delete().where(databases.SongInQueue.uuid == song.uuid).execute()
 
             if oldSongTitle != constants.EMPTY_INPUT and oldSongLink != constants.EMPTY_INPUT and self.musicIsPlaying.value == constants.PLAY:
-                databases.ActionHistory.newNextSong(constants.EMPTY_INPUT, None, constants.EMPTY_INPUT, oldSongTitle, ''.join(self.songPlaying[:]), oldSongLink)
+                databases.ActionHistory.newNextSong(constants.EMPTY_INPUT, None, constants.EMPTY_INPUT, None, oldSongTitle, ''.join(self.songPlaying[:]), oldSongLink)
                 oldSongTitle = constants.EMPTY_INPUT
                 oldSongLink = constants.EMPTY_INPUT
                 self.songPlaying[:] = constants.EMPTY_UUID
