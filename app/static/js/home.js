@@ -94,6 +94,9 @@ function reArrangeQueueTable(parameters){
             $(this).find('.queueindexcolumn').text(parseInt(indexNum)-1);
         })
     }
+
+    // remove top song from structure
+    songs.splice(0, 1);
 }
 
 function addNewSongToQueue(parameters){
@@ -122,6 +125,12 @@ function addNewSongToQueue(parameters){
         //newObj.append($('<td><a id="table_link" href="'+parameters.newLink+'">Link</a></td>'));
         table.append(newObj);
     }
+    songs.push({
+        'songLink': parameters.newLink,
+        'songTitle': parameters.newTitle,
+        'songuuid': parameters.newID,
+        'songLength': parameters.newLength
+    });
 }
 
 function removeSongFromQueueFromUpdate(parameters){
@@ -146,6 +155,13 @@ function removeSongFromQueueFromUpdate(parameters){
             }
         }
     });
+
+    for(var i = 0; i < songs.length; i++){
+        if(songs[i].songuuid == parameters.oldID){
+            songs.splice(i, 1);
+            break;
+        }
+    }
 }
 
 function stopPlayChange(parameters){
