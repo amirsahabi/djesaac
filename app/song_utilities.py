@@ -37,9 +37,23 @@ def get_related_video_url(input_url):
     # get list of related links
     related_links = soup.find_all('a', {'class': search_class})
 
-    # get the first TODO: check to see if we've already played the song, if so go to the next song
+    # get the first
     if related_links is not None and len(related_links) > 0:
-        return_link = constants.HTTPS + send_url + related_links[0].get('href')
+        for link in related_links:
+            http_link = constants.HTTP + send_url + link.get('href')
+            https_link = constants.HTTPS + send_url + link.get('href')
+
+            # make sure that link hasn't been already used
+            if(databases.History.select().where(databases.History.songLink == http_link).wrapped_count() > 0 or
+               databases.History.select().where(databases.History.songLink == https_link).wrapped_count() > 0 or
+               databases.SongInQueue.select().where(databases.SongInQueue.songLink == http_link).wrapped_count() > 0 or
+               databases.SongInQueue.select().where(databases.SongInQueue.songLink == https_link).wrapped_count() > 0):
+                continue
+            return_link = constants.HTTPS + send_url + link.get('href')
+
+        if return_link == constants.EMPTY_INPUT:
+            # all the related songs have been played, it's fine just play the first one
+            return_link = constants.HTTPS + send_url + related_links[0].get('href')
 
     return return_link
 
