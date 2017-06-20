@@ -1,0 +1,24 @@
+.ticker {
+    position: relative;
+    width: 250px;
+    height: 12px;
+}
+
+.ticker div {
+    position: absolute;
+    background: black;
+}
+
+.current-time {
+    left: 20px;
+    width: 4px;
+    height: 100%;
+}
+
+.timeline {
+    top: 33%;
+    width: 100%;
+    height: 33%;
+}
+
+/* please see https://jsfiddle.net/pvLbjbmz/ */

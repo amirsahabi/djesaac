@@ -80,10 +80,9 @@ function reArrangeQueueTable(parameters){
             //no next song, just remove the column
             currentlyPlayingRow.remove();
         } else {
-            //acocomodate next song
+            //accommodate  next song
             currentlyPlayingRow.find('.skipsong').attr('onclick', "skipSong('"+parameters.newID+"')");
-            currentlyPlayingRow.find('.songtitlecolumn').text(parameters.newTitle);
-            currentlyPlayingRow.find('#table_link').attr('href', parameters.newLink);
+            currentlyPlayingRow.find('.songtitlecolumn').html('<a id="table_link" href="'+parameters.newLink+'">'+parameters.newTitle+'</a>');
         }
     }
     var playlistRows = $('.playlist').find('tr.tabledatarow');
@@ -95,6 +94,9 @@ function reArrangeQueueTable(parameters){
             $(this).find('.queueindexcolumn').text(parseInt(indexNum)-1);
         })
     }
+
+    // remove top song from structure
+    songs.splice(0, 1);
 }
 
 function addNewSongToQueue(parameters){
@@ -105,11 +107,9 @@ function addNewSongToQueue(parameters){
         var newObj = $('<tr class="tabledatarow"></tr>');
         var count = table.find('tr.tabledatarow').length + 1;
         newObj.append('<td class="queueindexcolumn">'+count+"</td>");
-        newObj.append('<td class="songtitlecolumn">'+parameters.newTitle+"</td>");
-        //var link = $('<a id="table_link" href="'+parameters.newLink+'">Link</a>');
-        //newObj.append($("<td></td>").append(link));
-        var remove = $('<i class="material-icons"><span class="remove" id="'+parameters.newID+'"onclick="removeSongFromQueue("'+parameters.newID+'")">remove_circle_outline</span></i>');
-        newObj.append($("<td></td>").append(remove));
+        newObj.append('<td class="songtitlecolumn">'+'<a id="table_link" href="'+parameters.newLink+'">'+parameters.newTitle+'</a>'+"</td>");
+        var remove = $('<i class="material-icons"><span class="remove" id="'+parameters.newID+'" onclick="removeSongFromQueue(\''+parameters.newID+'\')">remove_circle_outline</span></i>');
+        newObj.append($("<td class=\"removebuttoncolumn\"></td>").append(remove));
         table.append(newObj);
     } else {
         var table = $('.currently_playing').find('table');
@@ -125,6 +125,12 @@ function addNewSongToQueue(parameters){
         //newObj.append($('<td><a id="table_link" href="'+parameters.newLink+'">Link</a></td>'));
         table.append(newObj);
     }
+    songs.push({
+        'songLink': parameters.newLink,
+        'songTitle': parameters.newTitle,
+        'songuuid': parameters.newID,
+        'songLength': parameters.newLength
+    });
 }
 
 function removeSongFromQueueFromUpdate(parameters){
@@ -149,6 +155,13 @@ function removeSongFromQueueFromUpdate(parameters){
             }
         }
     });
+
+    for(var i = 0; i < songs.length; i++){
+        if(songs[i].songuuid == parameters.oldID){
+            songs.splice(i, 1);
+            break;
+        }
+    }
 }
 
 function stopPlayChange(parameters){

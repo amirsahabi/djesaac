@@ -127,11 +127,11 @@ def history():
                 song = databases.History.select().where(databases.History.uuid == songID).get()
                 if os.path.isfile(song.songPath):
                     # file already downloaded, just
-                    newSongUUID = databases.SongInQueue.addSongToQueue(song.songPath, song.songTitle, song.songLink)
+                    newSongUUID = databases.SongInQueue.addSongToQueue(song.songPath, song.songTitle, song.songLink, song.songLength)
                     # needs to be reprocessed
                     databases.PreprocessRequest.newPreProcessRequest(song.songPath, str(newSongUUID))
                     #send update to client
-                    databases.ActionHistory.newAddSong(song.songTitle, str(newSongUUID), song.songLink)
+                    databases.ActionHistory.newAddSong(song.songTitle, str(newSongUUID), song.songLink,  song.songLength)
                 else:
                     newSongUUID = song_utilities.addSongToQueue(song.songLink)
 
@@ -181,6 +181,7 @@ def listener():
                         yield "data: newID: {}\n\n".format(ev.newID if ev.newID is not None else constants.EMPTY_UUID)
                         yield "data: newTitle: {}\n\n".format(ev.newTitle)
                         yield "data: newLink: {}\n\n".format(ev.newLink)
+                        yield "data: newLength: {}\n\n".format(ev.newSongLength)
                         yield "data: oldID: {}\n\n".format(ev.oldID)
                         yield "data: oldLink: {}\n\n".format(ev.oldLink)
                         yield "data: oldTitle: {}\n\n".format(ev.oldTitle)

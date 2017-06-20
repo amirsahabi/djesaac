@@ -24,16 +24,18 @@ class History(Base):
     songTitle = CharField()
     songLink = CharField()
     songPath = CharField()
+    songLength = IntegerField()
     dateTimeFinish = DateTimeField()
 
     @staticmethod
-    def addSongToHistory(title, link, path):
+    def addSongToHistory(title, link, path, length):
         try:
             eventInHistory = History()
             eventInHistory.uuid = uuid.uuid1()
             eventInHistory.songTitle = title
             eventInHistory.songLink = link
             eventInHistory.songPath = path
+            eventInHistory.songLength = length
             eventInHistory.dateTimeFinish = datetime.datetime.now()
             eventInHistory.save()
 
@@ -48,16 +50,18 @@ class SongInQueue(Base):
     songTitle = CharField()
     songLink = CharField()
     songPath = CharField()
+    songLength = IntegerField()
     dateAdded = DateTimeField()
 
     @staticmethod
-    def addSongToQueue(path, title, link):
+    def addSongToQueue(path, title, link, length):
         try:
             newSong = SongInQueue()
             newSong.uuid = uuid.uuid1()
             newSong.songTitle = title
             newSong.songPath = path
             newSong.songLink = link
+            newSong.songLength = length
             newSong.dateAdded = datetime.datetime.now()
             newSong.save()
 
@@ -116,6 +120,7 @@ class ActionHistory(Base):
     newTitle = CharField()
     newID = UUIDField(null=True)
     newLink = CharField()
+    newSongLength = IntegerField(null=True)
     oldTitle = CharField()
     oldID = UUIDField(null=True)
     oldLink = CharField()
@@ -146,7 +151,7 @@ class ActionHistory(Base):
         query.execute()
 
     @staticmethod
-    def newNextSong(_newTitle, _newID, _newLink, _oldTitle, _oldID, _oldLink):
+    def newNextSong(_newTitle, _newID, _newLink, _songLength, _oldTitle, _oldID, _oldLink):
         try:
             new_action = ActionHistory()
             new_action.uuid = uuid.uuid1()
@@ -154,6 +159,7 @@ class ActionHistory(Base):
             if _newID is not None:
                 new_action.newID = uuid.UUID(_newID)
             new_action.newLink = _newLink
+            new_action.newSongLength = _songLength
             new_action.oldTitle = _oldTitle
             new_action.oldID = uuid.UUID(_oldID)
             new_action.oldLink = _oldLink
@@ -182,13 +188,14 @@ class ActionHistory(Base):
             return constants.FAILED_UUID_STR
 
     @staticmethod
-    def newAddSong(_addTitle, _addID, _addLink):
+    def newAddSong(_addTitle, _addID, _addLink, _addLength):
         try:
             new_action = ActionHistory()
             new_action.uuid = uuid.uuid1()
             new_action.newTitle = _addTitle
             new_action.newID = uuid.UUID(_addID)
             new_action.newLink = _addLink
+            new_action.newSongLength = _addLength
             new_action.oldTitle = constants.EMPTY_INPUT
             new_action.oldLink = constants.EMPTY_INPUT
             new_action.datetime = datetime.datetime.now()

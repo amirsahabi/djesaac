@@ -50,6 +50,19 @@
 
 
 <script>
+    var songs = [
+    {% for i in range(0,songs|length) %}
+    {% if i != 0 %}
+    ,
+    {% endif %}
+    {
+        'songLink': '{{songs[i].songLink}}',
+        'songLength': {{songs[i].songLength}},
+        'songTitle': '{{songs[i].songTitle}}',
+        'songuuid': '{{songs[i].uuid}}'
+     }
+    {% endfor %}
+    ];
     var updateEventInProgress = false;
     var updateEventParameters = {};
     $(document).ready(function(){
@@ -154,7 +167,7 @@
                     {% endif %}
                     <i class="material-icons"><span class='skipsong' onClick='skipSong("{{songs[0].uuid}}")'>skip_next</span></i>
                 </td>
-                <td class="songtitlecolumn"> <a id=table_link href="{{songs[i].songLink}}">{{songs[i].songTitle}}</a> </td>
+                <td class="songtitlecolumn"><a id=table_link href="{{songs[i].songLink}}">{{songs[i].songTitle}}</a></td>
             </tr>
             {% endfor %}
             {% endif %}

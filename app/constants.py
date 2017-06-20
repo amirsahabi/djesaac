@@ -50,6 +50,7 @@ YOUTUBE = 'youtube.com'
 SOUNDCLOUD = 'soundcloud.com'
 CONTENT_LINK = 'content-link'
 SIDE_BAR = 'soundBadge__avatarLink'
+HTTP = 'http:/www.'
 HTTPS = 'https://www.'
 
 YDL_OPTIONS = {

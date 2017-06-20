@@ -19,13 +19,13 @@ class TestDatabasesMethods(unittest.TestCase):
     def test_add_bad_song_to_history(self):
 
         # test empty args
-        response_one = databases.History.addSongToHistory(None, None, None)
-        response_two = databases.History.addSongToHistory("junk", None, None)
-        response_three = databases.History.addSongToHistory(None, "junk", None)
-        response_four = databases.History.addSongToHistory(None, None, "junk")
-        response_five = databases.History.addSongToHistory("junk", "junk", None)
-        response_six = databases.History.addSongToHistory("junk", None, "junk")
-        response_seven = databases.History.addSongToHistory(None, "junk", "junk")
+        response_one = databases.History.addSongToHistory(None, None, None, None)
+        response_two = databases.History.addSongToHistory("junk", None, None, None)
+        response_three = databases.History.addSongToHistory(None, "junk", None, None)
+        response_four = databases.History.addSongToHistory(None, None, "junk", None)
+        response_five = databases.History.addSongToHistory("junk", "junk", None, None)
+        response_six = databases.History.addSongToHistory("junk", None, "junk", None)
+        response_seven = databases.History.addSongToHistory(None, "junk", "junk", None)
         assert response_one == constants.FAILED_UUID_STR
         assert response_two == constants.FAILED_UUID_STR
         assert response_three == constants.FAILED_UUID_STR
@@ -36,7 +36,7 @@ class TestDatabasesMethods(unittest.TestCase):
 
     def test_add_good_song_to_history(self):
         # test solid args
-        response = databases.History.addSongToHistory(ct.VALID_DATABASE_STRING, ct.VALID_DATABASE_STRING, ct.VALID_DATABASE_STRING)
+        response = databases.History.addSongToHistory(ct.VALID_DATABASE_STRING, ct.VALID_DATABASE_STRING, ct.VALID_DATABASE_STRING, 2)
         assert response != constants.FAILED_UUID_STR
 
         response_verified = databases.History.select().where(databases.History.uuid == response).get()
@@ -48,13 +48,13 @@ class TestDatabasesMethods(unittest.TestCase):
     def test_add_bad_song_to_queue(self):
 
         # test bad args
-        response_one = databases.SongInQueue.addSongToQueue(None, None, None)
-        response_two = databases.SongInQueue.addSongToQueue("junk", None, None)
-        response_three = databases.SongInQueue.addSongToQueue(None, "junk", None)
-        response_four = databases.SongInQueue.addSongToQueue(None, None, "junk")
-        response_five = databases.SongInQueue.addSongToQueue("junk", "junk", None)
-        response_six = databases.SongInQueue.addSongToQueue("junk", None, "junk")
-        response_seven = databases.SongInQueue.addSongToQueue(None, "junk", "junk")
+        response_one = databases.SongInQueue.addSongToQueue(None, None, None, None)
+        response_two = databases.SongInQueue.addSongToQueue("junk", None, None, None)
+        response_three = databases.SongInQueue.addSongToQueue(None, "junk", None, None)
+        response_four = databases.SongInQueue.addSongToQueue(None, None, "junk", None)
+        response_five = databases.SongInQueue.addSongToQueue("junk", "junk", None, None)
+        response_six = databases.SongInQueue.addSongToQueue("junk", None, "junk", None)
+        response_seven = databases.SongInQueue.addSongToQueue(None, "junk", "junk", None)
 
         assert response_one == constants.FAILED_UUID_STR
         assert response_two == constants.FAILED_UUID_STR
@@ -66,7 +66,7 @@ class TestDatabasesMethods(unittest.TestCase):
 
     def test_add_good_song_to_queue(self):
         # test solid args
-        response = databases.SongInQueue.addSongToQueue(ct.VALID_DATABASE_STRING, ct.VALID_DATABASE_STRING, ct.VALID_DATABASE_STRING)
+        response = databases.SongInQueue.addSongToQueue(ct.VALID_DATABASE_STRING, ct.VALID_DATABASE_STRING, ct.VALID_DATABASE_STRING, 1)
         assert response != constants.FAILED_UUID_STR
 
         response_verified = databases.SongInQueue.select().where(databases.SongInQueue.uuid == response).get()
@@ -178,13 +178,13 @@ class TestDatabasesMethods(unittest.TestCase):
 
     def test_bad_add_song(self):
 
-        response_one = databases.ActionHistory.newAddSong(None, None, None)
-        response_two = databases.ActionHistory.newAddSong("junk", None, None)
-        response_three = databases.ActionHistory.newAddSong(None, "junk", None)
-        response_four = databases.ActionHistory.newAddSong(None, None, "junk")
-        response_five = databases.ActionHistory.newAddSong(None, "junk", "junk")
-        response_six = databases.ActionHistory.newAddSong("junk", None, "junk")
-        response_seven = databases.ActionHistory.newAddSong("junk", "junk", None)
+        response_one = databases.ActionHistory.newAddSong(None, None, None, None)
+        response_two = databases.ActionHistory.newAddSong("junk", None, None, None)
+        response_three = databases.ActionHistory.newAddSong(None, "junk", None, None)
+        response_four = databases.ActionHistory.newAddSong(None, None, "junk", None)
+        response_five = databases.ActionHistory.newAddSong(None, "junk", "junk", None)
+        response_six = databases.ActionHistory.newAddSong("junk", None, "junk", None)
+        response_seven = databases.ActionHistory.newAddSong("junk", "junk", None, None)
 
         assert response_one == constants.FAILED_UUID_STR
         assert response_two == constants.FAILED_UUID_STR
@@ -197,7 +197,7 @@ class TestDatabasesMethods(unittest.TestCase):
 
     def test_good_add_song(self):
         use_uuid = str(uuid.uuid1())
-        response_uuid = databases.ActionHistory.newAddSong(ct.VALID_DATABASE_STRING, use_uuid, ct.VALID_DATABASE_STRING)
+        response_uuid = databases.ActionHistory.newAddSong(ct.VALID_DATABASE_STRING, use_uuid, ct.VALID_DATABASE_STRING, 2)
 
         assert response_uuid != constants.FAILED_UUID_STR
 
@@ -258,6 +258,7 @@ class TestDatabasesMethods(unittest.TestCase):
                                         use_items[a],
                                         use_items[b],
                                         use_items[c],
+                                        1,
                                         use_items[d],
                                         use_items[e],
                                         use_items[f]
@@ -273,6 +274,7 @@ class TestDatabasesMethods(unittest.TestCase):
         resp_uuid = databases.ActionHistory.newNextSong(ct.VALID_DATABASE_STRING,
                                                         str(new_uuid),
                                                         ct.VALID_DATABASE_STRING,
+                                                        1,
                                                         ct.VALID_DATABASE_STRING,
                                                         str(old_uuid),
                                                         ct.VALID_DATABASE_STRING)
