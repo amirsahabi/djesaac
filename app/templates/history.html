@@ -133,7 +133,7 @@
                 <tbody>
                 {% for event in history %}
                 <tr class="tabledatarow" id="{{loop.index0}}">
-                    <td class="indexcolumn">{{loop.index0}}</td>
+                    <td class="indexcolumn">{{loop.index}}</td>
                     <td class="titlecolumn"> <a id=table_link href="{{event.songLink}}">{{event.songTitle}}</a></td>
                     <td class="replaycolumn"><i class="material-icons"><span class='play_stop' onclick="sendReplayRequest('{{event.uuid}}', '{{loop.index0}}')">replay</span></i></td>
                 </tr>

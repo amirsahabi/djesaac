@@ -57,7 +57,7 @@ function rearrangeHistoryTable(parameters){
         newRow.attr('class', 'tabledatarow');
         var indexColumn = $(document.createElement('td'));
         indexColumn.attr('class','indexcolumn');
-        indexColumn.text('0');
+        indexColumn.text('1');
         newRow.append(indexColumn);
         var titleColumn = $(document.createElement('td'));
         titleColumn.attr('class', 'titlecolumn');
